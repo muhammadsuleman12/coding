@@ -1,5 +1,10 @@
 # AI Store Builder — Shopify App (project brief)
 
+## Dev workflow
+Code is written in the cloud session and pushed to branch
+`claude/ai-store-builder-shopify-2o09jy`. Developer's local clone lives in
+`D:\Office\Shopifyapp`; they `git pull` and run `shopify app dev` there.
+
 ## Working agreement
 Developer is new to Shopify app development. Go one step at a time, explain each
 command before it runs, and wait for confirmation of the result before moving on.
@@ -30,7 +35,11 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
 - [x] Distribution: Public (unlisted, install via link)
 - [ ] Theme exemption request (Online Store Protected Scope Exemption): themeCreate,
       themePublish, themeFilesUpsert. Waiting on who submits.
-- [ ] Step 1: install Node 20+, Git, VS Code, Shopify CLI — IN PROGRESS
+- [x] Step 1: tools installed on dev machine (Windows): Node 24, Git, VS Code, Shopify CLI 4.9
+- [x] Step 2: project scaffolded from React Router template, linked to AI Store Builder
+- [x] Step 3 (partial): scopes set; `shopify app dev` runs on dev store asb-test-1.myshopify.com
+      (Optiapps org, empty store). Permissions verified: no customer/order access.
+- Note: Dev Dashboard distribution card still says "Select distribution method".
 - Do NOT request other protected scopes (customer data, orders, subscriptions…).
 
 ## Tech stack
@@ -77,10 +86,10 @@ Embedded + session tokens + latest App Bridge; Web Vitals (LCP<2.5s, CLS<0.1,
 INP<200ms); no Asset API; Polaris; GDPR webhooks; clean uninstall; Billing API if paid.
 
 ## Roadmap
-1. Install tools ← current
+1. Install tools ✓
 2. `shopify app init` (React Router) → `shopify app config link`
-3. Scopes in toml → `shopify app deploy` → `shopify app dev` on a demo store
-4. Export General + Pet bundles
+3. Scopes in toml → `shopify app deploy` → `shopify app dev` on a demo store ✓ (dev done; deploy pending)
+4. Export General + Pet bundles ← current
 5. Importer (worker + queue)
 6. UI screens
 7. Deploy to Fly.io (+ Postgres, Redis, R2)

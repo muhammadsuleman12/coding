@@ -29,3 +29,4 @@ pnpm-lock.yaml
 .react-router/
 
 !.env.example
+app/types/*.schema.json

@@ -5,6 +5,11 @@ import { createReadableStreamFromReadable } from "@react-router/node";
 import { type EntryContext } from "react-router";
 import { isbot } from "isbot";
 import { addDocumentResponseHeaders } from "./shopify.server";
+import { startImportWorker } from "./importer/worker.server";
+
+// Import jobs run in the background of the web process for now; they move to
+// a separate worker process when the app is deployed.
+startImportWorker();
 
 export const streamTimeout = 5000;
 

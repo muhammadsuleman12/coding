@@ -1,0 +1,165 @@
+{
+  "template": "sample",
+  "files": [
+    {
+      "filename": "asb-sample-hero.jpg",
+      "url": "https://burst.shopifycdn.com/photos/laptop-on-desk.jpg",
+      "alt": "Laptop on a desk",
+      "contentType": "IMAGE"
+    }
+  ],
+  "products": [
+    {
+      "handle": "asb-sample-classic-tee",
+      "title": "Classic Tee",
+      "descriptionHtml": "<p>A soft cotton tee for every day.</p>",
+      "vendor": "AI Store Builder Sample",
+      "productType": "Shirts",
+      "tags": ["apparel", "sample"],
+      "images": [
+        {
+          "url": "https://burst.shopifycdn.com/photos/product-photo.jpg",
+          "alt": "Classic Tee"
+        }
+      ],
+      "options": [{ "name": "Size", "values": ["S", "M", "L"] }],
+      "variants": [
+        { "options": { "Size": "S" }, "price": "19.00", "sku": "ASB-TEE-S" },
+        { "options": { "Size": "M" }, "price": "19.00", "sku": "ASB-TEE-M" },
+        {
+          "options": { "Size": "L" },
+          "price": "21.00",
+          "compareAtPrice": "25.00",
+          "sku": "ASB-TEE-L"
+        }
+      ]
+    },
+    {
+      "handle": "asb-sample-laptop-stand",
+      "title": "Laptop Stand",
+      "descriptionHtml": "<p>Aluminium stand that lifts your screen to eye level.</p>",
+      "vendor": "AI Store Builder Sample",
+      "productType": "Accessories",
+      "tags": ["office", "sample"],
+      "images": [
+        {
+          "url": "https://burst.shopifycdn.com/photos/laptop-closeup.jpg",
+          "alt": "Laptop Stand"
+        }
+      ],
+      "variants": [{ "price": "39.00", "sku": "ASB-STAND" }]
+    },
+    {
+      "handle": "asb-sample-desk-mat",
+      "title": "Desk Mat",
+      "descriptionHtml": "<p>A large felt mat for a tidy desk.</p>",
+      "vendor": "AI Store Builder Sample",
+      "productType": "Accessories",
+      "tags": ["office", "sample"],
+      "options": [{ "name": "Color", "values": ["Grey", "Black"] }],
+      "variants": [
+        { "options": { "Color": "Grey" }, "price": "24.00" },
+        { "options": { "Color": "Black" }, "price": "24.00" }
+      ]
+    }
+  ],
+  "collections": [
+    {
+      "handle": "asb-sample-featured",
+      "title": "Featured",
+      "descriptionHtml": "<p>Hand-picked favourites.</p>",
+      "sortOrder": "MANUAL",
+      "products": ["asb-sample-laptop-stand", "asb-sample-classic-tee"]
+    },
+    {
+      "handle": "asb-sample-office",
+      "title": "Office",
+      "descriptionHtml": "<p>Everything for your workspace.</p>",
+      "sortOrder": "ALPHA_ASC",
+      "rules": {
+        "disjunctive": false,
+        "conditions": [
+          { "column": "TAG", "relation": "EQUALS", "condition": "office" }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "handle": "asb-sample-about",
+      "title": "About us",
+      "bodyHtml": "<p>We are a sample store created by AI Store Builder.</p>"
+    },
+    {
+      "handle": "asb-sample-faq",
+      "title": "FAQ",
+      "bodyHtml": "<h3>How long is shipping?</h3><p>3 to 5 business days.</p>"
+    }
+  ],
+  "blogs": [
+    {
+      "handle": "asb-sample-journal",
+      "title": "Journal",
+      "articles": [
+        {
+          "handle": "asb-sample-welcome",
+          "title": "Welcome to our store",
+          "author": "Store Team",
+          "bodyHtml": "<p>This is the first post on our new store.</p>",
+          "tags": ["news"]
+        }
+      ]
+    }
+  ],
+  "policies": [
+    {
+      "type": "REFUND_POLICY",
+      "body": "<p>Returns are accepted within 30 days of delivery.</p>"
+    },
+    {
+      "type": "SHIPPING_POLICY",
+      "body": "<p>Orders ship within 2 business days.</p>"
+    }
+  ],
+  "menus": [
+    {
+      "handle": "main-menu",
+      "title": "Main menu",
+      "items": [
+        { "title": "Home", "type": "FRONTPAGE" },
+        {
+          "title": "Shop",
+          "type": "CATALOG",
+          "items": [
+            {
+              "title": "Featured",
+              "type": "COLLECTION",
+              "ref": "asb-sample-featured"
+            },
+            {
+              "title": "Office",
+              "type": "COLLECTION",
+              "ref": "asb-sample-office"
+            }
+          ]
+        },
+        { "title": "Journal", "type": "BLOG", "ref": "asb-sample-journal" },
+        { "title": "About us", "type": "PAGE", "ref": "asb-sample-about" }
+      ]
+    },
+    {
+      "handle": "footer",
+      "title": "Footer menu",
+      "items": [
+        { "title": "Search", "type": "SEARCH" },
+        { "title": "FAQ", "type": "PAGE", "ref": "asb-sample-faq" },
+        {
+          "title": "Refund policy",
+          "type": "SHOP_POLICY",
+          "ref": "REFUND_POLICY"
+        }
+      ]
+    }
+  ],
+  "redirects": [{ "path": "/pages/about", "target": "/pages/asb-sample-about" }]
+}

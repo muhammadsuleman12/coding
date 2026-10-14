@@ -11,6 +11,7 @@ function getConfig() {
         apiVersion: ApiVersion.October26,
         documents: ["./app/**/*.{js,ts,jsx,tsx}", "./app/.server/**/*.{js,ts,jsx,tsx}"],
         outputDir: "./app/types",
+        enumsAsConst: true,
       }),
     },
   };

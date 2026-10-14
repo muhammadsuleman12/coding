@@ -32,3 +32,24 @@ model Session {
   refreshToken        String?
   refreshTokenExpires DateTime?
 }
+
+// One template import into one shop. The worker claims QUEUED jobs, runs the
+// steps in order and records progress so a crashed or retried job resumes
+// from the first unfinished step.
+model ImportJob {
+  id          String   @id @default(cuid())
+  shop        String
+  template    String
+  status      String   @default("QUEUED") // QUEUED | RUNNING | DONE | FAILED
+  // JSON array of { key, status, message? } in run order
+  steps       String
+  error       String?
+  attempts    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  startedAt   DateTime?
+  finishedAt  DateTime?
+
+  @@index([shop, createdAt])
+  @@index([status, createdAt])
+}

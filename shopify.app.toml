@@ -11,14 +11,13 @@ name = "AI Store Builder"
 #   themes                    themeCreate / themePublish / theme files (needs the theme exemption)
 #   products                  products, variants, collections, product metafield definitions
 #   publications              publish imported products/collections to the Online Store
-#   content                   blogs and articles
-#   online_store_pages        pages
+#   content                   pages, blogs and articles
 #   online_store_navigation   menus and URL redirects
 #   files                     images and other files
 #   metaobjects               metaobject entries
 #   metaobject_definitions    metaobject definitions
 #   legal_policies            shop policies
-scopes = "write_themes,write_products,write_publications,write_content,write_online_store_pages,write_online_store_navigation,write_files,write_metaobjects,write_metaobject_definitions,write_legal_policies"
+scopes = "write_themes,write_products,write_publications,write_content,write_online_store_navigation,write_files,write_metaobjects,write_metaobject_definitions,write_legal_policies"
 optional_scopes = [ ]
 use_legacy_install_flow = false
 

@@ -4,249 +4,225 @@ import type {
   HeadersFunction,
   LoaderFunctionArgs,
 } from "react-router";
-import { useFetcher } from "react-router";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { authenticate } from "../shopify.server";
+import { useFetcher, useLoaderData, useRevalidator } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
+import { authenticate } from "../shopify.server";
+import {
+  createImportJob,
+  latestImportJob,
+  parseSteps,
+  retryImportJob,
+} from "../importer/jobs.server";
+import { STEP_LABELS } from "../importer/steps";
+import type { JobStatus, StepState } from "../importer/steps";
+import { TEMPLATES, isTemplateAvailable } from "../importer/templates.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+  const { session } = await authenticate.admin(request);
+  const job = await latestImportJob(session.shop);
 
-  return null;
-};
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($product: ProductCreateInput!) {
-        productCreate(product: $product) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
-                }
-              }
-            }
-          }
-        }
-      }`,
-    {
-      variables: {
-        product: {
-          title: `${color} Snowboard`,
-        },
-      },
-    },
+  const templates = await Promise.all(
+    TEMPLATES.map(async (t) => ({
+      ...t,
+      available: await isTemplateAvailable(t.id),
+    })),
   );
-  const responseJson = await response.json();
-
-  const product = responseJson.data!.productCreate!.product!;
-  const variantId = product.variants.edges[0]!.node!.id!;
-
-  const variantResponse = await admin.graphql(
-    `#graphql
-    mutation shopifyReactRouterTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-      productVariantsBulkUpdate(productId: $productId, variants: $variants) {
-        productVariants {
-          id
-          price
-          barcode
-          createdAt
-        }
-      }
-    }`,
-    {
-      variables: {
-        productId: product.id,
-        variants: [{ id: variantId, price: "100.00" }],
-      },
-    },
-  );
-
-  const variantResponseJson = await variantResponse.json();
 
   return {
-    product: responseJson!.data!.productCreate!.product,
-    variant:
-      variantResponseJson!.data!.productVariantsBulkUpdate!.productVariants,
+    shop: session.shop,
+    templates,
+    job: job && {
+      id: job.id,
+      template: job.template,
+      status: job.status as JobStatus,
+      steps: parseSteps(job.steps),
+      error: job.error,
+    },
   };
 };
 
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const { session } = await authenticate.admin(request);
+  const form = await request.formData();
+  const intent = form.get("intent");
+
+  if (intent === "retry") {
+    await retryImportJob(session.shop, String(form.get("jobId")));
+    return null;
+  }
+
+  const template = String(form.get("template"));
+  const current = await latestImportJob(session.shop);
+  if (current && ["QUEUED", "RUNNING"].includes(current.status)) {
+    return null;
+  }
+  if (!(await isTemplateAvailable(template))) {
+    throw new Response("Template not available", { status: 400 });
+  }
+  await createImportJob(session.shop, template);
+  return null;
+};
+
 export default function Index() {
-  const fetcher = useFetcher<typeof action>();
+  const { shop, templates, job } = useLoaderData<typeof loader>();
+  const fetcher = useFetcher();
+  const revalidator = useRevalidator();
+  const active = job?.status === "QUEUED" || job?.status === "RUNNING";
+  const submitting = fetcher.state !== "idle";
 
-  const shopify = useAppBridge();
-  const isLoading =
-    ["loading", "submitting"].includes(fetcher.state) &&
-    fetcher.formMethod === "POST";
-
+  // Poll for progress while the import runs.
   useEffect(() => {
-    if (fetcher.data?.product?.id) {
-      shopify.toast.show("Product created");
-    }
-  }, [fetcher.data?.product?.id, shopify]);
+    if (!active) return;
+    const timer = setInterval(() => revalidator.revalidate(), 2000);
+    return () => clearInterval(timer);
+  }, [active, revalidator]);
 
-  const generateProduct = () => fetcher.submit({}, { method: "POST" });
+  const startImport = (template: string) =>
+    fetcher.submit({ intent: "start", template }, { method: "POST" });
 
-  return (
-    <s-page heading="Shopify app template">
-      <s-button slot="primary-action" onClick={generateProduct}>
-        Generate a product
-      </s-button>
-
-      <s-section heading="Congrats on creating a new Shopify app 🎉">
-        <s-paragraph>
-          This embedded app template uses{" "}
-          <s-link
-            href="https://shopify.dev/docs/apps/tools/app-bridge"
-            target="_blank"
-          >
-            App Bridge
-          </s-link>{" "}
-          interface examples like an{" "}
-          <s-link href="/app/additional">additional page in the app nav</s-link>
-          , as well as an{" "}
-          <s-link
-            href="https://shopify.dev/docs/api/admin-graphql"
-            target="_blank"
-          >
-            Admin GraphQL
-          </s-link>{" "}
-          mutation demo, to provide a starting point for app development.
-        </s-paragraph>
-      </s-section>
-      <s-section heading="Get started with products">
-        <s-paragraph>
-          Generate a product with GraphQL and get the JSON output for that
-          product. Learn more about the{" "}
-          <s-link
-            href="https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate"
-            target="_blank"
-          >
-            productCreate
-          </s-link>{" "}
-          mutation in our API references.
-        </s-paragraph>
-        <s-stack direction="inline" gap="base">
+  if (job && (active || job.status === "FAILED" || job.status === "DONE")) {
+    const templateName =
+      templates.find((t) => t.id === job.template)?.name ?? job.template;
+    return (
+      <s-page heading="AI Store Builder">
+        <ImportProgress
+          templateName={templateName}
+          status={job.status}
+          steps={job.steps}
+          error={job.error}
+        />
+        {job.status === "FAILED" && (
           <s-button
-            onClick={generateProduct}
-            {...(isLoading ? { loading: true } : {})}
+            slot="primary-action"
+            onClick={() =>
+              fetcher.submit(
+                { intent: "retry", jobId: job.id },
+                { method: "POST" },
+              )
+            }
+            {...(submitting ? { loading: true } : {})}
           >
-            Generate a product
+            Retry
           </s-button>
-          {fetcher.data?.product && (
-            <s-button
-              onClick={() => {
-                shopify.intents.invoke?.("edit:shopify/Product", {
-                  value: fetcher.data?.product?.id,
-                });
-              }}
-              target="_blank"
-              variant="tertiary"
-            >
-              Edit product
-            </s-button>
-          )}
-        </s-stack>
-        {fetcher.data?.product && (
-          <s-section heading="productCreate mutation">
-            <s-stack direction="block" gap="base">
-              <s-box
-                padding="base"
-                borderWidth="base"
-                borderRadius="base"
-                background="subdued"
+        )}
+        {job.status === "DONE" && (
+          <s-section heading="Your store is ready">
+            <s-stack direction="inline" gap="base">
+              <s-button
+                variant="primary"
+                href={`https://${shop}`}
+                target="_blank"
               >
-                <pre style={{ margin: 0 }}>
-                  <code>{JSON.stringify(fetcher.data.product, null, 2)}</code>
-                </pre>
-              </s-box>
-
-              <s-heading>productVariantsBulkUpdate mutation</s-heading>
-              <s-box
-                padding="base"
-                borderWidth="base"
-                borderRadius="base"
-                background="subdued"
-              >
-                <pre style={{ margin: 0 }}>
-                  <code>{JSON.stringify(fetcher.data.variant, null, 2)}</code>
-                </pre>
-              </s-box>
+                View store
+              </s-button>
+              <s-button href={`https://${shop}/admin/themes`} target="_blank">
+                Customize theme
+              </s-button>
             </s-stack>
           </s-section>
         )}
-      </s-section>
+      </s-page>
+    );
+  }
 
-      <s-section slot="aside" heading="App template specs">
+  return (
+    <s-page heading="AI Store Builder">
+      <s-section heading="Choose a store template">
         <s-paragraph>
-          <s-text>Framework: </s-text>
-          <s-link href="https://reactrouter.com/" target="_blank">
-            React Router
-          </s-link>
+          We copy the template&apos;s products, collections, pages, blog posts,
+          menus and policies into your store. Content you already have is kept.
         </s-paragraph>
-        <s-paragraph>
-          <s-text>Interface: </s-text>
-          <s-link
-            href="https://shopify.dev/docs/api/app-home/using-polaris-components"
-            target="_blank"
-          >
-            Polaris web components
-          </s-link>
-        </s-paragraph>
-        <s-paragraph>
-          <s-text>API: </s-text>
-          <s-link
-            href="https://shopify.dev/docs/api/admin-graphql"
-            target="_blank"
-          >
-            GraphQL
-          </s-link>
-        </s-paragraph>
-        <s-paragraph>
-          <s-text>Database: </s-text>
-          <s-link href="https://www.prisma.io/" target="_blank">
-            Prisma
-          </s-link>
-        </s-paragraph>
-      </s-section>
-
-      <s-section slot="aside" heading="Next steps">
-        <s-unordered-list>
-          <s-list-item>
-            Build an{" "}
-            <s-link
-              href="https://shopify.dev/docs/apps/getting-started/build-app-example"
-              target="_blank"
+        <s-grid
+          gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))"
+          gap="base"
+        >
+          {templates.map((template) => (
+            <s-box
+              key={template.id}
+              padding="base"
+              borderWidth="base"
+              borderRadius="base"
             >
-              example app
-            </s-link>
-          </s-list-item>
-          <s-list-item>
-            Explore Shopify&apos;s API with{" "}
-            <s-link
-              href="https://shopify.dev/docs/apps/tools/graphiql-admin-api"
-              target="_blank"
-            >
-              GraphiQL
-            </s-link>
-          </s-list-item>
-        </s-unordered-list>
+              <s-stack direction="block" gap="small-200">
+                <s-heading>{template.name}</s-heading>
+                <s-paragraph>{template.description}</s-paragraph>
+                {template.available ? (
+                  <s-button
+                    variant="primary"
+                    onClick={() => startImport(template.id)}
+                    {...(submitting ? { loading: true } : {})}
+                  >
+                    Import this template
+                  </s-button>
+                ) : (
+                  <s-badge>Coming soon</s-badge>
+                )}
+              </s-stack>
+            </s-box>
+          ))}
+        </s-grid>
       </s-section>
     </s-page>
   );
+}
+
+function ImportProgress({
+  templateName,
+  status,
+  steps,
+  error,
+}: {
+  templateName: string;
+  status: JobStatus;
+  steps: StepState[];
+  error: string | null;
+}) {
+  const heading =
+    status === "DONE"
+      ? `${templateName} template imported`
+      : status === "FAILED"
+        ? `Import of ${templateName} stopped`
+        : `Importing the ${templateName} template`;
+
+  return (
+    <s-section heading={heading}>
+      {status === "FAILED" && error && (
+        <s-banner tone="critical" heading="Something went wrong">
+          <s-paragraph>{error}</s-paragraph>
+          <s-paragraph>
+            Retry continues from the step that failed. Nothing already imported
+            is duplicated.
+          </s-paragraph>
+        </s-banner>
+      )}
+      <s-stack direction="block" gap="small-200">
+        {steps.map((step) => (
+          <s-stack
+            key={step.key}
+            direction="inline"
+            gap="small-200"
+            alignItems="center"
+          >
+            <StepBadge status={step.status} />
+            <s-text>{STEP_LABELS[step.key]}</s-text>
+          </s-stack>
+        ))}
+      </s-stack>
+    </s-section>
+  );
+}
+
+function StepBadge({ status }: { status: StepState["status"] }) {
+  switch (status) {
+    case "DONE":
+      return <s-badge tone="success">Done</s-badge>;
+    case "RUNNING":
+      return <s-badge tone="info">In progress</s-badge>;
+    case "FAILED":
+      return <s-badge tone="critical">Failed</s-badge>;
+    default:
+      return <s-badge>Waiting</s-badge>;
+  }
 }
 
 export const headers: HeadersFunction = (headersArgs) => {

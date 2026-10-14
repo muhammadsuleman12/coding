@@ -42,7 +42,8 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
 - [x] Privacy compliance webhooks (tested with `shopify app webhook trigger`)
 - [x] Importer v1: files, products, collections (2026-10 `sources`), pages, blogs,
       policies, menus, redirects; ImportJob table + in-process worker; progress UI.
-      Sample bundle (bundles/sample) imports cleanly on asb-test-1.
+      Sample bundle (bundles/sample, images in public/bundles/sample) imports
+      cleanly on asb-test-1 with product images; importer waits for media READY.
 - [ ] Waiting on boss: staff access to the General/Pet demo stores, the "files on
       our server", and whether the theme is a paid Theme Store theme.
 - Note: Dev Dashboard distribution card still says "Select distribution method".

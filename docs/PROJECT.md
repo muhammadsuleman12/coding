@@ -39,6 +39,12 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
 - [x] Step 2: project scaffolded from React Router template, linked to AI Store Builder
 - [x] Step 3 (partial): scopes set; `shopify app dev` runs on dev store asb-test-1.myshopify.com
       (Optiapps org, empty store). Permissions verified: no customer/order access.
+- [x] Privacy compliance webhooks (tested with `shopify app webhook trigger`)
+- [x] Importer v1: files, products, collections (2026-10 `sources`), pages, blogs,
+      policies, menus, redirects; ImportJob table + in-process worker; progress UI.
+      Sample bundle (bundles/sample) imports cleanly on asb-test-1.
+- [ ] Waiting on boss: staff access to the General/Pet demo stores, the "files on
+      our server", and whether the theme is a paid Theme Store theme.
 - Note: Dev Dashboard distribution card still says "Select distribution method".
 - Do NOT request other protected scopes (customer data, orders, subscriptions…).
 
@@ -89,7 +95,7 @@ INP<200ms); no Asset API; Polaris; GDPR webhooks; clean uninstall; Billing API i
 1. Install tools ✓
 2. `shopify app init` (React Router) → `shopify app config link`
 3. Scopes in toml → `shopify app deploy` → `shopify app dev` on a demo store ✓ (dev done; deploy pending)
-4. Export General + Pet bundles ← current
+4. Export General + Pet bundles ← current (blocked on demo store access)
 5. Importer (worker + queue)
 6. UI screens
 7. Deploy to Fly.io (+ Postgres, Redis, R2)
@@ -104,3 +110,11 @@ INP<200ms); no Asset API; Polaris; GDPR webhooks; clean uninstall; Billing API i
 4. Free or paid?
 5. Overwrite existing content, or fresh stores only?
 6. Who submits the exemption form?
+
+## Notes for the next session
+- shopify.dev is allowed in the cloud environment's network settings, but Node
+  can't reach it through the proxy: download the schema with curl
+  (introspection POST to https://shopify.dev/admin-graphql-direct-proxy/2026-10)
+  into app/types/admin-2026-10.schema.json, then `npm run graphql-codegen`.
+- Job queue is a DB-polling worker (app/importer/worker.server.ts) instead of
+  BullMQ/Redis for now; revisit at deploy time.

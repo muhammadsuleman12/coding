@@ -78,5 +78,13 @@
     "overrides": {
       "qs": "^6.16.0"
     }
+  },
+  "allowScripts": {
+    "@parcel/watcher": true,
+    "@prisma/client": true,
+    "@prisma/engines": true,
+    "esbuild": true,
+    "prisma": true,
+    "unrs-resolver": true
   }
 }

@@ -1,9 +1,26 @@
-# This file stores configurations for your Shopify app.
-client_id = ""
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "58a0e997ee1bd53381b27d22937c6f28"
+application_url = "https://example.com"
+embedded = true
+name = "AI Store Builder"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+# write_* scopes include the matching read_* access.
+#   themes                    themeCreate / themePublish / theme files (needs the theme exemption)
+#   products                  products, variants, collections, product metafield definitions
+#   publications              publish imported products/collections to the Online Store
+#   content                   blogs and articles
+#   online_store_pages        pages
+#   online_store_navigation   menus and URL redirects
+#   files                     images and other files
+#   metaobjects               metaobject entries
+#   metaobject_definitions    metaobject definitions
+#   legal_policies            shop policies
+scopes = "write_themes,write_products,write_publications,write_content,write_online_store_pages,write_online_store_navigation,write_files,write_metaobjects,write_metaobject_definitions,write_legal_policies"
+optional_scopes = [ ]
+use_legacy_install_flow = false
 
 [webhooks]
 api_version = "2026-10"
@@ -11,51 +28,12 @@ api_version = "2026-10"
   # Handled by: /app/routes/webhooks.app.uninstalled.tsx
   [[webhooks.subscriptions]]
   uri = "/webhooks/app/uninstalled"
-  topics = ["app/uninstalled"]
+  topics = [ "app/uninstalled" ]
 
   # Handled by: /app/routes/webhooks.app.scopes_update.tsx
   [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
 
-  # Mandatory compliance topic for public apps only
-  # See: https://shopify.dev/docs/apps/build/privacy-law-compliance
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/customers/data_request"
-  # compliance_topics = ["customers/data_request"]
-
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/customers/redact"
-  # compliance_topics = ["customers/redact"]
-
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/shop/redact"
-  # compliance_topics = ["shop/redact"]
-
-# Only receive Events when a variant's price changes and the product status is active.
-# See: https://shopify.dev/docs/apps/build/events-webhooks
-# [events]
-# api_version = "2026-10"
-
-#   [[events.subscription]]
-#   handle = "product-price-change"
-#   topic = "Product"
-#   actions = ["update"]
-#   triggers = ["product.variants.price", "product.variants.compareAtPrice"]
-#   uri = "/webhooks/products/update"
-#   query = """
-#   query product_variant_price_change($productId: ID!, $variantsId: ID!) {
-#     product(id: $productId) {
-#       id
-#       title
-#       status
-#     }
-#     productVariant(id: $variantsId) {
-#       id
-#       title
-#       price
-#       compareAtPrice
-#     }
-#   }
-#   """
-#   query_filter = "product.status:'ACTIVE'"
+[auth]
+redirect_urls = [ ]

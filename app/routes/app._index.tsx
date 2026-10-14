@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type {
   ActionFunctionArgs,
   HeadersFunction,
@@ -69,6 +69,7 @@ export default function Index() {
   const revalidator = useRevalidator();
   const active = job?.status === "QUEUED" || job?.status === "RUNNING";
   const submitting = fetcher.state !== "idle";
+  const [choosingNew, setChoosingNew] = useState(false);
 
   // Poll for progress while the import runs.
   useEffect(() => {
@@ -77,10 +78,12 @@ export default function Index() {
     return () => clearInterval(timer);
   }, [active, revalidator]);
 
-  const startImport = (template: string) =>
+  const startImport = (template: string) => {
+    setChoosingNew(false);
     fetcher.submit({ intent: "start", template }, { method: "POST" });
+  };
 
-  if (job && (active || job.status === "FAILED" || job.status === "DONE")) {
+  if (job && !choosingNew) {
     const templateName =
       templates.find((t) => t.id === job.template)?.name ?? job.template;
     return (
@@ -120,6 +123,14 @@ export default function Index() {
               </s-button>
             </s-stack>
           </s-section>
+        )}
+        {!active && (
+          <s-button
+            slot="secondary-actions"
+            onClick={() => setChoosingNew(true)}
+          >
+            Start a new import
+          </s-button>
         )}
       </s-page>
     );

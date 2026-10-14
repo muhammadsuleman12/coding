@@ -1,7 +1,7 @@
 import type { BundleProduct } from "../bundle";
 import type { StepContext } from "../context.server";
 import { publishToOnlineStore } from "../context.server";
-import { assertNoUserErrors, gql } from "../graphql.server";
+import { assertNoUserErrors, gql, sleep } from "../graphql.server";
 
 // Creates each product with productSet, keyed by handle. Products whose
 // handle already exists are left untouched.
@@ -45,8 +45,60 @@ export async function importProducts(ctx: StepContext) {
     const id = data?.productSet?.product?.id;
     if (!id) throw new Error(`Product ${product.handle} was not created`);
 
+    await waitForMedia(ctx, product.handle, id);
     await publishToOnlineStore(ctx, id);
     ctx.log(`Created product ${product.handle}`);
+  }
+}
+
+const MEDIA_TIMEOUT_MS = 120_000;
+
+// Shopify downloads product images after productSet returns. Wait until they
+// are processed so a broken image URL fails the import instead of leaving a
+// product without photos.
+async function waitForMedia(ctx: StepContext, handle: string, id: string) {
+  const deadline = Date.now() + MEDIA_TIMEOUT_MS;
+  for (;;) {
+    const data = await gql(
+      ctx.admin,
+      `#graphql
+        query importerProductMedia($id: ID!) {
+          product(id: $id) {
+            media(first: 250) {
+              nodes {
+                alt
+                status
+                mediaErrors {
+                  message
+                  details
+                }
+              }
+            }
+          }
+        }`,
+      { id },
+    );
+    const media = data?.product?.media.nodes ?? [];
+
+    const failed = media.filter((m) => m.status === "FAILED");
+    if (failed.length > 0) {
+      const reasons = failed
+        .map((m) => {
+          const error = m.mediaErrors[0];
+          const reason = error
+            ? error.details || error.message
+            : "unknown error";
+          return `${m.alt || "image"}: ${reason}`;
+        })
+        .join("; ");
+      throw new Error(`Product ${handle} images failed: ${reasons}`);
+    }
+    if (media.every((m) => m.status === "READY")) return;
+
+    if (Date.now() > deadline) {
+      throw new Error(`Product ${handle} images are still processing`);
+    }
+    await sleep(2000);
   }
 }
 

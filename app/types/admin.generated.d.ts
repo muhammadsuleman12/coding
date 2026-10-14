@@ -75,6 +75,28 @@ export type ImporterCreateFileMutationVariables = AdminTypes.Exact<{
 
 export type ImporterCreateFileMutation = { fileCreate?: AdminTypes.Maybe<{ files?: AdminTypes.Maybe<Array<Pick<AdminTypes.ExternalVideo, 'id'> | Pick<AdminTypes.GenericFile, 'id'> | Pick<AdminTypes.MediaImage, 'id'> | Pick<AdminTypes.Model3d, 'id'> | Pick<AdminTypes.Video, 'id'>>>, userErrors: Array<Pick<AdminTypes.FilesUserError, 'field' | 'message'>> }> };
 
+export type ImporterFileStatusQueryVariables = AdminTypes.Exact<{
+  ids: Array<AdminTypes.Scalars['ID']['input']> | AdminTypes.Scalars['ID']['input'];
+}>;
+
+
+export type ImporterFileStatusQuery = { nodes: Array<AdminTypes.Maybe<(
+    Pick<AdminTypes.ExternalVideo, 'fileStatus'>
+    & { fileErrors: Array<Pick<AdminTypes.FileError, 'message' | 'details'>> }
+  ) | (
+    Pick<AdminTypes.GenericFile, 'fileStatus'>
+    & { fileErrors: Array<Pick<AdminTypes.FileError, 'message' | 'details'>> }
+  ) | (
+    Pick<AdminTypes.MediaImage, 'fileStatus'>
+    & { fileErrors: Array<Pick<AdminTypes.FileError, 'message' | 'details'>> }
+  ) | (
+    Pick<AdminTypes.Model3d, 'fileStatus'>
+    & { fileErrors: Array<Pick<AdminTypes.FileError, 'message' | 'details'>> }
+  ) | (
+    Pick<AdminTypes.Video, 'fileStatus'>
+    & { fileErrors: Array<Pick<AdminTypes.FileError, 'message' | 'details'>> }
+  )>> };
+
 export type ImporterMenusQueryVariables = AdminTypes.Exact<{ [key: string]: never; }>;
 
 
@@ -152,6 +174,25 @@ export type ImporterSetProductMutationVariables = AdminTypes.Exact<{
 
 export type ImporterSetProductMutation = { productSet?: AdminTypes.Maybe<{ product?: AdminTypes.Maybe<Pick<AdminTypes.Product, 'id'>>, userErrors: Array<Pick<AdminTypes.ProductSetUserError, 'field' | 'message'>> }> };
 
+export type ImporterProductMediaQueryVariables = AdminTypes.Exact<{
+  id: AdminTypes.Scalars['ID']['input'];
+}>;
+
+
+export type ImporterProductMediaQuery = { product?: AdminTypes.Maybe<{ media: { nodes: Array<(
+        Pick<AdminTypes.ExternalVideo, 'alt' | 'status'>
+        & { mediaErrors: Array<Pick<AdminTypes.MediaError, 'message' | 'details'>> }
+      ) | (
+        Pick<AdminTypes.MediaImage, 'alt' | 'status'>
+        & { mediaErrors: Array<Pick<AdminTypes.MediaError, 'message' | 'details'>> }
+      ) | (
+        Pick<AdminTypes.Model3d, 'alt' | 'status'>
+        & { mediaErrors: Array<Pick<AdminTypes.MediaError, 'message' | 'details'>> }
+      ) | (
+        Pick<AdminTypes.Video, 'alt' | 'status'>
+        & { mediaErrors: Array<Pick<AdminTypes.MediaError, 'message' | 'details'>> }
+      )> } }> };
+
 export type ImporterFindRedirectQueryVariables = AdminTypes.Exact<{
   query: AdminTypes.Scalars['String']['input'];
 }>;
@@ -172,12 +213,14 @@ interface GeneratedQueryTypes {
   "#graphql\n        query importerFindCollection($handle: String!) {\n          collectionByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindCollectionQuery, variables: ImporterFindCollectionQueryVariables},
   "#graphql\n        query importerFindCollectionProduct($handle: String!) {\n          productByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindCollectionProductQuery, variables: ImporterFindCollectionProductQueryVariables},
   "#graphql\n        query importerFindFile($query: String!) {\n          files(first: 1, query: $query) {\n            nodes {\n              id\n            }\n          }\n        }": {return: ImporterFindFileQuery, variables: ImporterFindFileQueryVariables},
+  "#graphql\n        query importerFileStatus($ids: [ID!]!) {\n          nodes(ids: $ids) {\n            ... on File {\n              fileStatus\n              fileErrors {\n                message\n                details\n              }\n            }\n          }\n        }": {return: ImporterFileStatusQuery, variables: ImporterFileStatusQueryVariables},
   "#graphql\n      query importerMenus {\n        menus(first: 100) {\n          nodes {\n            id\n            handle\n            isDefault\n          }\n        }\n      }": {return: ImporterMenusQuery, variables: ImporterMenusQueryVariables},
   "#graphql\n        query importerMenuCollection($handle: String!) {\n          collectionByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterMenuCollectionQuery, variables: ImporterMenuCollectionQueryVariables},
   "#graphql\n        query importerMenuProduct($handle: String!) {\n          productByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterMenuProductQuery, variables: ImporterMenuProductQueryVariables},
   "#graphql\n      query importerFindPage($query: String!) {\n        pages(first: 1, query: $query) {\n          nodes {\n            id\n            handle\n          }\n        }\n      }": {return: ImporterFindPageQuery, variables: ImporterFindPageQueryVariables},
   "#graphql\n      query importerPolicies {\n        shop {\n          shopPolicies {\n            id\n            type\n            body\n          }\n        }\n      }": {return: ImporterPoliciesQuery, variables: ImporterPoliciesQueryVariables},
   "#graphql\n        query importerFindProduct($handle: String!) {\n          productByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindProductQuery, variables: ImporterFindProductQueryVariables},
+  "#graphql\n        query importerProductMedia($id: ID!) {\n          product(id: $id) {\n            media(first: 250) {\n              nodes {\n                alt\n                status\n                mediaErrors {\n                  message\n                  details\n                }\n              }\n            }\n          }\n        }": {return: ImporterProductMediaQuery, variables: ImporterProductMediaQueryVariables},
   "#graphql\n        query importerFindRedirect($query: String!) {\n          urlRedirects(first: 1, query: $query) {\n            nodes {\n              path\n            }\n          }\n        }": {return: ImporterFindRedirectQuery, variables: ImporterFindRedirectQueryVariables},
 }
 

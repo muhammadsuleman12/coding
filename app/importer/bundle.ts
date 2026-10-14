@@ -1,6 +1,8 @@
 // The template bundle format: everything the importer copies into a store.
 // Exported once per template store (bundles/<template>/content.json) and
 // referenced by handle, never by ID, so it can be replayed into any shop.
+// Image and file URLs are absolute, or relative to BUNDLE_ASSET_BASE_URL
+// (defaults to the app's own URL, which serves public/).
 
 export interface Bundle {
   template: string;

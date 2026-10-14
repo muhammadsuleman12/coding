@@ -3,8 +3,8 @@
   "files": [
     {
       "filename": "asb-sample-hero.jpg",
-      "url": "https://burst.shopifycdn.com/photos/laptop-on-desk.jpg",
-      "alt": "Laptop on a desk",
+      "url": "bundles/sample/hero.jpg",
+      "alt": "Sample hero banner",
       "contentType": "IMAGE"
     }
   ],
@@ -18,16 +18,35 @@
       "tags": ["apparel", "sample"],
       "images": [
         {
-          "url": "https://burst.shopifycdn.com/photos/product-photo.jpg",
+          "url": "bundles/sample/classic-tee.jpg",
           "alt": "Classic Tee"
         }
       ],
-      "options": [{ "name": "Size", "values": ["S", "M", "L"] }],
-      "variants": [
-        { "options": { "Size": "S" }, "price": "19.00", "sku": "ASB-TEE-S" },
-        { "options": { "Size": "M" }, "price": "19.00", "sku": "ASB-TEE-M" },
+      "options": [
         {
-          "options": { "Size": "L" },
+          "name": "Size",
+          "values": ["S", "M", "L"]
+        }
+      ],
+      "variants": [
+        {
+          "options": {
+            "Size": "S"
+          },
+          "price": "19.00",
+          "sku": "ASB-TEE-S"
+        },
+        {
+          "options": {
+            "Size": "M"
+          },
+          "price": "19.00",
+          "sku": "ASB-TEE-M"
+        },
+        {
+          "options": {
+            "Size": "L"
+          },
           "price": "21.00",
           "compareAtPrice": "25.00",
           "sku": "ASB-TEE-L"
@@ -43,11 +62,16 @@
       "tags": ["office", "sample"],
       "images": [
         {
-          "url": "https://burst.shopifycdn.com/photos/laptop-closeup.jpg",
+          "url": "bundles/sample/laptop-stand.jpg",
           "alt": "Laptop Stand"
         }
       ],
-      "variants": [{ "price": "39.00", "sku": "ASB-STAND" }]
+      "variants": [
+        {
+          "price": "39.00",
+          "sku": "ASB-STAND"
+        }
+      ]
     },
     {
       "handle": "asb-sample-desk-mat",
@@ -56,10 +80,37 @@
       "vendor": "AI Store Builder Sample",
       "productType": "Accessories",
       "tags": ["office", "sample"],
-      "options": [{ "name": "Color", "values": ["Grey", "Black"] }],
+      "options": [
+        {
+          "name": "Color",
+          "values": ["Grey", "Black"]
+        }
+      ],
       "variants": [
-        { "options": { "Color": "Grey" }, "price": "24.00" },
-        { "options": { "Color": "Black" }, "price": "24.00" }
+        {
+          "options": {
+            "Color": "Grey"
+          },
+          "price": "24.00",
+          "imageIndex": 0
+        },
+        {
+          "options": {
+            "Color": "Black"
+          },
+          "price": "24.00",
+          "imageIndex": 1
+        }
+      ],
+      "images": [
+        {
+          "url": "bundles/sample/desk-mat-grey.jpg",
+          "alt": "Desk Mat in grey"
+        },
+        {
+          "url": "bundles/sample/desk-mat-black.jpg",
+          "alt": "Desk Mat in black"
+        }
       ]
     }
   ],
@@ -79,7 +130,11 @@
       "rules": {
         "disjunctive": false,
         "conditions": [
-          { "column": "TAG", "relation": "EQUALS", "condition": "office" }
+          {
+            "column": "TAG",
+            "relation": "EQUALS",
+            "condition": "office"
+          }
         ]
       }
     }
@@ -126,7 +181,10 @@
       "handle": "main-menu",
       "title": "Main menu",
       "items": [
-        { "title": "Home", "type": "FRONTPAGE" },
+        {
+          "title": "Home",
+          "type": "FRONTPAGE"
+        },
         {
           "title": "Shop",
           "type": "CATALOG",
@@ -143,16 +201,31 @@
             }
           ]
         },
-        { "title": "Journal", "type": "BLOG", "ref": "asb-sample-journal" },
-        { "title": "About us", "type": "PAGE", "ref": "asb-sample-about" }
+        {
+          "title": "Journal",
+          "type": "BLOG",
+          "ref": "asb-sample-journal"
+        },
+        {
+          "title": "About us",
+          "type": "PAGE",
+          "ref": "asb-sample-about"
+        }
       ]
     },
     {
       "handle": "footer",
       "title": "Footer menu",
       "items": [
-        { "title": "Search", "type": "SEARCH" },
-        { "title": "FAQ", "type": "PAGE", "ref": "asb-sample-faq" },
+        {
+          "title": "Search",
+          "type": "SEARCH"
+        },
+        {
+          "title": "FAQ",
+          "type": "PAGE",
+          "ref": "asb-sample-faq"
+        },
         {
           "title": "Refund policy",
           "type": "SHOP_POLICY",
@@ -161,5 +234,10 @@
       ]
     }
   ],
-  "redirects": [{ "path": "/pages/about", "target": "/pages/asb-sample-about" }]
+  "redirects": [
+    {
+      "path": "/pages/about",
+      "target": "/pages/asb-sample-about"
+    }
+  ]
 }

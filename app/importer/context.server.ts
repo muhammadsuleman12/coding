@@ -7,6 +7,7 @@ export interface StepContext {
   bundle: Bundle;
   log: (message: string) => void;
   onlineStorePublicationId: () => Promise<string>;
+  assetUrl: (url: string) => string;
 }
 
 export function createContext(
@@ -23,7 +24,19 @@ export function createContext(
     // channel we publish them to.
     onlineStorePublicationId: () =>
       (publicationId ??= findOnlineStorePublication(admin)),
+    assetUrl,
   };
+}
+
+// Bundle files may use paths relative to where bundle assets are hosted
+// (e.g. "bundles/sample/hero.jpg"). Shopify downloads them from that host,
+// which defaults to the app itself (its public/ folder).
+function assetUrl(url: string) {
+  if (/^https?:\/\//.test(url)) return url;
+  const base =
+    process.env.BUNDLE_ASSET_BASE_URL || process.env.SHOPIFY_APP_URL || "";
+  if (!base) throw new Error(`No base URL to resolve asset ${url}`);
+  return `${base.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
 }
 
 async function findOnlineStorePublication(admin: Admin) {

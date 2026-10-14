@@ -36,7 +36,7 @@ export async function importProducts(ctx: StepContext) {
             }
           }
         }`,
-      { input: toProductSetInput(product) },
+      { input: toProductSetInput(ctx, product) },
     );
     assertNoUserErrors(
       `Product ${product.handle}`,
@@ -102,10 +102,10 @@ async function waitForMedia(ctx: StepContext, handle: string, id: string) {
   }
 }
 
-function toProductSetInput(product: BundleProduct) {
+function toProductSetInput(ctx: StepContext, product: BundleProduct) {
   const images = product.images ?? [];
   const files = images.map((image) => ({
-    originalSource: image.url,
+    originalSource: ctx.assetUrl(image.url),
     alt: image.alt,
     contentType: "IMAGE" as const,
   }));

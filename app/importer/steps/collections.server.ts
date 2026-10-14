@@ -45,7 +45,10 @@ export async function importCollections(ctx: StepContext) {
           templateSuffix: collection.templateSuffix,
           seo: collection.seo,
           image: collection.image
-            ? { src: collection.image.url, altText: collection.image.alt }
+            ? {
+                src: ctx.assetUrl(collection.image.url),
+                altText: collection.image.alt,
+              }
             : undefined,
           sources: await toSources(ctx, collection),
         },

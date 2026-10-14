@@ -69,7 +69,10 @@ export async function importBlogs(ctx: StepContext) {
             templateSuffix: article.templateSuffix,
             isPublished: article.published ?? true,
             image: article.image
-              ? { url: article.image.url, altText: article.image.alt }
+              ? {
+                  url: ctx.assetUrl(article.image.url),
+                  altText: article.image.alt,
+                }
               : undefined,
           },
         },

@@ -38,7 +38,7 @@ export async function importFiles(ctx: StepContext) {
       {
         files: [
           {
-            originalSource: file.url,
+            originalSource: ctx.assetUrl(file.url),
             filename: file.filename,
             alt: file.alt,
             contentType: file.contentType,

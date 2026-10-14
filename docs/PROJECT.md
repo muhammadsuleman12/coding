@@ -1,0 +1,97 @@
+# AI Store Builder — Shopify App (project brief)
+
+## Working agreement
+Developer is new to Shopify app development. Go one step at a time, explain each
+command before it runs, and wait for confirmation of the result before moving on.
+Give exact click-by-click instructions for anything done in a browser.
+
+## What the app does
+Public (unlisted) Shopify app that copies a complete pre-built template store into a
+merchant's store: theme, products, collections, pages, blogs, menus, files,
+metafields/metaobjects, policies and settings.
+
+Flow:
+1. Customer picks a template (General, Pet, …) on the client's site and installs the app.
+2. App imports all content in a background job.
+3. App installs the matching theme (unpublished), links content, then publishes it.
+4. Merchant sees a progress screen, then a "store ready" screen.
+
+Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
+
+## Template stores (source data)
+- General: https://new-eph-general-demo.myshopify.com/
+- Pet: https://new-eph-pet-demo.myshopify.com/
+- Storefront password lives in `.env` only — never commit it.
+- 3 demo/dev stores available for testing.
+
+## Status
+- [x] Joined client's Partner org (Optiapps)
+- [x] App "AI Store Builder" created in Dev Dashboard (versions -1, -2, unconfigured)
+- [x] Distribution: Public (unlisted, install via link)
+- [ ] Theme exemption request (Online Store Protected Scope Exemption): themeCreate,
+      themePublish, themeFilesUpsert. Waiting on who submits.
+- [ ] Step 1: install Node 20+, Git, VS Code, Shopify CLI — IN PROGRESS
+- Do NOT request other protected scopes (customer data, orders, subscriptions…).
+
+## Tech stack
+- Shopify app template: React Router + TypeScript, Polaris web components, App Bridge,
+  session-token auth, embedded
+- GraphQL Admin API only (no REST Asset API)
+- Postgres + Prisma (sessions, installs, import jobs)
+- BullMQ + Redis (Upstash) — imports run in a worker, never in a web request
+- Cloudflare R2 for template bundles (theme.zip must be fetchable by themeCreate)
+- Fly.io: web + worker processes
+
+## Access scopes (verify each against current docs; remove unused)
+read_themes, write_themes, read_products, write_products, write_content,
+write_online_store_pages, write_online_store_navigation, write_files,
+write_publications, write_metaobjects, write_metaobject_definitions, write_legal_policies
+
+## Architecture
+### Export (once per template)
+- Theme: `shopify theme pull --store <demo> --path bundles/<template>/theme`, zip
+- Content script (Admin GraphQL) → `bundles/<template>/content.json`
+- Upload bundles to R2
+
+### Import (per install) — order matters
+1. Files/images (keep filenames)
+2. Metafield + metaobject definitions
+3. Products (`productSet`, same handles, throttle by query cost)
+4. Collections (same handles)
+5. Pages, blogs, articles
+6. Menus (`menuCreate`) with old→new ID remap
+7. Metafield/metaobject values, policies, redirects
+8. `themeCreate` (unpublished) → patch settings → `themePublish` after confirmation
+
+Rules: same handles/filenames; keep old→new ID map; idempotent and resumable;
+never touch the merchant's existing theme; no storefront scripts. Until the
+exemption is approved, test the theme step with `shopify theme push`.
+
+## UI
+1. Template picker (preselect via `?template=`)
+2. Import progress (polls job status)
+3. Done (view store / customize theme)
+
+## Built for Shopify from day one
+Embedded + session tokens + latest App Bridge; Web Vitals (LCP<2.5s, CLS<0.1,
+INP<200ms); no Asset API; Polaris; GDPR webhooks; clean uninstall; Billing API if paid.
+
+## Roadmap
+1. Install tools ← current
+2. `shopify app init` (React Router) → `shopify app config link`
+3. Scopes in toml → `shopify app deploy` → `shopify app dev` on a demo store
+4. Export General + Pet bundles
+5. Importer (worker + queue)
+6. UI screens
+7. Deploy to Fly.io (+ Postgres, Redis, R2)
+8. Switch theme step to themeCreate after exemption
+9. Test on all 3 demo stores
+10. Compliance webhooks, billing, listing, review
+
+## Open questions for the client
+1. Demo themes custom-built or Theme Store? (paid themes need per-store license)
+2. How does checkout pass the chosen template? (link param vs in-app picker)
+3. What does "better" include? (AI copy, brand colors, logo upload…)
+4. Free or paid?
+5. Overwrite existing content, or fresh stores only?
+6. Who submits the exemption form?

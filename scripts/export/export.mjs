@@ -283,6 +283,27 @@ function cleanSeo(seo) {
   };
 }
 
+// Filenames the theme references as shopify://shop_images/<filename>.
+function themeImageRefs(themeDir) {
+  const refs = new Set();
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (/\.(json|liquid)$/.test(entry.name)) {
+        const text = fs.readFileSync(full, "utf8");
+        for (const m of text.matchAll(
+          /shopify:\/\/shop_images\/([^"\\\s]+)/g,
+        )) {
+          refs.add(decodeURIComponent(m[1]));
+        }
+      }
+    }
+  };
+  walk(themeDir);
+  return refs;
+}
+
 function stripQuery(url) {
   return url.split("?")[0];
 }
@@ -479,17 +500,34 @@ async function main() {
   }));
   console.log(`  redirects: ${bundle.redirects.length}`);
 
-  // Files uploaded under Content > Files (the theme references these by
-  // filename). Product images are copied with their products instead.
+  // Files uploaded under Content > Files. The theme references these as
+  // shopify://shop_images/<filename>. Once the theme has been pulled into
+  // bundles/<template>/theme, only files it (or page/article HTML) uses are
+  // kept; stores accumulate many unused uploads. --all-files keeps them all.
+  const themeDir = path.join(repoRoot, "bundles", args.template, "theme");
+  const referenced = fs.existsSync(themeDir)
+    ? themeImageRefs(themeDir)
+    : undefined;
+  const contentHtml = JSON.stringify([bundle.pages, bundle.blogs]);
+
   bundle.files = [];
   const seenFilenames = new Set();
   for (const file of skip.has("files") ? [] : await fetchAll("files")) {
     const url = file.image?.url ?? file.url;
-    if (!url || productImageUrls.has(stripQuery(url))) continue;
+    if (!url) continue;
     const filename = decodeURIComponent(
       path.posix.basename(new URL(url).pathname),
     );
     if (seenFilenames.has(filename)) continue;
+
+    const used =
+      referenced?.has(filename) || contentHtml.includes(stripQuery(url));
+    const keep =
+      referenced && !args["all-files"]
+        ? used
+        : used || !productImageUrls.has(stripQuery(url));
+    if (!keep) continue;
+
     seenFilenames.add(filename);
     bundle.files.push({
       filename,
@@ -497,6 +535,18 @@ async function main() {
       alt: file.alt || undefined,
       contentType: file.image ? "IMAGE" : "FILE",
     });
+  }
+  for (const filename of referenced ?? []) {
+    if (!seenFilenames.has(filename)) {
+      warn(
+        `Theme references shop_images/${filename}, which is not in the store's files`,
+      );
+    }
+  }
+  if (!referenced) {
+    warn(
+      "No theme in bundles/<template>/theme yet; exported all uploaded files",
+    );
   }
   console.log(`  files: ${bundle.files.length}`);
 

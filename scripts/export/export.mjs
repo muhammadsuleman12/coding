@@ -9,7 +9,7 @@
 // and are read-only. Images keep their Shopify CDN URLs; the importer hands
 // those URLs to Shopify, which copies the files into the merchant's store.
 
-import { execFileSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -338,28 +338,26 @@ function runCli(query, variables) {
   fs.writeFileSync(queryFile, query);
   fs.writeFileSync(variableFile, JSON.stringify(variables));
   try {
-    const output = execFileSync(
-      "shopify",
-      [
-        "store",
-        "execute",
-        "--store",
-        args.store,
-        "--query-file",
-        queryFile,
-        "--variable-file",
-        variableFile,
-        "--json",
-        "--no-input",
-      ],
-      {
+    // Inputs go through the CLI's SHOPIFY_FLAG_* environment variables so the
+    // command line itself is constant (shopify is a .cmd shim on Windows and
+    // needs a shell).
+    return JSON.parse(
+      execSync("shopify store execute --json --no-input", {
         encoding: "utf8",
         maxBuffer: 256 * 1024 * 1024,
-        // shopify is a .cmd shim on Windows
-        shell: process.platform === "win32",
-      },
+        stdio: ["ignore", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          SHOPIFY_FLAG_STORE: args.store,
+          SHOPIFY_FLAG_QUERY_FILE: queryFile,
+          SHOPIFY_FLAG_VARIABLE_FILE: variableFile,
+        },
+      }),
     );
-    return JSON.parse(output);
+  } catch (error) {
+    // Progress output is hidden on success; show it when the CLI fails.
+    if (error.stderr) console.error(error.stderr);
+    throw error;
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

@@ -1,0 +1,36 @@
+# Quick look at a template store before exporting it:
+#   shopify store execute --store <store>.myshopify.com --query-file scripts/export/overview.graphql
+query StoreOverview {
+  shop {
+    name
+    plan {
+      publicDisplayName
+      partnerDevelopment
+      shopifyPlus
+    }
+  }
+  productsCount {
+    count
+  }
+  collectionsCount {
+    count
+  }
+  pagesCount {
+    count
+  }
+  blogsCount {
+    count
+  }
+  menus(first: 50) {
+    nodes {
+      handle
+    }
+  }
+  themes(first: 20) {
+    nodes {
+      name
+      role
+      themeStoreId
+    }
+  }
+}

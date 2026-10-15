@@ -71,7 +71,7 @@ export type ImporterFindFileQueryVariables = AdminTypes.Exact<{
 }>;
 
 
-export type ImporterFindFileQuery = { files: { nodes: Array<Pick<AdminTypes.ExternalVideo, 'id'> | Pick<AdminTypes.GenericFile, 'id'> | Pick<AdminTypes.MediaImage, 'id'> | Pick<AdminTypes.Model3d, 'id'> | Pick<AdminTypes.Video, 'id'>> } };
+export type ImporterFindFileQuery = { files: { nodes: Array<Pick<AdminTypes.ExternalVideo, 'id' | 'fileStatus'> | Pick<AdminTypes.GenericFile, 'id' | 'fileStatus'> | Pick<AdminTypes.MediaImage, 'id' | 'fileStatus'> | Pick<AdminTypes.Model3d, 'id' | 'fileStatus'> | Pick<AdminTypes.Video, 'id' | 'fileStatus'>> } };
 
 export type ImporterCreateFileMutationVariables = AdminTypes.Exact<{
   files: Array<AdminTypes.FileCreateInput> | AdminTypes.FileCreateInput;
@@ -79,6 +79,13 @@ export type ImporterCreateFileMutationVariables = AdminTypes.Exact<{
 
 
 export type ImporterCreateFileMutation = { fileCreate?: AdminTypes.Maybe<{ files?: AdminTypes.Maybe<Array<Pick<AdminTypes.ExternalVideo, 'id'> | Pick<AdminTypes.GenericFile, 'id'> | Pick<AdminTypes.MediaImage, 'id'> | Pick<AdminTypes.Model3d, 'id'> | Pick<AdminTypes.Video, 'id'>>>, userErrors: Array<Pick<AdminTypes.FilesUserError, 'field' | 'message'>> }> };
+
+export type ImporterDeleteFileMutationVariables = AdminTypes.Exact<{
+  fileIds: Array<AdminTypes.Scalars['ID']['input']> | AdminTypes.Scalars['ID']['input'];
+}>;
+
+
+export type ImporterDeleteFileMutation = { fileDelete?: AdminTypes.Maybe<{ userErrors: Array<Pick<AdminTypes.FilesUserError, 'field' | 'message'>> }> };
 
 export type ImporterFileStatusQueryVariables = AdminTypes.Exact<{
   ids: Array<AdminTypes.Scalars['ID']['input']> | AdminTypes.Scalars['ID']['input'];
@@ -173,6 +180,7 @@ export type ImporterFindProductQueryVariables = AdminTypes.Exact<{
 export type ImporterFindProductQuery = { productByIdentifier?: AdminTypes.Maybe<Pick<AdminTypes.Product, 'id'>> };
 
 export type ImporterSetProductMutationVariables = AdminTypes.Exact<{
+  handle: AdminTypes.Scalars['String']['input'];
   input: AdminTypes.ProductSetInput;
 }>;
 
@@ -218,7 +226,7 @@ interface GeneratedQueryTypes {
   "#graphql\n        query importerFindCollection($handle: String!) {\n          collectionByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindCollectionQuery, variables: ImporterFindCollectionQueryVariables},
   "#graphql\n        query importerFindCollectionProduct($handle: String!) {\n          productByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindCollectionProductQuery, variables: ImporterFindCollectionProductQueryVariables},
   "#graphql\n      query importerShopCurrency {\n        shop {\n          currencyCode\n        }\n      }": {return: ImporterShopCurrencyQuery, variables: ImporterShopCurrencyQueryVariables},
-  "#graphql\n        query importerFindFile($query: String!) {\n          files(first: 1, query: $query) {\n            nodes {\n              id\n            }\n          }\n        }": {return: ImporterFindFileQuery, variables: ImporterFindFileQueryVariables},
+  "#graphql\n      query importerFindFile($query: String!) {\n        files(first: 1, query: $query) {\n          nodes {\n            id\n            fileStatus\n          }\n        }\n      }": {return: ImporterFindFileQuery, variables: ImporterFindFileQueryVariables},
   "#graphql\n        query importerFileStatus($ids: [ID!]!) {\n          nodes(ids: $ids) {\n            ... on File {\n              fileStatus\n              fileErrors {\n                message\n                details\n              }\n            }\n          }\n        }": {return: ImporterFileStatusQuery, variables: ImporterFileStatusQueryVariables},
   "#graphql\n      query importerMenus {\n        menus(first: 100) {\n          nodes {\n            id\n            handle\n            isDefault\n          }\n        }\n      }": {return: ImporterMenusQuery, variables: ImporterMenusQueryVariables},
   "#graphql\n        query importerMenuCollection($handle: String!) {\n          collectionByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterMenuCollectionQuery, variables: ImporterMenuCollectionQueryVariables},
@@ -226,7 +234,7 @@ interface GeneratedQueryTypes {
   "#graphql\n      query importerFindPage($query: String!) {\n        pages(first: 1, query: $query) {\n          nodes {\n            id\n            handle\n          }\n        }\n      }": {return: ImporterFindPageQuery, variables: ImporterFindPageQueryVariables},
   "#graphql\n      query importerPolicies {\n        shop {\n          shopPolicies {\n            id\n            type\n            body\n          }\n        }\n      }": {return: ImporterPoliciesQuery, variables: ImporterPoliciesQueryVariables},
   "#graphql\n        query importerFindProduct($handle: String!) {\n          productByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindProductQuery, variables: ImporterFindProductQueryVariables},
-  "#graphql\n        query importerProductMedia($id: ID!) {\n          product(id: $id) {\n            media(first: 250) {\n              nodes {\n                alt\n                status\n                mediaErrors {\n                  message\n                  details\n                }\n              }\n            }\n          }\n        }": {return: ImporterProductMediaQuery, variables: ImporterProductMediaQueryVariables},
+  "#graphql\n      query importerProductMedia($id: ID!) {\n        product(id: $id) {\n          media(first: 250) {\n            nodes {\n              alt\n              status\n              mediaErrors {\n                message\n                details\n              }\n            }\n          }\n        }\n      }": {return: ImporterProductMediaQuery, variables: ImporterProductMediaQueryVariables},
   "#graphql\n        query importerFindRedirect($query: String!) {\n          urlRedirects(first: 1, query: $query) {\n            nodes {\n              path\n            }\n          }\n        }": {return: ImporterFindRedirectQuery, variables: ImporterFindRedirectQueryVariables},
 }
 
@@ -235,12 +243,13 @@ interface GeneratedMutationTypes {
   "#graphql\n          mutation importerCreateBlog($blog: BlogCreateInput!) {\n            blogCreate(blog: $blog) {\n              blog {\n                id\n              }\n              userErrors {\n                field\n                message\n              }\n            }\n          }": {return: ImporterCreateBlogMutation, variables: ImporterCreateBlogMutationVariables},
   "#graphql\n          mutation importerCreateArticle($article: ArticleCreateInput!) {\n            articleCreate(article: $article) {\n              article {\n                id\n              }\n              userErrors {\n                field\n                message\n              }\n            }\n          }": {return: ImporterCreateArticleMutation, variables: ImporterCreateArticleMutationVariables},
   "#graphql\n        mutation importerCreateCollection($collection: CollectionCreateInput!) {\n          collectionCreate(collection: $collection) {\n            collection {\n              id\n            }\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreateCollectionMutation, variables: ImporterCreateCollectionMutationVariables},
-  "#graphql\n        mutation importerCreateFile($files: [FileCreateInput!]!) {\n          fileCreate(files: $files) {\n            files {\n              id\n            }\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreateFileMutation, variables: ImporterCreateFileMutationVariables},
+  "#graphql\n      mutation importerCreateFile($files: [FileCreateInput!]!) {\n        fileCreate(files: $files) {\n          files {\n            id\n          }\n          userErrors {\n            field\n            message\n          }\n        }\n      }": {return: ImporterCreateFileMutation, variables: ImporterCreateFileMutationVariables},
+  "#graphql\n      mutation importerDeleteFile($fileIds: [ID!]!) {\n        fileDelete(fileIds: $fileIds) {\n          userErrors {\n            field\n            message\n          }\n        }\n      }": {return: ImporterDeleteFileMutation, variables: ImporterDeleteFileMutationVariables},
   "#graphql\n          mutation importerUpdateMenu($id: ID!, $title: String!, $items: [MenuItemUpdateInput!]!) {\n            menuUpdate(id: $id, title: $title, items: $items) {\n              userErrors {\n                field\n                message\n              }\n            }\n          }": {return: ImporterUpdateMenuMutation, variables: ImporterUpdateMenuMutationVariables},
   "#graphql\n          mutation importerCreateMenu($title: String!, $handle: String!, $items: [MenuItemCreateInput!]!) {\n            menuCreate(title: $title, handle: $handle, items: $items) {\n              userErrors {\n                field\n                message\n              }\n            }\n          }": {return: ImporterCreateMenuMutation, variables: ImporterCreateMenuMutationVariables},
   "#graphql\n        mutation importerCreatePage($page: PageCreateInput!) {\n          pageCreate(page: $page) {\n            page {\n              id\n            }\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreatePageMutation, variables: ImporterCreatePageMutationVariables},
   "#graphql\n        mutation importerUpdatePolicy($shopPolicy: ShopPolicyInput!) {\n          shopPolicyUpdate(shopPolicy: $shopPolicy) {\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterUpdatePolicyMutation, variables: ImporterUpdatePolicyMutationVariables},
-  "#graphql\n        mutation importerSetProduct($input: ProductSetInput!) {\n          productSet(input: $input, synchronous: true) {\n            product {\n              id\n            }\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterSetProductMutation, variables: ImporterSetProductMutationVariables},
+  "#graphql\n      mutation importerSetProduct($handle: String!, $input: ProductSetInput!) {\n        productSet(\n          identifier: { handle: $handle }\n          input: $input\n          synchronous: true\n        ) {\n          product {\n            id\n          }\n          userErrors {\n            field\n            message\n          }\n        }\n      }": {return: ImporterSetProductMutation, variables: ImporterSetProductMutationVariables},
   "#graphql\n        mutation importerCreateRedirect($urlRedirect: UrlRedirectInput!) {\n          urlRedirectCreate(urlRedirect: $urlRedirect) {\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreateRedirectMutation, variables: ImporterCreateRedirectMutationVariables},
 }
 declare module '@shopify/admin-api-client' {

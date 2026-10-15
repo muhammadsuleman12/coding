@@ -1,64 +1,114 @@
+import type { BundleFile } from "../bundle";
 import type { StepContext } from "../context.server";
-import { assertNoUserErrors, gql, sleep } from "../graphql.server";
+import {
+  assertNoUserErrors,
+  forEachLimit,
+  gql,
+  sleep,
+} from "../graphql.server";
 
-// Uploads the standalone files the theme references by filename.
-export async function importFiles(ctx: StepContext) {
-  for (const file of ctx.bundle.files ?? []) {
-    const existing = await gql(
-      ctx.admin,
-      `#graphql
-        query importerFindFile($query: String!) {
-          files(first: 1, query: $query) {
-            nodes {
-              id
-            }
-          }
-        }`,
-      { query: `filename:'${file.filename}'` },
-    );
-    if (existing?.files.nodes.length) {
-      ctx.log(`File ${file.filename} already exists`);
-      continue;
-    }
-
-    const data = await gql(
-      ctx.admin,
-      `#graphql
-        mutation importerCreateFile($files: [FileCreateInput!]!) {
-          fileCreate(files: $files) {
-            files {
-              id
-            }
-            userErrors {
-              field
-              message
-            }
-          }
-        }`,
-      {
-        files: [
-          {
-            originalSource: ctx.assetUrl(file.url),
-            filename: file.filename,
-            alt: file.alt,
-            contentType: file.contentType,
-            duplicateResolutionMode: "RAISE_ERROR",
-          },
-        ],
-      },
-    );
-    assertNoUserErrors(`File ${file.filename}`, data?.fileCreate?.userErrors);
-    const id = data?.fileCreate?.files?.[0]?.id;
-    if (!id) throw new Error(`File ${file.filename} was not created`);
-    await waitForFile(ctx, file.filename, id);
-    ctx.log(`Uploaded file ${file.filename}`);
-  }
-}
-
+const CONCURRENCY = 4;
+const MAX_ATTEMPTS = 3;
 const FILE_TIMEOUT_MS = 120_000;
 
-// fileCreate returns before Shopify has downloaded the file; wait for it so a
-// broken URL fails the import.
+// Uploads the standalone files the theme references by filename. Shopify
+// downloads each file from its source URL in the background; a download that
+// fails (source CDN hiccups happen) is deleted and retried. A file left
+// FAILED by an earlier run is replaced rather than skipped.
+export async function importFiles(ctx: StepContext) {
+  await forEachLimit(ctx.bundle.files ?? [], CONCURRENCY, async (file) => {
+    const existing = await findFile(ctx, file.filename);
+    if (existing && existing.fileStatus !== "FAILED") {
+      ctx.log(`File ${file.filename} already exists`);
+      return;
+    }
+    if (existing) await deleteFile(ctx, existing.id);
+
+    for (let attempt = 1; ; attempt++) {
+      const id = await createFile(ctx, file);
+      const error = await waitForFile(ctx, file.filename, id);
+      if (!error) break;
+
+      await deleteFile(ctx, id);
+      if (attempt >= MAX_ATTEMPTS) {
+        throw new Error(`File ${file.filename} failed: ${error}`);
+      }
+      ctx.log(`File ${file.filename} failed (${error}); retrying`);
+      await sleep(5000 * attempt);
+    }
+    ctx.log(`Uploaded file ${file.filename}`);
+  });
+}
+
+async function findFile(ctx: StepContext, filename: string) {
+  const data = await gql(
+    ctx.admin,
+    `#graphql
+      query importerFindFile($query: String!) {
+        files(first: 1, query: $query) {
+          nodes {
+            id
+            fileStatus
+          }
+        }
+      }`,
+    { query: `filename:'${filename}'` },
+  );
+  return data?.files.nodes[0];
+}
+
+async function createFile(ctx: StepContext, file: BundleFile) {
+  const data = await gql(
+    ctx.admin,
+    `#graphql
+      mutation importerCreateFile($files: [FileCreateInput!]!) {
+        fileCreate(files: $files) {
+          files {
+            id
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }`,
+    {
+      files: [
+        {
+          originalSource: ctx.assetUrl(file.url),
+          filename: file.filename,
+          alt: file.alt,
+          contentType: file.contentType,
+          duplicateResolutionMode: "RAISE_ERROR",
+        },
+      ],
+    },
+  );
+  assertNoUserErrors(`File ${file.filename}`, data?.fileCreate?.userErrors);
+  const id = data?.fileCreate?.files?.[0]?.id;
+  if (!id) throw new Error(`File ${file.filename} was not created`);
+  return id;
+}
+
+async function deleteFile(ctx: StepContext, id: string) {
+  const data = await gql(
+    ctx.admin,
+    `#graphql
+      mutation importerDeleteFile($fileIds: [ID!]!) {
+        fileDelete(fileIds: $fileIds) {
+          userErrors {
+            field
+            message
+          }
+        }
+      }`,
+    { fileIds: [id] },
+  );
+  assertNoUserErrors(`Deleting file ${id}`, data?.fileDelete?.userErrors);
+}
+
+// Waits until Shopify has processed the file. Returns the failure reason, or
+// undefined once the file is ready.
 async function waitForFile(ctx: StepContext, filename: string, id: string) {
   const deadline = Date.now() + FILE_TIMEOUT_MS;
   for (;;) {
@@ -88,15 +138,11 @@ async function waitForFile(ctx: StepContext, filename: string, id: string) {
 
     if (file?.fileStatus === "FAILED") {
       const error = file.fileErrors?.[0];
-      throw new Error(
-        `File ${filename} failed: ${error ? error.details || error.message : "unknown error"}`,
-      );
+      return error ? error.details || error.message : "unknown error";
     }
-    if (file?.fileStatus === "READY") return;
+    if (file?.fileStatus === "READY") return undefined;
 
-    if (Date.now() > deadline) {
-      throw new Error(`File ${filename} is still processing`);
-    }
+    if (Date.now() > deadline) return `${filename} is still processing`;
     await sleep(2000);
   }
 }

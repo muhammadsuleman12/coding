@@ -9,99 +9,124 @@ import {
 } from "../graphql.server";
 
 const CONCURRENCY = 4;
+const MAX_ATTEMPTS = 3;
+const MEDIA_TIMEOUT_MS = 300_000;
 
-// Creates each product with productSet, keyed by handle. Products whose
-// handle already exists are left untouched. Products are created a few at a
-// time; their images are checked once all of them exist, since Shopify
-// processes images in the background.
+// Creates each product with productSet, keyed by handle. Products are
+// created a few at a time; their images are checked once all of them exist,
+// since Shopify downloads images in the background. Images that fail to
+// download (source CDN hiccups happen) are retried by setting the product
+// again. An existing product is left untouched unless an earlier run left it
+// with failed images, in which case it is repaired.
 export async function importProducts(ctx: StepContext) {
-  const created: { handle: string; id: string }[] = [];
+  const products = ctx.bundle.products ?? [];
+  const toCheck: { product: BundleProduct; id: string }[] = [];
 
-  await forEachLimit(
-    ctx.bundle.products ?? [],
-    CONCURRENCY,
-    async (product) => {
-      const existing = await gql(
-        ctx.admin,
-        `#graphql
+  await forEachLimit(products, CONCURRENCY, async (product) => {
+    const existing = await gql(
+      ctx.admin,
+      `#graphql
         query importerFindProduct($handle: String!) {
           productByIdentifier(identifier: { handle: $handle }) {
             id
           }
         }`,
-        { handle: product.handle },
-      );
-      if (existing?.productByIdentifier) {
+      { handle: product.handle },
+    );
+    const existingId = existing?.productByIdentifier?.id;
+    if (existingId) {
+      const media = await loadMedia(ctx, existingId);
+      if (!media.some((m) => m.status === "FAILED")) {
         ctx.log(`Product ${product.handle} already exists`);
         return;
       }
+      ctx.log(`Product ${product.handle} has failed images; repairing`);
+      await setProduct(ctx, product);
+      toCheck.push({ product, id: existingId });
+      return;
+    }
 
-      const data = await gql(
-        ctx.admin,
-        `#graphql
-        mutation importerSetProduct($input: ProductSetInput!) {
-          productSet(input: $input, synchronous: true) {
-            product {
-              id
-            }
-            userErrors {
-              field
-              message
-            }
-          }
-        }`,
-        { input: toProductSetInput(ctx, product) },
-      );
-      assertNoUserErrors(
-        `Product ${product.handle}`,
-        data?.productSet?.userErrors,
-      );
-      const id = data?.productSet?.product?.id;
-      if (!id) throw new Error(`Product ${product.handle} was not created`);
+    const id = await setProduct(ctx, product);
+    await publishToOnlineStore(ctx, id);
+    toCheck.push({ product, id });
+    ctx.log(`Created product ${product.handle}`);
+  });
 
-      await publishToOnlineStore(ctx, id);
-      created.push({ handle: product.handle, id });
-      ctx.log(`Created product ${product.handle}`);
-    },
-  );
-
-  await forEachLimit(created, CONCURRENCY, ({ handle, id }) =>
-    waitForMedia(ctx, handle, id),
-  );
+  await forEachLimit(toCheck, CONCURRENCY, async ({ product, id }) => {
+    for (let attempt = 1; ; attempt++) {
+      const error = await waitForMedia(ctx, id);
+      if (!error) return;
+      if (attempt >= MAX_ATTEMPTS) {
+        throw new Error(`Product ${product.handle} images failed: ${error}`);
+      }
+      ctx.log(`Product ${product.handle} images failed (${error}); retrying`);
+      await sleep(5000 * attempt);
+      await setProduct(ctx, product);
+    }
+  });
 }
 
-const MEDIA_TIMEOUT_MS = 300_000;
+// Creates the product, or replaces it when the handle already exists.
+async function setProduct(ctx: StepContext, product: BundleProduct) {
+  const data = await gql(
+    ctx.admin,
+    `#graphql
+      mutation importerSetProduct($handle: String!, $input: ProductSetInput!) {
+        productSet(
+          identifier: { handle: $handle }
+          input: $input
+          synchronous: true
+        ) {
+          product {
+            id
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }`,
+    { handle: product.handle, input: toProductSetInput(ctx, product) },
+  );
+  assertNoUserErrors(`Product ${product.handle}`, data?.productSet?.userErrors);
+  const id = data?.productSet?.product?.id;
+  if (!id) throw new Error(`Product ${product.handle} was not created`);
+  return id;
+}
 
-// Shopify downloads product images after productSet returns. Wait until they
-// are processed so a broken image URL fails the import instead of leaving a
-// product without photos.
-async function waitForMedia(ctx: StepContext, handle: string, id: string) {
-  const deadline = Date.now() + MEDIA_TIMEOUT_MS;
-  for (;;) {
-    const data = await gql(
-      ctx.admin,
-      `#graphql
-        query importerProductMedia($id: ID!) {
-          product(id: $id) {
-            media(first: 250) {
-              nodes {
-                alt
-                status
-                mediaErrors {
-                  message
-                  details
-                }
+async function loadMedia(ctx: StepContext, id: string) {
+  const data = await gql(
+    ctx.admin,
+    `#graphql
+      query importerProductMedia($id: ID!) {
+        product(id: $id) {
+          media(first: 250) {
+            nodes {
+              alt
+              status
+              mediaErrors {
+                message
+                details
               }
             }
           }
-        }`,
-      { id },
-    );
-    const media = data?.product?.media.nodes ?? [];
+        }
+      }`,
+    { id },
+  );
+  return data?.product?.media.nodes ?? [];
+}
+
+// Waits until Shopify has processed the product's images. Returns the
+// failure reasons, or undefined once every image is ready.
+async function waitForMedia(ctx: StepContext, id: string) {
+  const deadline = Date.now() + MEDIA_TIMEOUT_MS;
+  for (;;) {
+    const media = await loadMedia(ctx, id);
 
     const failed = media.filter((m) => m.status === "FAILED");
     if (failed.length > 0) {
-      const reasons = failed
+      return failed
         .map((m) => {
           const error = m.mediaErrors[0];
           const reason = error
@@ -110,13 +135,10 @@ async function waitForMedia(ctx: StepContext, handle: string, id: string) {
           return `${m.alt || "image"}: ${reason}`;
         })
         .join("; ");
-      throw new Error(`Product ${handle} images failed: ${reasons}`);
     }
-    if (media.every((m) => m.status === "READY")) return;
+    if (media.every((m) => m.status === "READY")) return undefined;
 
-    if (Date.now() > deadline) {
-      throw new Error(`Product ${handle} images are still processing`);
-    }
+    if (Date.now() > deadline) return "images are still processing";
     await sleep(2000);
   }
 }

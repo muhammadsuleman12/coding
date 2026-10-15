@@ -1,0 +1,15 @@
+query ExportPages($after: String) {
+  pages(first: 50, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      handle
+      title
+      body
+      templateSuffix
+      isPublished
+    }
+  }
+}

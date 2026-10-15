@@ -1,0 +1,24 @@
+query ExportMenus {
+  menus(first: 50) {
+    nodes {
+      handle
+      title
+      items {
+        ...ExportMenuItem
+        items {
+          ...ExportMenuItem
+          items {
+            ...ExportMenuItem
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment ExportMenuItem on MenuItem {
+  title
+  type
+  url
+  resourceId
+}

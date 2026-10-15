@@ -1,0 +1,8 @@
+query ExportPolicies {
+  shop {
+    shopPolicies {
+      type
+      body
+    }
+  }
+}

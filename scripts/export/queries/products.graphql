@@ -1,0 +1,67 @@
+query ExportProducts($after: String) {
+  products(first: 10, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      handle
+      title
+      descriptionHtml
+      vendor
+      productType
+      tags
+      status
+      templateSuffix
+      seo {
+        title
+        description
+      }
+      options {
+        name
+        optionValues {
+          name
+        }
+      }
+      media(first: 50) {
+        nodes {
+          ... on MediaImage {
+            image {
+              url
+              altText
+            }
+          }
+        }
+      }
+      variants(first: 100) {
+        nodes {
+          price
+          compareAtPrice
+          sku
+          taxable
+          selectedOptions {
+            name
+            value
+          }
+          media(first: 1) {
+            nodes {
+              ... on MediaImage {
+                image {
+                  url
+                }
+              }
+            }
+          }
+        }
+      }
+      metafields(first: 50) {
+        nodes {
+          namespace
+          key
+          type
+          value
+        }
+      }
+    }
+  }
+}

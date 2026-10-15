@@ -1,0 +1,12 @@
+query ExportRedirects($after: String) {
+  urlRedirects(first: 250, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      path
+      target
+    }
+  }
+}

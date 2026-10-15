@@ -1,0 +1,19 @@
+query ExportFiles($after: String) {
+  files(first: 100, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      alt
+      ... on MediaImage {
+        image {
+          url
+        }
+      }
+      ... on GenericFile {
+        url
+      }
+    }
+  }
+}

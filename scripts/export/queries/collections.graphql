@@ -1,0 +1,36 @@
+query ExportCollections($after: String) {
+  collections(first: 25, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      handle
+      title
+      descriptionHtml
+      sortOrder
+      templateSuffix
+      seo {
+        title
+        description
+      }
+      image {
+        url
+        altText
+      }
+      ruleSet {
+        appliedDisjunctively
+        rules {
+          column
+          relation
+          condition
+        }
+      }
+      products(first: 250) {
+        nodes {
+          handle
+        }
+      }
+    }
+  }
+}

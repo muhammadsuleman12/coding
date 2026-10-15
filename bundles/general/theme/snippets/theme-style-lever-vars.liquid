@@ -1,0 +1,114 @@
+
+{%- liquid
+  assign heading_scale_num = heading_scale | times: 1
+  if heading_scale_num == 0
+    case heading_scale
+      when 'small'
+        assign heading_scale_num = 85
+      when 'large'
+        assign heading_scale_num = 115
+      else
+        assign heading_scale_num = 100
+    endcase
+  endif
+-%}
+--heading-scale: {{ heading_scale_num | divided_by: 100.0 }};
+{%- liquid
+  assign section_spacing_num = section_spacing | times: 1
+  if section_spacing_num == 0
+    case section_spacing
+      when 'tight'
+        assign section_spacing_num = 65
+      when 'airy'
+        assign section_spacing_num = 100
+      else
+        assign section_spacing_num = 80
+    endcase
+  endif
+-%}
+--section-spacing-scale: {{ section_spacing_num | divided_by: 100.0 }};
+{%- assign card_gap_value = card_gap | default: 20 -%}
+--style-gap-cards: {{ card_gap_value }}px;
+{%- assign card_shadow_is_legacy_string = false -%}
+{%- case card_shadow -%}
+  {%- when 'none' -%}
+    {%- assign card_shadow_value = 'none' -%}
+    {%- assign card_shadow_is_legacy_string = true -%}
+  {%- when 'subtle' -%}
+    {%- assign card_shadow_value = '0 2px 8px rgba(0,0,0,0.06)' -%}
+    {%- assign card_shadow_is_legacy_string = true -%}
+  {%- when 'medium' -%}
+    {%- assign card_shadow_value = '0 4px 16px rgba(0,0,0,0.10)' -%}
+    {%- assign card_shadow_is_legacy_string = true -%}
+  {%- when 'strong' -%}
+    {%- assign card_shadow_value = '0 8px 24px rgba(0,0,0,0.16)' -%}
+    {%- assign card_shadow_is_legacy_string = true -%}
+{%- endcase -%}
+{%- unless card_shadow_is_legacy_string -%}
+  {%- assign card_shadow_num = card_shadow | default: 33 | times: 1 -%}
+  {%- if card_shadow_num <= 0 -%}
+    {%- assign card_shadow_value = 'none' -%}
+  {%- else -%}
+    {%- assign shadow_offset = card_shadow_num | times: 0.06 | plus: 2 | round -%}
+    {%- assign shadow_blur = card_shadow_num | times: 0.16 | plus: 8 | round -%}
+    {%- assign shadow_opacity = card_shadow_num | times: 0.0014 | plus: 0.02 -%}
+    {%- assign card_shadow_value = '0 ' | append: shadow_offset | append: 'px ' | append: shadow_blur | append: 'px rgba(0,0,0,' | append: shadow_opacity | append: ')' -%}
+  {%- endif -%}
+{%- endunless -%}
+--style-shadow-card: {{ card_shadow_value }};
+{%- assign global_border_radius_value = global_border_radius | default: 8 -%}
+--style-border-radius-global: {{ global_border_radius_value }}px;
+--style-border-radius-cards: var(--style-border-radius-global);
+--style-border-radius-images: var(--style-border-radius-global);
+{%- if button_shape == 'pill' -%}
+  --style-border-radius-buttons-primary: 999px;
+  --style-border-radius-buttons-secondary: 999px;
+{%- elsif button_shape == 'square' -%}
+  --style-border-radius-buttons-primary: 0px;
+  --style-border-radius-buttons-secondary: 0px;
+{%- elsif button_shape == 'soft' -%}
+  --style-border-radius-buttons-primary: 4px;
+  --style-border-radius-buttons-secondary: 4px;
+{%- elsif button_shape == 'custom' -%}
+  --style-border-radius-buttons-primary: {{ button_radius_custom | default: 4 }}px;
+  --style-border-radius-buttons-secondary: {{ button_radius_custom | default: 4 }}px;
+{%- else -%}
+  --style-border-radius-buttons-primary: var(--style-border-radius-global);
+  --style-border-radius-buttons-secondary: var(--style-border-radius-global);
+{%- endif -%}
+--style-border-radius-inputs: {{ inputs_border_radius | default: 8 }}px;
+--variant-picker-swatch-radius: {{ variant_swatch_radius | default: 8 | append: 'px' }};
+--variant-picker-button-radius: {{ variant_button_radius | default: 8 | append: 'px' }};
+{%- assign heading_letter_spacing_value = 'heading-normal' -%}
+{%- case heading_tracking -%}
+  {%- when 'tight' -%}
+    {%- assign heading_letter_spacing_value = 'heading-tight' -%}
+  {%- when 'loose' -%}
+    {%- assign heading_letter_spacing_value = 'heading-loose' -%}
+{%- endcase -%}
+{%- assign heading_case_value = heading_case | default: 'none' -%}
+{%- for n in (1..6) -%}
+  --font-h{{ n }}--case: {{ heading_case_value }};
+  --font-h{{ n }}--letter-spacing: var(--letter-spacing--{{ heading_letter_spacing_value }});
+{%- endfor -%}
+{%- case animation_intensity -%}
+  {%- when 'none' -%}
+    --anim-reveal-duration: 0ms;
+    --anim-reveal-distance: 0px;
+    --anim-reveal-stagger: 0ms;
+  {%- when 'lots' -%}
+    --anim-reveal-duration: 700ms;
+    --anim-reveal-distance: 32px;
+    --anim-reveal-stagger: 90ms;
+  {%- when 'custom' -%}
+    {%- assign animation_speed_value = animation_speed_custom | default: 550 -%}
+    {%- assign animation_distance_value = animation_distance_custom | default: 24 -%}
+    {%- assign custom_stagger = animation_speed_value | times: 0.13 | round -%}
+    --anim-reveal-duration: {{ animation_speed_value }}ms;
+    --anim-reveal-distance: {{ animation_distance_value }}px;
+    --anim-reveal-stagger: {{ custom_stagger }}ms;
+  {%- else -%}
+    --anim-reveal-duration: 750ms;
+    --anim-reveal-distance: 28px;
+    --anim-reveal-stagger: 85ms;
+{%- endcase -%}

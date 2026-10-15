@@ -1,0 +1,171 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign label = section.settings.label
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign review_blocks = section.blocks | where: 'type', 'review'
+%}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-reviews bold-section forge-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-reviews__inner">
+    {% if label != blank or heading != blank or subtitle != blank %}
+      <header class="bold-section-header" data-animate="fade-up">
+        {% if label != blank %}
+          <span class="bold-section-label">{{ label }}</span>
+        {% endif %}
+        {% if heading != blank %}
+          <h2 class="bold-section-title">{{ heading }}</h2>
+        {% endif %}
+        {% if subtitle != blank %}
+          <p class="bold-section-subtitle">{{ subtitle }}</p>
+        {% endif %}
+        <div class="bold-accent-line" aria-hidden="true"></div>
+      </header>
+    {% endif %}
+
+    {% if review_blocks.size > 0 %}
+      <div class="bold-reviews__grid" data-animate-group>
+        {% for block in review_blocks %}
+          <article class="bold-reviews__card" data-animate="fade-up" {{ block.shopify_attributes }}>
+            {% if block.settings.rating > 0 %}
+              <div class="bold-reviews__stars" aria-label="{{ block.settings.rating }} out of 5 stars">
+                {% for i in (1..5) %}
+                  <span class="bold-reviews__star{% if i <= block.settings.rating %} bold-reviews__star--filled{% endif %}" aria-hidden="true">★</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <div class="bold-reviews__avatar" aria-hidden="true">
+              {{ block.settings.initials | default: block.settings.name | slice: 0, 2 | upcase }}
+            </div>
+            {% if block.settings.text != blank %}
+              <blockquote class="bold-reviews__text forge-rte">{{ block.settings.text }}</blockquote>
+            {% endif %}
+            {% if block.settings.name != blank %}
+              <cite class="bold-reviews__name">{{ block.settings.name }}</cite>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-reviews {
+    padding: calc(72px * var(--section-spacing-scale, 1)) 24px;
+  }
+
+  .bold-reviews__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .bold-reviews__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--style-gap-cards, 20px);
+  }
+
+  .bold-reviews__card {
+    background: var(--bold-card-bg);
+    border: 1px solid var(--bold-glass-border);
+    border-radius: var(--bold-radius-lg);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--bold-shadow);
+  }
+
+  .bold-reviews__stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .bold-reviews__star {
+    color: rgb(var(--color-foreground-rgb) / 0.2);
+    font-size: 14px;
+  }
+
+  .bold-reviews__star--filled {
+    color: var(--bold-accent1);
+  }
+
+  .bold-reviews__avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bold-accent2), var(--bold-accent1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--bold-font-heading);
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--bold-text-light);
+  }
+
+  .bold-reviews__text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--bold-text-muted);
+    margin: 0;
+    font-style: normal;
+    flex: 1;
+  }
+
+  .bold-reviews__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bold-accent2);
+    font-style: normal;
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-reviews {
+      padding: calc(48px * var(--section-spacing-scale, 1)) 16px;
+    }
+
+    .bold-reviews__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bold Reviews",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:forge.settings.color_scheme", "default": "scheme-1" },
+    { "type": "text", "id": "label", "label": "Section label", "default": "REVIEWS" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What customers say" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Verified reviews from our community." }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Review text", "default": "<p>Outstanding quality. This exceeded my expectations on every trip.</p>" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Alex M." },
+        { "type": "text", "id": "initials", "label": "Initials", "default": "AM" },
+        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 1, "default": 5, "label": "Star rating" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Reviews",
+      "blocks": [
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" }
+      ]
+    }
+  ]
+}
+{% endschema %}

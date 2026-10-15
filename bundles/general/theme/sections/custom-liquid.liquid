@@ -1,0 +1,75 @@
+
+
+<div class="forge-section-background no-gradient-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="forge-section forge-section--{{ section.settings.section_width }} forge-spacing-style {% if section.settings.color_scheme != blank %}forge-color-{{ section.settings.color_scheme }}{% endif %}"
+  style="{% render 'spacing-padding', settings: section.settings %}"
+>
+  {{ section.settings.custom_liquid }}
+</div>
+
+{% schema %}
+{
+  "name": "t:forge.names.custom_liquid",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:forge.settings.custom_liquid",
+      "info": "t:forge.info.custom_liquid"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:forge.settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:forge.options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:forge.options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.custom_liquid",
+      "category": "t:forge.categories.layout"
+    }
+  ]
+}
+{% endschema %}

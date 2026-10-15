@@ -1,0 +1,57 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "gs_footer": {
+      "type": "gs-footer",
+      "blocks": {
+        "m1": {
+          "type": "menu",
+          "settings": {
+            "heading": "Shop",
+            "menu": "footer-shop"
+          }
+        },
+        "m2": {
+          "type": "menu",
+          "settings": {
+            "heading": "Help",
+            "menu": "footer"
+          }
+        },
+        "x1": {
+          "type": "text",
+          "settings": {
+            "heading": "Need a hand?",
+            "text": "<p>Message us any time through our contact page. We are happy to help with orders, sizes and returns.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "x1"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "show_logo": false,
+        "about": "<p>Useful, good-looking things for home, tech, gifting and every day. Picked with care and priced fairly.</p>",
+        "copyright": "All rights reserved.",
+        "show_policies": true,
+        "show_payment": true
+      }
+    }
+  },
+  "order": [
+    "gs_footer"
+  ]
+}

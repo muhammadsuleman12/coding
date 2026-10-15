@@ -1,0 +1,286 @@
+
+{% liquid
+  assign overline = section.settings.overline | strip_html | strip
+  assign heading = section.settings.heading | strip_html | strip
+  assign body_html = section.settings.body
+  assign btn_label = section.settings.button_label
+  assign btn_link = section.settings.button_link | default: '/'
+  assign alignment = section.settings.alignment | default: 'center'
+  if alignment != 'left'
+    assign alignment = 'center'
+  endif
+  assign content_width = section.settings.content_width | default: 'narrow'
+  if content_width != 'page'
+    assign content_width = 'narrow'
+  endif
+%}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="affluence-rich-text forge-spacing-style forge-color-{{ section.settings.color_scheme }} affluence-rich-text--align-{{ alignment }} affluence-rich-text--width-{{ content_width }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  <div class="affluence-rich-text__inner" data-animate="fade-up">
+    {% if overline != blank %}
+      <p class="affluence-rich-text__overline">{{ overline }}</p>
+    {% endif %}
+    {% if heading != blank %}
+      <h2 class="affluence-rich-text__heading">{{ heading }}</h2>
+    {% endif %}
+    {% if body_html != blank %}
+      <div class="affluence-rich-text__body">{{ body_html }}</div>
+    {% endif %}
+    {% if btn_label != blank %}
+      <div class="affluence-rich-text__cta">
+        <a href="{{ btn_link }}" class="affluence-rich-text__btn">{{ btn_label }}</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .affluence-rich-text {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .affluence-rich-text__inner {
+    box-sizing: border-box;
+    margin-inline: auto;
+    padding-inline: clamp(20px, 5vw, 56px);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .affluence-rich-text--width-narrow .affluence-rich-text__inner {
+    max-width: 720px;
+  }
+
+  .affluence-rich-text--width-page .affluence-rich-text__inner {
+    max-width: 1280px;
+  }
+
+  .affluence-rich-text--align-center .affluence-rich-text__inner {
+    text-align: center;
+    align-items: center;
+  }
+
+  .affluence-rich-text--align-left .affluence-rich-text__inner {
+    text-align: left;
+    align-items: flex-start;
+    margin-inline: auto;
+  }
+
+  .affluence-rich-text__overline {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.6;
+  }
+
+  .affluence-rich-text__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-weight: var(--font-h2--weight, 400);
+    font-size: clamp(1.75rem, 4vw, calc(var(--font-h2--size) * 1.2));
+    line-height: 1.15;
+    letter-spacing: var(--font-h2--letter-spacing, 0.005em);
+    color: var(--color-foreground-heading, var(--color-foreground));
+    max-width: 22ch;
+  }
+
+  .affluence-rich-text--align-center .affluence-rich-text__heading {
+    margin-inline: auto;
+  }
+
+  .affluence-rich-text__body {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-foreground);
+    opacity: 0.82;
+    max-width: 56ch;
+  }
+
+  .affluence-rich-text__body :is(p, ul, ol) {
+    margin: 0 0 1em;
+  }
+
+  .affluence-rich-text__body :is(p, ul, ol):last-child {
+    margin-bottom: 0;
+  }
+
+  .affluence-rich-text__body a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .affluence-rich-text--align-center .affluence-rich-text__body {
+    margin-inline: auto;
+  }
+
+  .affluence-rich-text__cta {
+    margin-top: 8px;
+  }
+
+  .affluence-rich-text__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0.85rem 1.6rem;
+    min-height: 44px;
+    background: var(--color-secondary-button-background);
+    color: var(--color-secondary-button-text);
+    border: 1px solid var(--color-secondary-button-border);
+    border-radius: var(--style-border-radius-buttons-secondary, 0px);
+    text-decoration: none;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: var(--font-body--weight, 600);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .affluence-rich-text__btn:hover {
+    background: var(--color-secondary-button-hover-background);
+    color: var(--color-secondary-button-hover-text);
+    border-color: var(--color-secondary-button-hover-border);
+  }
+
+  .affluence-rich-text__btn:focus-visible {
+    outline: 2px solid var(--color-secondary-button-border);
+    outline-offset: 3px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .affluence-rich-text__inner {
+      gap: 14px;
+      padding-inline: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Affluence Rich Text",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline",
+      "info": "Small uppercase eyebrow text. Optional."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Talk about your brand"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body",
+      "default": "<p>Share information about your brand with your customers.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the CTA"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "Content width",
+      "options": [
+        { "value": "narrow", "label": "Narrow" },
+        { "value": "page", "label": "Page width" }
+      ],
+      "default": "narrow"
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence Rich Text",
+      "settings": {
+        "heading": "An editorial pause",
+        "body": "<p>A quiet line or two of brand voice between collection rows.</p>",
+        "alignment": "center"
+      }
+    }
+  ]
+}
+{% endschema %}

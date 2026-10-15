@@ -1,0 +1,502 @@
+
+{% liquid
+  assign heading = section.settings.heading | strip_html | strip
+  assign subheading = section.settings.subheading | strip_html | strip
+  assign btn_label = section.settings.button_label
+  assign btn_link = section.settings.button_link
+  assign overlay_alpha = section.settings.overlay_opacity | default: 30 | divided_by: 100.0
+
+  assign banner_height = section.settings.banner_height | default: 'large'
+  case banner_height
+    when 'fullscreen'
+      assign min_height_dt = '92vh'
+      assign min_height_mb = '85vh'
+    when 'large'
+      assign min_height_dt = '720px'
+      assign min_height_mb = '78vh'
+    when 'medium'
+      assign min_height_dt = '520px'
+      assign min_height_mb = '60vh'
+    when 'slim'
+      assign min_height_dt = '320px'
+      assign min_height_mb = '320px'
+    else
+      assign min_height_dt = '720px'
+      assign min_height_mb = '78vh'
+  endcase
+
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign text_position = section.settings.text_position | default: 'middle-center'
+  assign has_mobile_image = false
+  if section.settings.mobile_image != blank
+    assign has_mobile_image = true
+  endif
+
+  assign adapt_mobile_to_image = false
+  unless has_mobile_image
+    assign adapt_mobile_to_image = true
+  endunless
+
+  assign desktop_aspect = 1.7777778
+  if section.settings.image != blank
+    assign desktop_aspect = section.settings.image.aspect_ratio
+  endif
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --aib-min-height-dt: {{ min_height_dt }};
+    --aib-min-height-mb: {{ min_height_mb }};
+    --aib-overlay-alpha: {{ overlay_alpha }};
+    --aib-text-color: {{ text_color }};
+    --aib-desktop-aspect: {{ desktop_aspect }};
+  }
+{% endstyle %}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="affluence-image-banner forge-spacing-style forge-color-{{ section.settings.color_scheme }} affluence-image-banner--align-{{ text_position }}{% if adapt_mobile_to_image %} affluence-image-banner--adapt-mobile{% endif %}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  <div
+    class="affluence-image-banner__slot affluence-image-banner__slot--desktop"
+    data-forge-slot-id="image"
+    data-forge-slot-group="affluence-banner-images"
+    data-forge-aspect-ratio="16:9"
+    data-forge-slot-label="Desktop"
+    {% if section.settings.image == blank %}data-forge-slot-blank="true"{% endif %}
+  ></div>
+  <div
+    class="affluence-image-banner__slot affluence-image-banner__slot--mobile"
+    data-forge-slot-id="mobile_image"
+    data-forge-slot-group="affluence-banner-images"
+    data-forge-aspect-ratio="9:16"
+    data-forge-slot-label="Mobile"
+    {% if section.settings.mobile_image == blank %}data-forge-slot-blank="true"{% endif %}
+  ></div>
+
+  <div class="affluence-image-banner__media" aria-hidden="true">
+    {% if section.settings.image %}
+      {% assign desktop_class = 'affluence-image-banner__img' %}
+      {% if has_mobile_image %}
+        {% assign desktop_class = 'affluence-image-banner__img affluence-image-banner__img--hide-on-mobile' %}
+      {% endif %}
+      {{
+        section.settings.image
+        | image_url: width: 2400
+        | image_tag:
+          class: desktop_class,
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '750, 1100, 1500, 2000, 2400',
+          sizes: '100vw',
+          alt: ''
+      }}
+    {% else %}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'affluence-image-banner__img affluence-image-banner__img--placeholder' }}
+    {% endif %}
+
+    {% if has_mobile_image %}
+      {{
+        section.settings.mobile_image
+        | image_url: width: 1200
+        | image_tag:
+          class: 'affluence-image-banner__img affluence-image-banner__img--mobile',
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '375, 600, 900, 1200',
+          sizes: '100vw',
+          alt: ''
+      }}
+    {% endif %}
+
+    <div class="affluence-image-banner__overlay"></div>
+  </div>
+
+  {% if heading != blank or subheading != blank or btn_label != blank %}
+    <div class="affluence-image-banner__content">
+      <div class="affluence-image-banner__inner" data-animate="fade-up">
+        {% if heading != blank %}
+          <h2 class="affluence-image-banner__heading">{{ heading }}</h2>
+        {% endif %}
+        {% if subheading != blank %}
+          <p class="affluence-image-banner__subheading">{{ subheading }}</p>
+        {% endif %}
+        {% if btn_label != blank %}
+          <a
+            href="{{ btn_link | default: '/collections/all' }}"
+            class="affluence-image-banner__btn"
+          >
+            {{ btn_label }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .affluence-image-banner {
+    position: relative;
+    width: 100vw;
+    max-width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    min-height: var(--aib-min-height-dt, 720px);
+    overflow: hidden;
+    display: flex;
+    color: var(--aib-text-color, #fff);
+    isolation: isolate;
+  }
+
+  .affluence-image-banner__slot--desktop,
+  .affluence-image-banner__slot--mobile {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .affluence-image-banner__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .affluence-image-banner__img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .affluence-image-banner__img--placeholder {
+    background: var(--color-card-background);
+    opacity: 0.4;
+  }
+
+  .affluence-image-banner__img--mobile {
+    display: none;
+  }
+
+  .affluence-image-banner__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, var(--aib-overlay-alpha, 0.3));
+    z-index: 1;
+  }
+
+  .affluence-image-banner__content {
+    position: relative;
+    z-index: 2;
+    flex: 1 1 auto;
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    padding: clamp(32px, 6vw, 96px) clamp(20px, 5vw, 80px);
+  }
+
+  .affluence-image-banner__inner {
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Text positioning */
+  .affluence-image-banner--align-top-left .affluence-image-banner__content {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .affluence-image-banner--align-top-center .affluence-image-banner__content {
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+  }
+  .affluence-image-banner--align-top-right .affluence-image-banner__content {
+    align-items: flex-end;
+    justify-content: flex-start;
+    text-align: right;
+  }
+  .affluence-image-banner--align-middle-left .affluence-image-banner__content {
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
+  }
+  .affluence-image-banner--align-middle-center .affluence-image-banner__content {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .affluence-image-banner--align-middle-right .affluence-image-banner__content {
+    align-items: flex-end;
+    justify-content: center;
+    text-align: right;
+  }
+  .affluence-image-banner--align-bottom-left .affluence-image-banner__content {
+    align-items: flex-start;
+    justify-content: flex-end;
+    text-align: left;
+  }
+  .affluence-image-banner--align-bottom-center .affluence-image-banner__content {
+    align-items: center;
+    justify-content: flex-end;
+    text-align: center;
+  }
+  .affluence-image-banner--align-bottom-right .affluence-image-banner__content {
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .affluence-image-banner__inner {
+    align-items: inherit;
+  }
+
+  .affluence-image-banner--align-middle-center .affluence-image-banner__inner,
+  .affluence-image-banner--align-top-center .affluence-image-banner__inner,
+  .affluence-image-banner--align-bottom-center .affluence-image-banner__inner {
+    align-items: center;
+  }
+
+  .affluence-image-banner__heading {
+    margin: 0;
+    color: var(--aib-text-color, #fff);
+    font-family: var(--font-heading--family, inherit);
+    font-weight: var(--font-h1--weight, 400);
+    font-size: clamp(2rem, 4.8vw, calc(var(--font-h1--size) * 1.5));
+    line-height: 1.05;
+    letter-spacing: var(--font-h1--letter-spacing, 0.01em);
+  }
+
+  .affluence-image-banner__subheading {
+    margin: 0;
+    color: var(--aib-text-color, #fff);
+    font-family: var(--font-body--family, inherit);
+    font-weight: var(--font-body--weight, 300);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    line-height: 1.6;
+    max-width: 540px;
+    opacity: 0.92;
+  }
+
+  .affluence-image-banner__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0.95rem 2rem;
+    min-height: 48px;
+    margin-top: 8px;
+    background: var(--color-primary-button-background);
+    color: var(--color-primary-button-text);
+    border: 1px solid var(--color-primary-button-border);
+    border-radius: var(--style-border-radius-buttons-primary, 0px);
+    text-decoration: none;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: var(--font-body--weight, 600);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .affluence-image-banner__btn:hover {
+    background: var(--color-primary-button-hover-background);
+    color: var(--color-primary-button-hover-text);
+    border-color: var(--color-primary-button-hover-border);
+  }
+
+  .affluence-image-banner__btn:focus-visible {
+    outline: 2px solid var(--color-primary-button-background);
+    outline-offset: 3px;
+  }
+
+  /* Mobile */
+  @media screen and (max-width: 749px) {
+    .affluence-image-banner {
+      min-height: var(--aib-min-height-mb, 78vh);
+    }
+
+    /* Wide desktop image fallback: size to the image, don't reserve empty vh. */
+    .affluence-image-banner--adapt-mobile {
+      min-height: 0;
+      aspect-ratio: var(--aib-desktop-aspect, 16 / 9);
+    }
+
+    .affluence-image-banner__img--hide-on-mobile {
+      display: none;
+    }
+
+    .affluence-image-banner__img--mobile {
+      display: block;
+    }
+
+    .affluence-image-banner__content {
+      padding: clamp(24px, 8vw, 48px) clamp(16px, 5vw, 32px);
+    }
+
+    .affluence-image-banner__heading {
+      font-size: clamp(1.75rem, 7vw, calc(var(--font-h1--size) * 1));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Affluence Image Banner",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Discover the Collection"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Curated luxury for everyday indulgence."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the CTA"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Desktop image (16:9)"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image (9:16)",
+      "info": "Optional. When empty, mobile uses the desktop image at its natural aspect ratio. Add a portrait image here for a tall full-bleed mobile banner."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "banner_height",
+      "label": "Banner height",
+      "options": [
+        { "value": "fullscreen", "label": "Fullscreen" },
+        { "value": "large", "label": "Large" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "slim", "label": "Slim" }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Text position",
+      "options": [
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-center", "label": "Top center" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "middle-left", "label": "Middle left" },
+        { "value": "middle-center", "label": "Middle center" },
+        { "value": "middle-right", "label": "Middle right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-center", "label": "Bottom center" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "middle-center"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Image overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 30,
+      "info": "Darken the image to keep overlaid text legible."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence Image Banner",
+      "settings": {
+        "heading": "Discover the Collection",
+        "subheading": "Curated luxury for everyday indulgence.",
+        "banner_height": "large",
+        "text_position": "middle-center"
+      }
+    }
+  ]
+}
+{% endschema %}

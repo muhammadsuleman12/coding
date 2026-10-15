@@ -1,0 +1,55 @@
+<section class="gs-section gs-section--tight gs-promos forge-color-{{ section.settings.color_scheme }}">
+  <div class="gs-wrap gs-promos__grid">
+    {%- for block in section.blocks -%}
+      {%- assign img = block.settings.image -%}
+      {%- assign img_m = block.settings.image_mobile | default: img -%}
+      <a class="gs-promo gs-promo--{{ block.settings.tone }}" href="{%- if block.settings.link != blank -%}{{ block.settings.link }}{%- elsif block.settings.tag != blank -%}{{ routes.all_products_collection_url }}/{{ block.settings.tag | handleize }}{%- else -%}{{ routes.all_products_collection_url }}{%- endif -%}" data-gs-reveal {{ block.shopify_attributes }}>
+        <span class="gs-promo__copy">
+          {%- if block.settings.badge != blank -%}<span class="gs-promo__badge">{{ block.settings.badge | escape }}</span>{%- endif -%}
+          <span class="gs-promo__title">{{ block.settings.heading | escape }}</span>
+          {%- if block.settings.text != blank -%}<span class="gs-promo__text">{{ block.settings.text | escape }}</span>{%- endif -%}
+          <span class="gs-btn gs-btn--auto {% if block.settings.tone == 'sky' %}{% else %}gs-btn--light{% endif %}">{{ block.settings.button_label | escape }}</span>
+        </span>
+        <span class="gs-promo__media">
+          {%- if img -%}
+            <picture>
+              <source media="(max-width: 749px)" srcset="{{ img_m | image_url: width: 750 }}">
+              {{ img | image_url: width: 900 | image_tag: loading: 'lazy', widths: '450,700,900', sizes: '(min-width: 990px) 28vw, 50vw', alt: '' }}
+            </picture>
+          {%- endif -%}
+        </span>
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "Promo banners (pair)",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" }
+  ],
+  "blocks": [
+    {
+      "type": "promo",
+      "name": "Promo",
+      "settings": [
+        { "type": "select", "id": "tone", "label": "Panel color", "default": "cobalt", "options": [ { "value": "cobalt", "label": "Dark" }, { "value": "sky", "label": "Light" }, { "value": "sun", "label": "Accent" } ] },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "Up to 40% off" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Gifts for everyone" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Thoughtful picks for birthdays, thank-yous and just because." },
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop gifts" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "tag", "label": "Or product tag", "info": "Used when no link is set." },
+        { "type": "image_picker", "id": "image", "label": "Image (desktop)", "info": "900 × 900 px" },
+        { "type": "image_picker", "id": "image_mobile", "label": "Image (mobile)", "info": "750 × 500 px" }
+      ]
+    }
+  ],
+  "max_blocks": 2,
+  "presets": [{ "name": "Promo banners (pair)", "blocks": [ { "type": "promo" }, { "type": "promo" } ] }]
+}
+{% endschema %}

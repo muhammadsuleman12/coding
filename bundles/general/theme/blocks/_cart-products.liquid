@@ -1,0 +1,117 @@
+
+
+{% render 'cart-products' %}
+
+{% stylesheet %}
+  .cart-page--empty .cart-items__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-block-start: 0;
+    text-align: center;
+  }
+
+  .cart-page__title + .cart-page__items {
+    margin-block-start: var(--margin-lg);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.cart_products",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:forge.settings.gap",
+      "min": 8,
+      "max": 36,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:forge.options.auto"
+        },
+        {
+          "value": "portrait",
+          "label": "t:forge.options.portrait"
+        },
+        {
+          "value": "square",
+          "label": "t:forge.options.square"
+        }
+      ],
+      "default": "adapt",
+      "label": "t:forge.settings.aspect_ratio"
+    },
+    {
+      "type": "checkbox",
+      "id": "dividers",
+      "label": "t:forge.settings.dividers",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "vendor",
+      "label": "t:forge.settings.vendor",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.cart_items"
+    }
+  ]
+}
+{% endschema %}

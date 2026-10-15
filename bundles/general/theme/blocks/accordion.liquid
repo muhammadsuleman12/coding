@@ -1,0 +1,314 @@
+
+
+{% assign block_settings = block.settings %}
+{% assign accordion_type_preset = block_settings.type_preset | default: 'h4' %}
+<div
+  class="accordion accordion--{{ block.id }} accordion--{{ block_settings.icon }} forge-border-style forge-spacing-style{% if block_settings.inherit_color_scheme == false %} forge-color-{{ block_settings.color_scheme }}{% endif %}{% if block_settings.dividers %} accordion--dividers{% endif %}"
+  style="
+    --summary-font-family: var(--font-{{ accordion_type_preset }}--family);
+     --summary-font-style: var(--font-{{ accordion_type_preset }}--style);
+     --summary-font-weight: var(--font-{{ accordion_type_preset }}--weight);
+     --summary-font-size: var(--font-{{ accordion_type_preset }}--size);
+     --summary-font-line-height: var(--font-{{ accordion_type_preset }}--line-height);
+     --summary-font-case: var(--font-{{ accordion_type_preset }}--case);
+    {% render 'spacing-style', settings: block_settings %}
+    {% render 'border-override', settings: block_settings %}
+  "
+  {{ block.shopify_attributes }}
+>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .accordion {
+    flex: 1;
+    width: 100%;
+  }
+
+  .accordion--dividers forge-accordion-custom:not(:first-child) .details {
+    border-block-start: var(--style-border-width) solid var(--color-border);
+  }
+
+  /* When accordion borders are not set, show fallback borders */
+  .accordion--dividers {
+    /* stylelint-disable-next-line declaration-property-value-disallowed-list */
+    --show-fallback-borders: 0;
+  }
+
+  .accordion--dividers:not([class*='forge-color-'])[style*='--border-width: 0'],
+  .accordion--dividers:not([class*='forge-color-'])[style*='--border-style: none'] {
+    --show-fallback-borders: 1;
+  }
+
+  .accordion--dividers forge-accordion-custom:first-child .details {
+    border-block-start: calc(var(--style-border-width) * var(--show-fallback-borders)) solid var(--color-border);
+  }
+
+  .accordion--dividers forge-accordion-custom:last-child .details {
+    border-block-end: calc(var(--style-border-width) * var(--show-fallback-borders)) solid var(--color-border);
+  }
+
+  .accordion--dividers .forge-details-content {
+    padding-block-end: var(--padding-sm);
+  }
+
+  .accordion--caret .forge-icon-plus,
+  .accordion--plus .forge-icon-caret {
+    display: none;
+  }
+
+  /* because we can't pass apply a specific class on a block based on its parent block setting */
+  .accordion .details__header {
+    font-family: var(--summary-font-family);
+    font-style: var(--summary-font-style);
+    font-weight: var(--summary-font-weight);
+    font-size: var(--summary-font-size);
+    line-height: var(--summary-font-line-height);
+    text-transform: var(--summary-font-case);
+    min-height: var(--minimum-touch-target);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.accordion",
+  "tag": null,
+  "class": "accordion",
+  "blocks": [
+    {
+      "type": "_accordion-row"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:forge.settings.icon",
+      "options": [
+        {
+          "value": "caret",
+          "label": "t:forge.options.caret"
+        },
+        {
+          "value": "plus",
+          "label": "t:forge.options.plus"
+        }
+      ],
+      "default": "caret"
+    },
+    {
+      "type": "checkbox",
+      "id": "dividers",
+      "label": "t:forge.settings.dividers",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:forge.settings.heading_preset",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:forge.options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:forge.options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:forge.options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:forge.options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:forge.options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:forge.options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:forge.options.h6"
+        }
+      ],
+      "default": "h4",
+      "info": "t:forge.info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:forge.settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.borders"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:forge.settings.style",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:forge.options.solid"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:forge.settings.thickness",
+      "default": 1,
+      "visible_if": "{{ block.settings.border != \"none\" }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:forge.settings.opacity",
+      "default": 100,
+      "visible_if": "{{ block.settings.border != \"none\" }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:forge.settings.border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.accordion",
+      "category": "t:forge.categories.layout",
+      "blocks": {
+        "row-1": {
+          "type": "_accordion-row",
+          "settings": {
+            "open_by_default": true,
+            "heading": "t:forge.text_defaults.return_policy"
+          },
+          "blocks": {
+            "text-1": {
+              "type": "text",
+              "settings": {
+                "text": "t:forge.html_defaults.goal_for_every_customer",
+                "width": "100%"
+              }
+            }
+          },
+          "block_order": ["text-1"]
+        },
+        "row-2": {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "t:forge.text_defaults.shipping"
+          },
+          "blocks": {
+            "text-1": {
+              "type": "text",
+              "settings": {
+                "text": "t:forge.html_defaults.work_quickly_to_ship",
+                "width": "100%"
+              }
+            }
+          },
+          "block_order": ["text-1"]
+        },
+        "row-3": {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "t:forge.text_defaults.manufacturing"
+          },
+          "blocks": {
+            "text-1": {
+              "type": "text",
+              "settings": {
+                "text": "t:forge.html_defaults.made_local_and_global",
+                "width": "100%"
+              }
+            }
+          },
+          "block_order": ["text-1"]
+        }
+      },
+      "block_order": ["row-1", "row-2", "row-3"]
+    }
+  ]
+}
+{% endschema %}

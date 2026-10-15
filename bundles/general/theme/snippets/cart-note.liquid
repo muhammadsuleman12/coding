@@ -1,0 +1,47 @@
+<script
+  type="module"
+  src="{{ 'cart-note.js' | asset_url }}"
+></script>
+
+<forge-cart-note style="display: flex;">
+  <forge-accordion-custom
+    class="cart-note"
+    {% if settings.cart_note_open_by_default %}
+      open-by-default-on-desktop
+      open-by-default-on-mobile
+    {% endif %}
+  >
+    <details
+      class="details"
+      {% if settings.cart_note_open_by_default %}
+        open
+      {% endif %}
+    >
+      <summary class="cart-note__summary">
+        <span class="cart-note__label forge-h6">
+          {% render 'forge-t', key: 'content.seller_note', fallback: 'Special instructions' %}
+        </span>
+
+        <span class="forge-svg-wrapper forge-icon-plus">
+          {{- 'icon-plus.svg' | inline_asset_content -}}
+        </span>
+      </summary>
+
+      <div class="forge-details-content cart-note__inner">
+        <label
+          for="forge-cart-note"
+          class="forge-visually-hidden"
+        >
+          {% render 'forge-t', key: 'content.seller_note', fallback: 'Special instructions' %}
+        </label>
+        <textarea
+          form="cart-form"
+          on:input="/updateCartNote"
+          id="forge-cart-note"
+          class="cart-note__instructions"
+          name="note"
+        >{{ cart.note }}</textarea>
+      </div>
+    </details>
+  </forge-accordion-custom>
+</forge-cart-note>

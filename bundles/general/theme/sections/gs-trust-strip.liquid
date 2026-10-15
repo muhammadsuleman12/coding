@@ -1,0 +1,43 @@
+<section class="gs-section gs-section--tight gs-trust gs-trust--{{ section.settings.layout }} forge-color-{{ section.settings.color_scheme }}">
+  <ul class="gs-wrap gs-trust__list" role="list">
+    {%- for block in section.blocks -%}
+      <li class="gs-trust__item" data-gs-reveal {{ block.shopify_attributes }}>
+        {% render 'gs-icon', name: block.settings.icon, size: 34 %}
+        <span>
+          <strong>{{ block.settings.title | escape }}</strong>
+          {%- if block.settings.text != blank -%}<span>{{ block.settings.text | escape }}</span>{%- endif -%}
+        </span>
+      </li>
+    {%- endfor -%}
+  </ul>
+</section>
+
+
+{% schema %}
+{
+  "name": "Trust badges",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "select", "id": "layout", "label": "Layout", "default": "stacked", "options": [ { "value": "stacked", "label": "Icon above text" }, { "value": "inline", "label": "Icon beside text" } ] }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Badge",
+      "settings": [
+        { "type": "select", "id": "icon", "label": "Icon", "default": "truck", "options": [
+          { "value": "truck", "label": "Shipping" }, { "value": "return", "label": "Returns" }, { "value": "shield", "label": "Secure" },
+          { "value": "chat", "label": "Support" }, { "value": "clock", "label": "Fast" }, { "value": "check", "label": "Quality" },
+          { "value": "gift", "label": "Gift" }, { "value": "tag", "label": "Price" }, { "value": "box", "label": "Packaging" }, { "value": "diamond", "label": "Diamond" }, { "value": "cart", "label": "Cart" }, { "value": "headset", "label": "Headset" }, { "value": "refresh", "label": "Refresh" }, { "value": "lock", "label": "Lock" }
+        ] },
+        { "type": "text", "id": "title", "label": "Title", "default": "Fast shipping" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Tracked delivery on every order" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [{ "name": "Trust badges", "blocks": [ { "type": "item" }, { "type": "item" }, { "type": "item" }, { "type": "item" } ] }]
+}
+{% endschema %}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html
+  class="{% if request.design_mode %}shopify-design-mode{% endif %}"
+  lang="{{ request.locale.iso_code }}"
+>
+  <head>
+    <script>
+      (function () {
+        // Meta's Android in-app browser (Instagram/Facebook) gets stuck mid-navigation
+        // when the View Transitions API runs, leaving taps registering but never rendering
+        // the destination page. Flag it here, before any CSS is parsed, so base.css can
+        // disable view-transitions for this browser only.
+        if (/Android/.test(navigator.userAgent) && /Instagram|FBAN|FBAV/.test(navigator.userAgent)) {
+          document.documentElement.classList.add('meta-iab');
+        }
+      })();
+    </script>
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {% # theme-check-disable RemoteAsset %}
+    <link
+      rel="expect"
+      href="#MainContent"
+      blocking="render"
+      id="view-transition-render-blocker"
+    >
+    {% # theme-check-enable RemoteAsset %}
+
+    {%- render 'meta-tags' -%}
+    {%- render 'json-ld-organization' -%}
+    {%- render 'stylesheets' -%}
+    {%- render 'fonts' -%}
+    {%- render 'scripts' -%}
+    {%- render 'theme-styles-variables' -%}
+    {%- render 'color-schemes' -%}
+    {{ 'gs-skin.css' | asset_url | stylesheet_tag }}
+    {{ 'gs-motion.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'gs-motion.js' | asset_url }}" type="module" defer></script>
+
+    {% if request.design_mode %}
+      {%- render 'theme-editor' -%}
+    {% endif %}
+
+    {{ content_for_header }}
+  </head>
+
+  <body
+    class="{% if settings.gs_motion %}gs-motion{% else %}gs-motion-off{% endif %} page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}"
+    data-page-color-scope="{% if template.name == 'index' %}index{% elsif template.name == 'product' %}{{ template.suffix }}{% endif %}"
+  >
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+    <div id="header-group">
+      {% sections 'header-group' %}
+    </div>
+
+    <script
+      src="{{ 'critical.js' | asset_url }}"
+      type="module"
+      async
+      blocking="render"
+    ></script>
+    
+    
+
+    <main
+      id="MainContent"
+      class="forge-content-for-layout"
+      role="main"
+      data-page-transition-enabled="{{ settings.page_transition_enabled }}"
+      data-product-transition="{{ settings.transition_to_main_product }}"
+      data-template="{{ template.name }}"
+      data-page-style="{% if template.name == 'index' %}index{% elsif template.name == 'product' %}{{ template.suffix }}{% endif %}"
+    >
+      {{ content_for_layout }}
+    </main>
+
+    <div id="footer-group">
+      {% sections 'footer-group' %}
+    </div>
+
+    {% render 'search-modal' %}
+
+    {% if settings.quick_add or settings.mobile_quick_add %}
+      {% render 'quick-add-modal' %}
+    {% endif %}
+  </body>
+</html>

@@ -1,0 +1,74 @@
+
+
+{%- if shop.features.follow_on_shop? -%}
+  <div
+    class="forge-spacing-style"
+    style="{% render 'spacing-padding', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    {{ shop | login_button: action: 'follow' }}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:forge.names.follow_on_shop",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:forge.content.follow_on_shop_eligiblity"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.follow_on_shop",
+      "category": "t:forge.categories.footer"
+    }
+  ]
+}
+{% endschema %}

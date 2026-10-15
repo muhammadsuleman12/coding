@@ -1,0 +1,143 @@
+
+
+{% assign block_settings = block.settings %}
+<div
+  class="page-block forge-spacing-style{% if block_settings.inherit_color_scheme == false %} forge-color-{{ block_settings.color_scheme }}{% endif %}"
+  style="{% render 'spacing-padding', settings: block_settings %}{% if block_settings.background %} background-color: {{ block_settings.background_color }};{% endif %}"
+>
+  {%- if block_settings.page != blank -%}
+    {%- if block_settings.page.title != blank -%}
+      <h2 class="page-title">{{ block_settings.page.title }}</h2>
+    {%- endif -%}
+    {%- if block_settings.page.content != blank -%}
+      <div class="forge-rte">
+        {{ block_settings.page.content }}
+      </div>
+    {%- endif -%}
+  {%- else -%}
+    <h2 class="page-title">{% render 'forge-t', key: 'content.page_placeholder_title', fallback: 'Page title' %}</h2>
+    <div class="forge-rte">
+      {% render 'forge-t', key: 'content.page_placeholder_content', fallback: 'Select a page to display its content.' %}
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .page-block {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: auto;
+    align-items: flex-start;
+  }
+
+  .page-title {
+    margin-bottom: var(--margin-xl);
+  }
+
+  .placeholder-image {
+    position: relative;
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+  }
+
+  .page-placeholder {
+    width: 100%;
+    height: 100%;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.page",
+  "settings": [
+    {
+      "type": "page",
+      "id": "page",
+      "label": "t:forge.settings.page"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:forge.settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "background",
+      "label": "t:forge.settings.background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:forge.settings.background_color",
+      "default": "#00000026",
+      "visible_if": "{{ block.settings.background }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.page",
+      "category": "t:forge.categories.basic"
+    }
+  ]
+}
+{% endschema %}

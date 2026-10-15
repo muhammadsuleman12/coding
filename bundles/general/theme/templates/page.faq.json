@@ -1,0 +1,68 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "faq": {
+      "type": "gs-faq",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Questions, answered",
+        "subheading": "Orders, delivery and returns in plain words.",
+        "contact_label": "Ask us something",
+        "contact_link": "shopify://pages/contact-us",
+        "open_first": true
+      },
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "When will my order arrive?",
+            "answer": "<p>Delivery options and times are shown at checkout before you pay. You'll get a tracking link by email as soon as your order ships.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "Can I return something?",
+            "answer": "<p>Yes. If an item isn't right, contact us and we'll walk you through the return. Full details are in our Refund Policy.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Which payment methods can I use?",
+            "answer": "<p>All available payment methods appear at checkout. Payments are processed securely and we never see your full card details.</p>"
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "How do I track my order?",
+            "answer": "<p>Use the tracking link in your shipping email. If you made an account, you can also see your orders there.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "faq"
+  ]
+}

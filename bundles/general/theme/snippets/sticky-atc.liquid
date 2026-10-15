@@ -1,0 +1,2400 @@
+{% liquid
+  assign satc_use_scheme = block.settings.use_scheme_colors
+  if satc_use_scheme == blank
+    assign satc_use_scheme = true
+  endif
+  assign satc_scheme = section.settings.color_scheme
+  assign satc_bg     = block.settings.container_background_color
+  if satc_bg == blank
+    assign satc_bg = satc_scheme.settings.background
+  endif
+  assign satc_fg     = satc_scheme.settings.foreground
+  assign satc_btn_bg = block.settings.button_background_color
+  if satc_btn_bg == blank
+    assign satc_btn_bg = satc_scheme.settings.primary_button_background
+  endif
+  assign satc_btn_text = block.settings.button_text_color
+  if satc_btn_text == blank
+    assign satc_btn_text = satc_scheme.settings.primary_button_text
+  endif
+  assign satc_badge_bg = block.settings.badge_bg_color
+  if satc_badge_bg == blank
+    assign satc_badge_bg = satc_scheme.settings.primary_button_background
+  endif
+  assign satc_badge_text = block.settings.badge_text_color
+  if satc_badge_text == blank
+    assign satc_badge_text = satc_scheme.settings.primary_button_text
+  endif
+  assign satc_title_color = block.settings.product_title_color
+  if satc_title_color == blank
+    assign satc_title_color = satc_scheme.settings.foreground_heading | default: satc_fg
+  endif
+  assign satc_price_color = block.settings.price_color
+  if satc_price_color == blank
+    assign satc_price_color = satc_fg
+  endif
+  assign satc_muted_color = block.settings.compare_price_color
+  if satc_muted_color == blank
+    assign satc_muted_color = satc_scheme.settings.foreground_muted | default: satc_fg
+  endif
+  assign satc_option_color = block.settings.product_option_color
+  if satc_option_color == blank
+    assign satc_option_color = satc_scheme.settings.foreground_muted | default: satc_fg
+  endif
+  assign satc_gradient_mode = false
+  if settings.style_mode == 'gradient' and satc_use_scheme
+    assign satc_gradient_mode = true
+  endif
+  assign satc_grad_1 = satc_scheme.settings.gradient_1 | default: satc_scheme.settings.primary
+  assign satc_grad_2 = satc_scheme.settings.gradient_2 | default: satc_scheme.settings.primary
+  assign satc_grad_3 = satc_scheme.settings.gradient_3 | default: satc_scheme.settings.primary
+  assign satc_grad_text = satc_scheme.settings.gradient_text_color | default: satc_scheme.settings.background
+  capture satc_button_gradient
+    echo 'linear-gradient(135deg, '
+    echo satc_grad_1
+    echo ', '
+    echo satc_grad_2
+    echo ', '
+    echo satc_grad_3
+    echo ')'
+  endcapture
+
+  assign satc_radius_top = block.settings.container_border_radius | default: 10
+
+  assign satc_use_theme_shape = block.settings.use_theme_shape_settings
+  if satc_use_theme_shape == blank
+    assign satc_use_theme_shape = true
+  endif
+  assign satc_dropdown_animated_border = block.settings.enable_variant_dropdown_animated_border
+  if satc_dropdown_animated_border == blank
+    assign satc_dropdown_animated_border = true
+  endif
+  if satc_use_theme_shape
+    assign satc_btn_radius = 'var(--style-border-radius-buttons-primary)'
+    assign satc_variant_radius = 'var(--style-border-radius-inputs)'
+    assign satc_image_radius = 'var(--style-border-radius-images)'
+  else
+    assign satc_btn_radius = block.settings.button_border_radius | default: 8 | append: 'px'
+    assign satc_variant_radius = block.settings.variant_selector_border_radius | default: 8 | append: 'px'
+    assign satc_image_radius = block.settings.image_border_radius | default: 8 | append: 'px'
+  endif
+%}
+{% style %}
+  .product-block-{{ block.id }} {
+    --product-title-color: {{ satc_title_color }};
+    --product-option-color: {{ satc_option_color }};
+    --product-title-size: {{ block.settings.title_size }}px;
+    --product-option-size: {{ block.settings.option_size }}px;
+    --satc-text: {{ satc_fg }};
+    --satc-bg-base: {{ satc_bg }};
+    --satc-accent: {{ block.settings.accent_color | default: satc_btn_bg }};
+    --satc-radius-top: {{ satc_radius_top }}px;
+    --satc-pad-y: {{ block.settings.bar_vertical_padding | default: 12 }}px;
+    --satc-max-width: {{ block.settings.bar_max_width | default: 1280 }}px;
+    --satc-compact-width: {{ block.settings.compact_width | default: 560 }}px;
+    --satc-btn-radius: {{ satc_btn_radius }};
+    --satc-variant-radius: {{ satc_variant_radius }};
+    --satc-image-radius: {{ satc_image_radius }};
+  }
+
+  #section-block-{{ block.id }}.product-block-{{ block.id }} {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 9999;
+    color: var(--satc-text);
+    border: 0 !important;
+    border-top: 1px solid color-mix(in srgb, var(--satc-text) 10%, transparent) !important;
+    border-radius: var(--satc-radius-top) var(--satc-radius-top) 0 0 !important;
+    overflow: hidden;
+    {% if block.settings.enable_backdrop_blur != false %}
+    background-color: color-mix(in srgb, var(--satc-bg-base) 96%, transparent) !important;
+    {% else %}
+    background-color: var(--satc-bg-base) !important;
+    {% endif %}
+    background-image:
+      {% if block.settings.enable_backdrop_blur != false %}
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--satc-bg-base) 97%, transparent),
+        color-mix(in srgb, var(--satc-bg-base) 98%, transparent)
+      ),
+      {% endif %}
+      {% if block.settings.enable_bg_gradient != false %}
+      radial-gradient(
+        circle at 16% 0%,
+        color-mix(in srgb, var(--satc-accent) 14%, var(--satc-bg-base)),
+        var(--satc-bg-base) 38%
+      ),
+      {% endif %}
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--satc-bg-base) 99%, white),
+        var(--satc-bg-base)
+      ) !important;
+    box-shadow:
+      {% if block.settings.container_shadow != false %}
+      0 -14px 36px -14px color-mix(in srgb, var(--satc-text) 22%, transparent),
+      0 -2px 8px -4px color-mix(in srgb, var(--satc-accent) 28%, transparent),
+      {% endif %}
+      inset 0 1px 0 color-mix(in srgb, white 42%, transparent) !important;
+    {% if block.settings.enable_backdrop_blur != false %}
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    {% endif %}
+    transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    pointer-events: auto;
+    isolation: isolate;
+  }
+
+  {% if block.settings.enable_accent_line != false %}
+  #section-block-{{ block.id }}.product-block-{{ block.id }}::before {
+    content: '';
+    position: absolute;
+    inset-inline: clamp(18px, 4vw, 36px);
+    inset-block-start: 0;
+    height: 3px;
+    border-radius: 0 0 999px 999px;
+    background: linear-gradient(90deg, transparent, var(--satc-accent), transparent);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  {% endif %}
+
+  body:has(#section-block-{{ block.id }}.sticky-atc--active.sticky-atc--full-width) {
+    padding-bottom: clamp(96px, 14vh, 140px);
+  }
+  @media (max-width: 768px) {
+    body:has(#section-block-{{ block.id }}.sticky-atc--active) {
+      padding-bottom: clamp(140px, 24vh, 200px);
+    }
+  }
+
+  @media (min-width: 769px) {
+    #section-block-{{ block.id }}.sticky-atc--compact.product-block-{{ block.id }} {
+      left: auto !important;
+      right: 20px !important;
+      bottom: 20px !important;
+      width: min(var(--satc-compact-width), calc(100vw - 40px)) !important;
+      max-width: var(--satc-compact-width) !important;
+      border-radius: var(--satc-radius-top) !important;
+      border: 1px solid color-mix(in srgb, var(--satc-text) 10%, transparent) !important;
+      box-shadow:
+        {% if block.settings.container_shadow != false %}
+        0 26px 70px -36px color-mix(in srgb, var(--satc-text) 55%, transparent),
+        0 12px 28px -18px color-mix(in srgb, var(--satc-accent) 45%, transparent),
+        {% endif %}
+        inset 0 1px 0 color-mix(in srgb, white 42%, transparent) !important;
+    }
+
+    #section-block-{{ block.id }}.sticky-atc--compact.product-block-{{ block.id }}::before {
+      inset-inline: 14px;
+    }
+
+    #section-block-{{ block.id }}.sticky-atc--compact .sticky-atc-container--restructured {
+      max-width: none !important;
+      margin: 0 !important;
+      padding: var(--satc-pad-y) 16px !important;
+    }
+
+    #section-block-{{ block.id }}.sticky-atc--compact .forge-sticky-atc__title {
+      max-width: 220px !important;
+    }
+
+    #section-block-{{ block.id }}.sticky-atc--compact.sticky-atc--after-scroll {
+      transform: translateY(calc(100% + 24px)) !important;
+    }
+
+    #section-block-{{ block.id }}.sticky-atc--compact.sticky-atc--after-scroll.sticky-atc--active {
+      transform: translateY(0) !important;
+    }
+  }
+
+
+  #section-block-{{ block.id }}.forge-sticky-atc {
+    #atc-price-{{ section.id }} .forge-price,
+    #atc-price-{{ section.id }} .price--sale {
+      color: {{ satc_price_color }} !important;
+      {% if block.settings.price_size != blank %}
+        font-size: {{ block.settings.price_size }}px !important;
+        line-height: 1 !important;
+      {% endif %}
+    }
+
+    #atc-price-{{ section.id }} .forge-compare-at-price {
+      color: {{ satc_muted_color }} !important;
+      {% if block.settings.comp_price_size != blank %}
+        font-size: {{ block.settings.comp_price_size }}px !important;
+        line-height: 1 !important;
+      {% endif %}
+    }
+
+    #atc-price-{{ section.id }} .forge-bundle-price-display {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: baseline !important;
+      gap: 0.5rem !important;
+    }
+
+    #atc-price-{{ section.id }} .forge-bundle-price-display .forge-compare-at-price {
+      text-decoration: line-through !important;
+      font-size: {{ block.settings.comp_price_size | default: 18 }}px !important;
+      color: {{ satc_muted_color }} !important;
+      font-weight: 400 !important;
+    }
+
+    #atc-price-{{ section.id }} .forge-bundle-badge {
+      background-color: var(--satc-badge-bg) !important;
+      color: var(--satc-badge-text) !important;
+      border-radius: var(--style-border-radius-global) !important;
+      font-size: {{ block.settings.badge_font_size | default: 12 }}px !important;
+      padding: {{ block.settings.badge_padding | default: 4 }}px {{ block.settings.badge_padding | default: 4 | times: 2 }}px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.025em !important;
+      white-space: nowrap !important;
+      line-height: 1 !important;
+    }
+
+    @media (min-width: 769px) {
+      #atc-price-{{ section.id }} .forge-bundle-badge {
+        margin-top: 5px !important;
+      }
+    }
+
+    #atc-price-{{ section.id }} .price-wrapper {
+      display: inline-flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      gap: 5px 8px !important;
+    }
+    #atc-price-{{ section.id }} .price-group {
+      display: inline-flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      flex-wrap: nowrap !important;
+      gap: 6px !important;
+    }
+
+    #atc-price-{{ section.id }} .forge-price-badge,
+    #atc-price-{{ section.id }} .forge-badge.price__badge-sale {
+      display: inline-flex !important;
+      align-items: center !important;
+      background-color: var(--satc-badge-bg) !important;
+      color: var(--satc-badge-text) !important;
+      border-radius: var(--style-border-radius-global) !important;
+      font-size: {{ block.settings.badge_font_size | default: 12 }}px !important;
+      padding: 3px 7px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.04em !important;
+      white-space: nowrap !important;
+      line-height: 1 !important;
+      flex-shrink: 0 !important;
+      margin-left: 0 !important;
+      align-self: center !important;
+    }
+
+    .forge-sticky-atc__dropdown {
+      border-radius: var(--satc-variant-radius) !important;
+    }
+
+    .forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus) {
+      border-radius: var(--satc-btn-radius) !important;
+      overflow: hidden;
+      border: none !important;
+      background: var(--satc-btn-bg) !important;
+      transition: filter 0.15s ease, transform 0.1s ease !important;
+      {% case block.settings.button_size %}
+        {% when 'small' %}
+          padding-left: 16px !important;
+          padding-right: 16px !important;
+        {% when 'large' %}
+          padding-left: 40px !important;
+          padding-right: 40px !important;
+        {% else %}
+          padding-left: 28px !important;
+          padding-right: 28px !important;
+      {% endcase %}
+    }
+
+    .forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus):hover:not(:disabled) {
+      filter: brightness(0.94) !important;
+    }
+    .forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus):active:not(:disabled) {
+      transform: scale(0.985) !important;
+    }
+
+    .forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus) {
+      .forge-product-form-button-text,
+      .forge-product-form-button-text:before {
+        color: var(--satc-btn-text) !important;
+        line-height: 1 !important;
+      }
+    }
+
+    .forge-button.forge-quantity-minus,
+    .forge-button.forge-quantity-plus {
+      background: transparent !important;
+      color: var(--color-foreground) !important;
+      border-radius: var(--style-border-radius-global) !important;
+    }
+    .forge-button.forge-quantity-minus svg,
+    .forge-button.forge-quantity-plus svg {
+      fill: var(--color-foreground) !important;
+      color: var(--color-foreground) !important;
+    }
+
+    {% unless block.settings.show_price %}
+      #atc-price-{{ section.id }} .forge-price,
+      #atc-price-{{ section.id }} .price--sale {
+        display: none !important;
+      }
+    {% endunless %}
+
+    {% unless block.settings.show_compare_at_price %}
+      #atc-price-{{ section.id }} .forge-compare-at-price {
+        display: none !important;
+      }
+    {% endunless %}
+
+    {% unless block.settings.show_price_badge %}
+      #atc-price-{{ section.id }} .forge-price-badge {
+        display: none !important;
+      }
+    {% endunless %}
+
+    {% unless block.settings.show_variant_selector %}
+      .forge-sticky-atc__dropdowns,
+      .sticky-atc__option-field,
+      .sticky-atc__option-border,
+      .forge-sticky-atc__dropdown-wrapper,
+      .forge-sticky-atc__dropdown,
+      #section-block-{{ block.id }} .forge-sticky-atc__dropdowns {
+        display: none !important;
+      }
+    {% endunless %}
+  }
+
+  {% assign needs_wiggle = false %}
+  {% if block.settings.enable_hover_wiggle or block.settings.auto_wiggle_interval != 'off' %}
+    {% assign needs_wiggle = true %}
+  {% endif %}
+
+  {% if needs_wiggle %}
+    {% assign wiggle_intensity = block.settings.wiggle_intensity | default: 'normal' %}
+
+    {% if wiggle_intensity == 'subtle' %}
+      @keyframes gentle-wiggle-sticky-atc-{{ block.id }} {
+        0%, 100% { transform: rotate(0deg) translateY(-1px); }
+        25% { transform: rotate(-0.25deg) translateY(-1.5px); }
+        50% { transform: rotate(0deg) translateY(-1px); }
+        75% { transform: rotate(0.25deg) translateY(-1.5px); }
+      }
+    {% elsif wiggle_intensity == 'pronounced' %}
+      @keyframes gentle-wiggle-sticky-atc-{{ block.id }} {
+        0%, 100% { transform: rotate(0deg) translateY(-1px); }
+        25% { transform: rotate(-1.5deg) translateY(-3px); }
+        50% { transform: rotate(0deg) translateY(-1px); }
+        75% { transform: rotate(1.5deg) translateY(-3px); }
+      }
+    {% else %}
+      @keyframes gentle-wiggle-sticky-atc-{{ block.id }} {
+        0%, 100% { transform: rotate(0deg) translateY(-1px); }
+        25% { transform: rotate(-0.5deg) translateY(-2px); }
+        50% { transform: rotate(0deg) translateY(-1px); }
+        75% { transform: rotate(0.5deg) translateY(-2px); }
+      }
+    {% endif %}
+
+    {% if block.settings.enable_hover_wiggle %}
+      #section-block-{{ block.id }} .forge-sticky-atc__button .forge-button:hover:not(:disabled),
+      #section-block-{{ block.id }} .forge-sticky-atc__button .forge-button:hover:not([disabled]) {
+        animation: gentle-wiggle-sticky-atc-{{ block.id }} 0.6s ease-in-out !important;
+      }
+    {% endif %}
+
+    #section-block-{{ block.id }} .forge-sticky-atc__button .forge-button.auto-wiggle:not(:disabled),
+    #section-block-{{ block.id }} .forge-sticky-atc__button .forge-button.auto-wiggle:not([disabled]) {
+      animation: gentle-wiggle-sticky-atc-{{ block.id }} 0.6s ease-in-out !important;
+    }
+  {% endif %}
+
+  @media (max-width: 768px) {
+    #section-block-{{ block.id }}.forge-sticky-atc {
+      .forge-badge.price__badge-sale,
+      .forge-price-badge {
+        line-height: 1;
+        padding: {{ block.settings.badge_padding | default: 4 | minus: 1 }}px {{ block.settings.badge_padding | default: 4 | times: 1.5 | round }}px !important;
+        gap: 0;
+        font-size: {{ block.settings.badge_font_size | default: 12 | minus: 2 }}px !important;
+        border-radius: var(--style-border-radius-global) !important;
+      }
+
+      .forge-price {
+        .price__compare-price .forge-price-item--regular {
+          font-size: {{ block.settings.comp_price_size | minus: 3 }}px !important;
+          font-weight: 600;
+        }
+
+        .forge-price-item,
+        .forge-price-item--sale,
+        span.forge-price-item.forge-price-item--sale.forge-price-item--last {
+          font-size: {{ block.settings.price_size | minus: 3 }}px !important;
+          font-weight: 600;
+        }
+      }
+
+      .forge-bundle-price-display {
+        gap: 0.375rem !important;
+      }
+
+      .forge-bundle-price-display .forge-compare-at-price {
+        font-size: {{ block.settings.comp_price_size | default: 18 | minus: 4 }}px !important;
+      }
+
+      .forge-bundle-badge {
+        font-size: {{ block.settings.badge_font_size | default: 12 | minus: 2 }}px !important;
+        padding: {{ block.settings.badge_padding | default: 4 | minus: 1 }}px {{ block.settings.badge_padding | default: 4 | times: 1.5 | round }}px !important;
+      }
+
+      .forge-sticky-atc__image img {
+        height: 40px;
+      }
+
+      .forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus) {
+        {% case block.settings.button_size %}
+          {% when 'small' %}
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+          {% when 'large' %}
+            padding-left: 28px !important;
+            padding-right: 28px !important;
+          {% else %}
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        {% endcase %}
+      }
+    }
+  }
+
+  #section-block-{{ block.id }}.sticky-atc--after-scroll {
+    transform: translateY(100%) !important;
+  }
+  #section-block-{{ block.id }}.sticky-atc--after-scroll.sticky-atc--active {
+    transform: translateY(0) !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc-container--restructured {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: var(--satc-max-width) !important;
+    box-sizing: border-box !important;
+    padding: var(--satc-pad-y) clamp(16px, 4vw, 36px) calc(var(--satc-pad-y) + env(safe-area-inset-bottom, 0px)) !important;
+    {%- case block.settings.container_alignment -%}
+      {%- when 'left' -%}
+        margin: 0 auto 0 0 !important;
+      {%- when 'right' -%}
+        margin: 0 0 0 auto !important;
+      {%- else -%}
+        margin-inline: auto !important;
+    {%- endcase -%}
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__image {
+    flex-shrink: 0 !important;
+    position: relative !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__image img {
+    height: 64px !important;
+    width: 64px !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: var(--satc-image-radius) !important;
+    background: color-mix(in srgb, var(--satc-text) 7%, transparent) !important;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--satc-text) 8%, transparent),
+      0 10px 22px -15px color-mix(in srgb, var(--satc-text) 45%, transparent) !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__quantity-badge {
+    position: absolute !important;
+    top: -8px !important;
+    right: -8px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    padding: 0 7px !important;
+    border-radius: var(--style-border-radius-pills) !important;
+    background: var(--satc-btn-bg, var(--color-primary-button-background, #000)) !important;
+    color: var(--satc-btn-text, var(--color-primary-button-text, #fff)) !important;
+    border: 2px solid var(--satc-bg-base, #fff) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+    box-shadow: 0 6px 14px -6px color-mix(in srgb, var(--satc-accent) 55%, transparent) !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__title {
+    font-size: var(--product-title-size, 16px) !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--product-title-color) !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px 16px !important;
+    flex-wrap: wrap !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__price {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 4px 10px !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__price .forge-price {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
+    flex-wrap: wrap !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__dropdowns {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    min-width: 0 !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__option-field {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__option-label {
+    display: block !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: max(11px, calc(var(--product-option-size, 14px) - 2px)) !important;
+    font-weight: 650 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
+    color: var(--product-option-color) !important;
+    opacity: 0.92 !important;
+    white-space: nowrap !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__swatches .sticky-atc__option-label {
+    float: none !important;
+    width: auto !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border,
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .forge-sticky-atc__dropdown-wrapper {
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__dropdown-wrapper {
+    margin: 0 !important;
+  }
+
+  {% if satc_dropdown_animated_border %}
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border {
+    position: relative !important;
+    display: block !important;
+    width: auto !important;
+    padding: 3px !important;
+    border-radius: calc(var(--satc-variant-radius) + 3px) !important;
+    overflow: hidden !important;
+    isolation: isolate !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: -120% !important;
+    z-index: 0 !important;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg 40deg,
+      var(--satc-accent) 80deg,
+      color-mix(in srgb, var(--satc-accent) 50%, white) 150deg,
+      var(--satc-accent) 210deg,
+      transparent 250deg 360deg
+    ) !important;
+    animation: satc-option-border-spin-{{ block.id }} 3.8s linear infinite !important;
+  }
+
+  @keyframes satc-option-border-spin-{{ block.id }} {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border__inner {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    border-radius: var(--satc-variant-radius) !important;
+    background: color-mix(in srgb, {{ satc_fg }} 7%, {{ satc_bg }}) !important;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 38%, transparent) !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__dropdown {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    color: {{ satc_fg }} !important;
+    font-size: {{ block.settings.option_size | default: 14 }}px !important;
+    font-weight: 600 !important;
+    padding: 8px 30px 8px 12px !important;
+    min-width: 88px !important;
+    max-width: 100% !important;
+    border-radius: var(--satc-variant-radius) !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    transition: background-color 0.15s ease !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border:has(.forge-sticky-atc__dropdown:hover) .sticky-atc__option-border__inner {
+    background: color-mix(in srgb, var(--satc-accent) 6%, {{ satc_bg }}) !important;
+  }
+  #section-block-{{ block.id }} .forge-sticky-atc__dropdown:focus {
+    outline: none !important;
+  }
+  #section-block-{{ block.id }} .forge-sticky-atc__dropdown:focus-visible {
+    outline: none !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border:has(.forge-sticky-atc__dropdown:focus-visible) {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--satc-accent) 22%, transparent) !important;
+  }
+  #section-block-{{ block.id }} .forge-sticky-atc__dropdown-wrapper .forge-select-wrapper {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  #section-block-{{ block.id }} .forge-sticky-atc__dropdown-wrapper .forge-icon-caret {
+    position: absolute !important;
+    top: 50% !important;
+    right: 12px !important;
+    left: auto !important;
+    transform: translateY(-50%) !important;
+    width: 10px !important;
+    height: 10px !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    color: {{ satc_fg }} !important;
+  }
+
+  #section-block-{{ block.id }} .sticky-atc__swatches {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border::before {
+      animation: none !important;
+      inset: 0 !important;
+      inset-block-start: auto !important;
+      height: 2px !important;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--satc-accent),
+        transparent
+      ) !important;
+      transform: none !important;
+    }
+  }
+  {% else %}
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .forge-sticky-atc__dropdown {
+    border: 1px solid color-mix(in srgb, {{ satc_fg }} 26%, transparent) !important;
+    background: color-mix(in srgb, {{ satc_fg }} 7%, {{ satc_bg }}) !important;
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, white 38%, transparent),
+      0 1px 2px color-mix(in srgb, {{ satc_fg }} 6%, transparent) !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .forge-sticky-atc__dropdown:hover {
+    border-color: color-mix(in srgb, var(--satc-accent) 40%, {{ satc_fg }}) !important;
+    background: color-mix(in srgb, var(--satc-accent) 6%, {{ satc_bg }}) !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .forge-sticky-atc__dropdown:focus-visible {
+    border-color: var(--satc-accent) !important;
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, white 38%, transparent),
+      0 0 0 3px color-mix(in srgb, var(--satc-accent) 22%, transparent) !important;
+  }
+  {% endif %}
+
+  #section-block-{{ block.id }} .sticky-atc__swatch-label {
+    position: relative !important;
+    display: inline-flex !important;
+    cursor: pointer !important;
+    border-radius: var(--style-border-radius-pills) !important;
+    line-height: 0 !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__swatch-input {
+    position: absolute !important;
+    inset: 0 !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__swatch-label .forge-swatch {
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: var(--style-border-radius-pills) !important;
+    display: block !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, {{ satc_fg }} 22%, transparent) !important;
+    transition: box-shadow 0.12s ease, transform 0.1s ease !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__swatch-label:hover .forge-swatch {
+    transform: scale(1.06) !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__swatch-label:has(.sticky-atc__swatch-input:checked) .forge-swatch {
+    box-shadow: 0 0 0 2px {{ satc_bg }}, 0 0 0 4px {{ satc_btn_bg }} !important;
+  }
+  #section-block-{{ block.id }} .sticky-atc__swatch-label:has(.sticky-atc__swatch-input:focus-visible) .forge-swatch {
+    box-shadow: 0 0 0 2px {{ satc_bg }}, 0 0 0 4px {{ satc_fg }} !important;
+  }
+
+  #section-block-{{ block.id }} .forge-sticky-atc__button {
+    padding: 0 !important;
+    margin: 0 !important;
+    align-self: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  @media (max-width: 768px) {
+    #section-block-{{ block.id }}.product-block-{{ block.id }} {
+      border-radius: 0 !important;
+    }
+
+    {% if block.settings.enable_accent_line != false %}
+    #section-block-{{ block.id }}.product-block-{{ block.id }}::before {
+      inset-inline: 14px;
+    }
+    {% endif %}
+
+    #section-block-{{ block.id }} .sticky-atc-container--restructured {
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: flex-start !important;
+      gap: 10px 12px !important;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      max-width: none !important;
+      margin-inline: 0 !important;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__image {
+      flex-shrink: 0 !important;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__image img {
+      height: 56px !important;
+      width: 56px !important;
+    }
+
+    #section-block-{{ block.id }} .sticky-atc__content {
+      flex: 1 !important;
+      min-width: 0 !important;
+      gap: 4px !important;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__title {
+      font-size: 14px !important;
+      max-width: none !important;
+      white-space: normal !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 1 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+      line-height: 1.3 !important;
+    }
+
+    #section-block-{{ block.id }} .sticky-atc__row {
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      gap: 8px !important;
+      padding-top: 5px;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__price {
+      margin: 0 !important;
+    }
+
+    #section-block-{{ block.id }} .sticky-atc__controls {
+      position: static !important;
+      order: 3 !important;
+      flex: 1 1 100% !important;
+      width: 100% !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 8px 10px !important;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__dropdowns {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      gap: 8px !important;
+      flex: 1 1 auto !important;
+      width: auto !important;
+      min-width: 0 !important;
+    }
+
+    #section-block-{{ block.id }} .sticky-atc__option-field {
+      width: auto !important;
+      max-width: 100% !important;
+    }
+
+    #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .sticky-atc__option-border,
+    #section-block-{{ block.id }} .sticky-atc__option-field--dropdown .forge-sticky-atc__dropdown-wrapper {
+      width: auto !important;
+      max-width: min(100%, 220px) !important;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__dropdown {
+      width: 100% !important;
+      min-width: 72px !important;
+      max-width: 220px !important;
+    }
+
+    #section-block-{{ block.id }} .sticky-atc__swatches {
+      width: auto !important;
+      max-width: 100% !important;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__button {
+      width: auto !important;
+      flex: 1 1 120px !important;
+      min-width: 120px !important;
+      margin-inline-start: auto !important;
+    }
+
+    #section-block-{{ block.id }} .forge-sticky-atc__button .forge-button {
+      width: 100% !important;
+      min-height: 44px !important;
+    }
+  }
+{% endstyle %}
+
+{%- assign atc_class = 'forge-sticky-atc sticky-atc--after-scroll' -%}
+{%- if block.settings.bar_width_mode == 'compact' -%}
+  {%- assign atc_class = atc_class | append: ' sticky-atc--compact' -%}
+{%- else -%}
+  {%- assign atc_class = atc_class | append: ' sticky-atc--full-width' -%}
+{%- endif -%}
+{%- if block.settings.container_alignment == 'left' -%}
+  {%- assign atc_class = atc_class | append: ' sticky-atc--align-left' -%}
+{%- elsif block.settings.container_alignment == 'center' -%}
+  {%- assign atc_class = atc_class | append: ' sticky-atc--align-center' -%}
+{%- else -%}
+  {%- assign atc_class = atc_class | append: ' sticky-atc--align-right' -%}
+{%- endif -%}
+
+{%- liquid
+  if satc_gradient_mode
+    assign satc_computed_btn_bg = satc_button_gradient
+    assign satc_computed_btn_text = satc_grad_text
+  else
+    assign satc_computed_btn_bg = satc_btn_bg
+    assign satc_computed_btn_text = satc_btn_text
+  endif
+  if block.settings.button_background_color != blank
+    assign satc_computed_btn_bg = block.settings.button_background_color
+  endif
+  if block.settings.button_text_color != blank
+    assign satc_computed_btn_text = block.settings.button_text_color
+  endif
+-%}
+<div
+  id="section-block-{{ block.id }}"
+  class="{{ atc_class }} product-block-{{ block.id }} sticky-atc-mobile-button-only"
+  style="--satc-btn-bg: {{ satc_computed_btn_bg }}; --satc-btn-text: {{ satc_computed_btn_text }}; --satc-badge-bg: {{ satc_badge_bg }}; --satc-badge-text: {{ satc_badge_text }};"
+  {{ block.shopify_attributes }}
+>
+  <div class="forge-sticky-atc-container sticky-atc-container--restructured">
+    <div class="forge-sticky-atc__image">
+      {{ product.featured_image | image_url: height: 200 | image_tag }}
+      {% if block.settings.show_quantity_badge %}
+        <span class="sticky-atc__quantity-badge" aria-live="polite" hidden>1×</span>
+      {% endif %}
+    </div>
+
+    <div class="sticky-atc__content">
+      <h3 class="forge-sticky-atc__title">{{ product.title }}</h3>
+      <div class="sticky-atc__row">
+        <div class="forge-sticky-atc__price" id="atc-price-{{ section.id }}">
+          {%- if product != blank -%}
+            {%- render 'price',
+              product_resource: product,
+              show_badges: block.settings.show_price_badge
+            -%}
+          {%- endif -%}
+        </div>
+
+        <div class="sticky-atc__controls">
+          {%- if block.settings.show_variant_selector and product.has_only_default_variant == false -%}
+            <div class="forge-sticky-atc__dropdowns">
+              {%- for option in product.options_with_values -%}
+                {%- assign satc_swatch_count = option.values | map: 'swatch' | compact | size -%}
+                {%- if satc_swatch_count > 0 -%}
+                  <fieldset
+                    class="sticky-atc__swatches sticky-atc__option-field"
+                    data-option="{{ option.name | escape }}"
+                  >
+                    <legend class="sticky-atc__option-label">{{ option.name }}</legend>
+                    {%- for value in option.values -%}
+                      <label
+                        class="sticky-atc__swatch-label"
+                        title="{{ value | escape }}"
+                      >
+                        <input
+                          type="radio"
+                          class="sticky-atc__swatch-input"
+                          name="sticky-swatch-{{ block.id }}-{{ forloop.index0 }}"
+                          value="{{ value | escape }}"
+                          data-option="{{ option.name | escape }}"
+                          aria-label="{{ value | escape }}"
+                          {% if option.selected_value == value %}checked{% endif %}
+                        >
+                        {% render 'swatch', swatch: value.swatch %}
+                      </label>
+                    {%- endfor -%}
+                  </fieldset>
+                {%- else -%}
+                  <div class="sticky-atc__option-field sticky-atc__option-field--dropdown">
+                    <label
+                      class="sticky-atc__option-label"
+                      for="sticky-dropdown-{{ block.id }}-{{ forloop.index0 }}"
+                    >
+                      {{- option.name -}}
+                    </label>
+                    {%- if satc_dropdown_animated_border -%}
+                      <div class="sticky-atc__option-border">
+                        <div class="sticky-atc__option-border__inner">
+                          <div class="forge-sticky-atc__dropdown-wrapper">
+                            <div class="forge-select-wrapper" style="position: relative;">
+                              <select
+                                id="sticky-dropdown-{{ block.id }}-{{ forloop.index0 }}"
+                                class="forge-sticky-atc__dropdown"
+                                data-option="{{ option.name | escape }}"
+                              >
+                                {%- for value in option.values -%}
+                                  <option
+                                    value="{{ value | escape }}"
+                                    {% if option.selected_value == value %}selected{% endif %}
+                                  >
+                                    {{ value }}
+                                  </option>
+                                {%- endfor -%}
+                              </select>
+                              <svg aria-hidden="true" focusable="false" class="forge-icon forge-icon-caret" viewBox="0 0 10 6">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 0 0-.708 0L5 4.293 1.354.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0 0-.708" fill="currentColor"/>
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {%- else -%}
+                      <div class="forge-sticky-atc__dropdown-wrapper">
+                        <div class="forge-select-wrapper" style="position: relative;">
+                          <select
+                            id="sticky-dropdown-{{ block.id }}-{{ forloop.index0 }}"
+                            class="forge-sticky-atc__dropdown"
+                            data-option="{{ option.name | escape }}"
+                          >
+                            {%- for value in option.values -%}
+                              <option
+                                value="{{ value | escape }}"
+                                {% if option.selected_value == value %}selected{% endif %}
+                              >
+                                {{ value }}
+                              </option>
+                            {%- endfor -%}
+                          </select>
+                          <svg aria-hidden="true" focusable="false" class="forge-icon forge-icon-caret" viewBox="0 0 10 6">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 0 0-.708 0L5 4.293 1.354.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0 0-.708" fill="currentColor"/>
+                          </svg>
+                        </div>
+                      </div>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          <div class="forge-sticky-atc__button">
+        {%- liquid
+          assign satc_atc_label = block.settings.button_label
+          if satc_atc_label == blank
+            capture satc_atc_label
+              render 'forge-t', key: 'products.product.add_to_cart', fallback: 'Add to cart'
+            endcapture
+          endif
+          assign satc_buynow_label = block.settings.buy_now_label
+          if satc_buynow_label == blank
+            capture satc_buynow_label
+              render 'forge-t', key: 'products.product.buy_now', fallback: 'Buy it now'
+            endcapture
+          endif
+          assign product_form_id = 'BuyButtons-ProductForm-' | append: section.id
+          assign check_against_inventory = true
+          if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
+            assign check_against_inventory = false
+          endif
+          if product.selected_or_first_available_variant.quantity_rule.min > product.selected_or_first_available_variant.inventory_quantity and check_against_inventory
+            assign quantity_rule_soldout = true
+          endif
+        -%}
+        {%- if block.settings.button_action == 'buy_now' -%}
+          <button
+            type="button"
+            class="forge-button split-slide-button"
+            id="atc-button-{{ section.id }}"
+            data-buy-now="true"
+            data-buy-now-label="{{ satc_buynow_label | escape }}"
+            {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}disabled{% endif %}
+          >
+            <div class="split-slide-right"></div>
+            <span class="product-added-success forge-hidden">{% render 'forge-t', key: 'products.product.added_to_cart', fallback: 'Added to cart' %}</span>
+            <span class="forge-product-form-button-text button-text">
+              {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+                {% capture satc_sold_out %}{% render 'forge-t', key: 'products.product.sold_out', fallback: 'Sold out' %}{% endcapture %}{{ satc_sold_out | capitalize }}
+              {%- else -%}
+                {{ satc_buynow_label }}
+              {%- endif -%}
+            </span>
+            <div class="forge-loading-overlay__spinner forge-hidden">
+              <svg aria-hidden="true" focusable="false" class="forge-spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                <circle class="forge-path" fill="none" stroke-width="6" cx="33" cy="33" r="30" stroke="#ffffff"/>
+              </svg>
+            </div>
+          </button>
+        {%- else -%}
+        <button
+          type="submit"
+          name="add"
+          class="forge-button split-slide-button"
+          id="atc-button-{{ section.id }}"
+          form="{{ product_form_id }}"
+          data-button-label="{{ satc_atc_label | escape }}"
+          {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}disabled{% endif %}
+        >
+          <div class="split-slide-right"></div>
+          <span class="product-added-success forge-hidden">{% render 'forge-t', key: 'products.product.added_to_cart', fallback: 'Added to cart' %}</span>
+            <span class="forge-product-form-button-text button-text">
+              {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+                {% capture satc_sold_out %}{% render 'forge-t', key: 'products.product.sold_out', fallback: 'Sold out' %}{% endcapture %}{{ satc_sold_out | capitalize }}
+              {%- else -%}
+                {{ satc_atc_label }}
+              {%- endif -%}
+            </span>
+          <div class="forge-loading-overlay__spinner forge-hidden">
+            <svg aria-hidden="true" focusable="false" class="forge-spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+              <circle class="forge-path" fill="none" stroke-width="6" cx="33" cy="33" r="30" stroke="#ffffff"/>
+            </svg>
+          </div>
+        </button>
+        {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script defer>
+  // Global function to ensure only one sticky ATC exists and is properly positioned
+  const initializeStickyATC = () => {
+    const targetId = 'section-block-{{ block.id }}';
+    const stickyAtcs = document.querySelectorAll('.forge-sticky-atc');
+
+    // Find the target sticky ATC (by ID) or the first one
+    let targetStickyAtc = document.getElementById(targetId);
+
+    // If there are multiple sticky ATCs
+    if (stickyAtcs.length > 1) {
+      stickyAtcs.forEach((atc) => {
+        if (atc.id !== targetId) {
+          atc.remove();
+        }
+      });
+
+      if (!targetStickyAtc && stickyAtcs.length > 0) {
+        targetStickyAtc = stickyAtcs[0];
+        targetStickyAtc.id = targetId;
+      }
+    } else if (stickyAtcs.length === 1 && !targetStickyAtc) {
+      targetStickyAtc = stickyAtcs[0];
+      targetStickyAtc.id = targetId;
+    }
+
+    if (!targetStickyAtc) {
+      targetStickyAtc = document.querySelector('.forge-sticky-atc');
+      if (targetStickyAtc) {
+        targetStickyAtc.id = targetId;
+      }
+    }
+
+    // Move sticky ATC to body level to escape section stacking context
+    if (targetStickyAtc) {
+      if (targetStickyAtc.id !== targetId) {
+        targetStickyAtc.id = targetId;
+      }
+
+      if (!targetStickyAtc.classList.contains('forge-sticky-atc')) {
+        targetStickyAtc.classList.add('forge-sticky-atc');
+      }
+
+      if (!targetStickyAtc.classList.contains('sticky-atc--after-scroll')) {
+        targetStickyAtc.classList.add('sticky-atc--after-scroll');
+      }
+
+      const showVariantSelector = {{ block.settings.show_variant_selector | json }};
+      const rightContainer = targetStickyAtc.querySelector('.sticky-atc__right');
+      if (rightContainer) {
+        if (showVariantSelector) {
+          rightContainer.classList.remove('sticky-atc__right--no-selector');
+        } else {
+          rightContainer.classList.add('sticky-atc__right--no-selector');
+        }
+      }
+
+      // Move to body to escape section stacking context.
+      // Colors are resolved in Liquid (not CSS vars) so nothing breaks after the move.
+      if (targetStickyAtc.parentElement && targetStickyAtc.parentElement.tagName !== 'BODY') {
+        document.body.appendChild(targetStickyAtc);
+      }
+    }
+
+    const finalCheck = document.querySelectorAll('.forge-sticky-atc');
+    if (finalCheck.length > 1) {
+      const target = document.getElementById(targetId);
+      if (target) {
+        finalCheck.forEach((atc) => {
+          if (atc.id !== targetId) {
+            atc.remove();
+          }
+        });
+      } else {
+        const first = finalCheck[0];
+        first.id = targetId;
+        for (let i = 1; i < finalCheck.length; i++) {
+          finalCheck[i].remove();
+        }
+      }
+    }
+  };
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeStickyATC);
+  } else {
+    initializeStickyATC();
+  }
+
+  const getSelectedQuantity = () => {
+    if (window.forgeBundleSelection && window.forgeBundleSelection.quantity) {
+      return parseInt(window.forgeBundleSelection.quantity) || 1;
+    }
+    const bundleSelection = window.forgeBundleSelection || null;
+    if (bundleSelection && bundleSelection.quantity) {
+      return parseInt(bundleSelection.quantity) || 1;
+    }
+    const quantityInput = document.querySelector('input[name="quantity"]');
+    if (quantityInput) {
+      const parsed = parseInt(quantityInput.value);
+      if (!Number.isNaN(parsed) && parsed > 0) return parsed;
+    }
+    return 1;
+  };
+
+  const updateStickyAtcQuantityBadge = () => {
+    const stickyAtc = document.getElementById('section-block-{{ block.id }}');
+    if (!stickyAtc) return;
+    const badge = stickyAtc.querySelector('.sticky-atc__quantity-badge');
+    if (!badge) return;
+    const quantity = getSelectedQuantity();
+    badge.textContent = `${quantity}×`;
+    badge.hidden = quantity <= 1;
+  };
+
+  const handleQuantityEvent = (event) => {
+    const value = event && event.target ? event.target.value : undefined;
+    const source = event && event.target && event.target instanceof Element ? event.target.closest('forge-quantity-selector-component') ? 'forge-quantity-selector-component' : event.target.tagName : 'unknown';
+    updateStickyAtcQuantityBadge();
+  };
+
+  const attachQuantityListeners = () => {
+    const quantityInputs = document.querySelectorAll('input[name="quantity"]');
+    quantityInputs.forEach((input) => {
+      input.addEventListener('input', handleQuantityEvent);
+      input.addEventListener('change', handleQuantityEvent);
+    });
+    document.addEventListener('forge:bundle-selection-updated', handleQuantityEvent);
+    document.addEventListener('forge:bundleSelected', handleQuantityEvent);
+    document.addEventListener('quantity:change', handleQuantityEvent, true);
+    document.addEventListener('quantity:input', handleQuantityEvent, true);
+    // Direct listeners on quantity selector web components (if present)
+    document.querySelectorAll('forge-quantity-selector-component').forEach((selector) => {
+      selector.addEventListener('change', handleQuantityEvent);
+      selector.addEventListener('input', handleQuantityEvent);
+    });
+    // Fallback for plus/minus button clicks inside quantity selectors
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target && target.closest && target.closest('forge-quantity-selector-component')) {
+        requestAnimationFrame(updateStickyAtcQuantityBadge);
+      }
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      updateStickyAtcQuantityBadge();
+      attachQuantityListeners();
+    });
+  } else {
+    updateStickyAtcQuantityBadge();
+    attachQuantityListeners();
+  }
+
+  // Watch for new sticky ATC elements being added (e.g., from theme editor reloads)
+  const watchForDuplicates = () => {
+    const observer = new MutationObserver(() => {
+      const stickyAtcs = document.querySelectorAll('.forge-sticky-atc');
+      if (stickyAtcs.length > 1) {
+        initializeStickyATC();
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    return observer;
+  };
+
+  setTimeout(() => {
+    watchForDuplicates();
+  }, 500);
+
+  const checkATCScroll = () => {
+    window.requestAnimationFrame(() => {
+     const stickyAtc = document.getElementById('section-block-{{ block.id }}') || document.querySelector('.forge-sticky-atc');
+
+      if (!stickyAtc) {
+        updateStickyAtcDocumentOffset();
+        return;
+      }
+
+      const forgeStickyScroller = () => {
+        const doc = document.scrollingElement || document.documentElement;
+        if (doc.scrollHeight > doc.clientHeight) return doc;
+        const candidates = document.querySelectorAll('body > *');
+        for (const c of candidates) {
+          const o = getComputedStyle(c).overflowY;
+          if ((o === 'auto' || o === 'scroll') && c.scrollHeight > c.clientHeight) return c;
+        }
+        return doc;
+      };
+
+      const triggerMode = '{{ block.settings.trigger_mode | default: "button_position" }}';
+
+      // Mode 1: Scroll percentage based
+      if (triggerMode === 'scroll_percentage') {
+        const scrollPercentage = {{ block.settings.scroll_percentage | default: 50 }};
+        const scroller = forgeStickyScroller();
+        const max = scroller.scrollHeight - scroller.clientHeight;
+        const scrolled = max > 0 ? (scroller.scrollTop / max) * 100 : 0;
+
+        if (scrolled >= scrollPercentage) {
+          stickyAtc.classList.add('sticky-atc--active');
+        } else {
+          stickyAtc.classList.remove('sticky-atc--active');
+        }
+      } else {
+      // Mode 2: Button position based (default)
+      // Function to find the best ATC button to track
+      const findBestATCButton = () => {
+        // Priority order: visible bundler button > main product button > buy buttons > add to cart button
+        const bundlerButton = document.getElementById('atlas-add-bundle-btn');
+        const mainButton = document.getElementById('my-add-to-cart-button');
+        const buyButtons = document.querySelector('[id^="BuyButtons-ProductSubmitButton-"]');
+        const addToCartButton = document.querySelector('.forge-add-to-cart-button button, .add-to-cart-with-price__button');
+        const allATCButtons = document.querySelectorAll('.atc-button');
+
+        // Check if bundler button is visible and available
+        if (bundlerButton && bundlerButton.offsetParent !== null && getComputedStyle(bundlerButton).display !== 'none') {
+          return bundlerButton;
+        }
+
+        // Fallback to main product button if visible
+        if (mainButton && mainButton.offsetParent !== null) {
+          return mainButton;
+        }
+
+        if (buyButtons && buyButtons.offsetParent !== null) {
+          return buyButtons;
+        }
+
+        // Check for add to cart button
+        if (addToCartButton && addToCartButton.offsetParent !== null) {
+          return addToCartButton;
+        }
+
+        // Final fallback: find any visible ATC button
+        for (let button of allATCButtons) {
+          if (button.offsetParent !== null && getComputedStyle(button).display !== 'none') {
+            return button;
+          }
+        }
+
+        return null;
+      };
+
+      const regularATC = findBestATCButton();
+
+      // If no ATC button found (hidden), show sticky ATC immediately
+      if (!regularATC) {
+        stickyAtc.classList.add('sticky-atc--active');
+      } else {
+      // Show sticky ATC earlier - configurable offset before the button reaches the top of viewport
+      const offset = {{ block.settings.scroll_offset | default: 300 }}; // Configurable offset
+
+      if (regularATC.getBoundingClientRect().top < offset) {
+        stickyAtc.classList.add('sticky-atc--active');
+      } else {
+        stickyAtc.classList.remove('sticky-atc--active');
+      }
+      }
+      }
+
+      updateStickyAtcDocumentOffset();
+      observeStickyAtcHeight(stickyAtc.classList.contains('sticky-atc--active') ? stickyAtc : null);
+    })
+  };
+
+  let stickyAtcResizeObserver = null;
+
+  const updateStickyAtcDocumentOffset = () => {
+    const activeBar = document.querySelector('.forge-sticky-atc.sticky-atc--active');
+    if (activeBar) {
+      const height = Math.ceil(activeBar.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--sticky-atc-height', `${height}px`);
+    } else {
+      document.documentElement.style.removeProperty('--sticky-atc-height');
+    }
+  };
+
+  const observeStickyAtcHeight = (bar) => {
+    if (stickyAtcResizeObserver) {
+      stickyAtcResizeObserver.disconnect();
+      stickyAtcResizeObserver = null;
+    }
+    if (!bar) return;
+    stickyAtcResizeObserver = new ResizeObserver(() => updateStickyAtcDocumentOffset());
+    stickyAtcResizeObserver.observe(bar);
+  };
+
+  window.addEventListener('resize', updateStickyAtcDocumentOffset);
+
+  // Function to find the product form dynamically (defined globally)
+  const findProductForm = () => {
+    // Try multiple methods to find the product form
+    const formById = document.querySelector('[id^="BuyButtons-ProductForm-"]');
+    if (formById) return formById;
+
+    const productFormComponent = document.querySelector('forge-product-form-component');
+    if (productFormComponent) {
+      const form = productFormComponent.querySelector('form[id^="BuyButtons-ProductForm-"]');
+      if (form) return form;
+      // Also check if the component itself contains the form
+      const formInComponent = productFormComponent.querySelector('form');
+      if (formInComponent) return formInComponent;
+    }
+
+    const formByType = document.querySelector('form[data-type="add-to-cart-form"]');
+    if (formByType) return formByType;
+
+    const variantInput = document.querySelector('input[name="id"][type="hidden"]');
+    if (variantInput) {
+      const form = variantInput.closest('form');
+      if (form) return form;
+    }
+
+    return null;
+  };
+
+  // Product option names in order - used to map variant.options[i] to option name.
+  const stickyAtcProductOptionNames = {{ product.options | json }};
+  const stickyAtcProductVariants = {{ product.variants | json }};
+
+  const getVariantOptionsFromRecord = (variant) => {
+    if (!variant) return [];
+    if (Array.isArray(variant.options)) return variant.options.filter(Boolean);
+    return [variant.option1, variant.option2, variant.option3].filter(Boolean);
+  };
+
+  const getStickyVariantCatalog = () => window.forgeVariants || stickyAtcProductVariants || [];
+
+  const resolveVariantIdFromOptions = (selectedOptions) => {
+    const variants = getStickyVariantCatalog();
+    if (!variants.length || !selectedOptions.length) return null;
+    if (selectedOptions.some(v => !v)) return null;
+
+    const match = variants.find(v => {
+      const opts = getVariantOptionsFromRecord(v);
+      return selectedOptions.every((val, i) => opts[i] === val);
+    });
+
+    return match ? String(match.id) : null;
+  };
+
+  const getStickySelectedOptions = () => {
+    const stickyEl = document.getElementById('section-block-{{ block.id }}') || document.querySelector('.forge-sticky-atc');
+    if (!stickyEl) return [];
+
+    return stickyAtcProductOptionNames.map(name => {
+      const dropdown = stickyEl.querySelector(`select.forge-sticky-atc__dropdown[data-option="${CSS.escape(name)}"]`);
+      if (dropdown && dropdown.value) return dropdown.value;
+
+      const checkedSwatch = stickyEl.querySelector(`input.sticky-atc__swatch-input[data-option="${CSS.escape(name)}"]:checked`);
+      return checkedSwatch ? checkedSwatch.value : null;
+    });
+  };
+
+  const publishStickyVariantSync = () => {
+    const options = getStickySelectedOptions();
+    if (options.some(v => !v)) return;
+
+    const variantId = resolveVariantIdFromOptions(options);
+    if (!variantId) return;
+
+    currentVariantId = String(variantId).split('/').pop();
+
+    document.dispatchEvent(new CustomEvent('forge:variantSync', {
+      bubbles: true,
+      detail: {
+        variantId,
+        source: 'sticky-atc',
+        options
+      }
+    }));
+  };
+
+  const handleDropdownChange = (event) => {
+    const selectedOption = event.target.getAttribute('data-option');
+    const selectedValue = event.target.value;
+    if (!selectedOption || !selectedValue) return;
+
+    // Determine the 0-based option index from sticky bar order
+    const stickyEl = document.getElementById('section-block-{{ block.id }}') || document.querySelector('.forge-sticky-atc');
+    const seenOptions = [];
+    if (stickyEl) {
+      stickyEl.querySelectorAll('[data-option]').forEach((ctrl) => {
+        const n = ctrl.getAttribute('data-option');
+        if (n && !seenOptions.includes(n)) seenOptions.push(n);
+      });
+    }
+    const optionIndex = seenOptions.indexOf(selectedOption);
+
+    // Drive the main <forge-variant-picker> by fieldset index - robust against hyphens in option names.
+    const variantPicker = document.querySelector('forge-variant-picker');
+    let didDriveMainPicker = false;
+    if (variantPicker && optionIndex >= 0) {
+      const fieldsets = variantPicker.querySelectorAll('fieldset');
+      const fieldset = fieldsets[optionIndex];
+      if (fieldset) {
+        const radio = fieldset.querySelector(`input[value="${CSS.escape(selectedValue)}"]`);
+        if (radio && !radio.checked) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+          didDriveMainPicker = true;
+        }
+      }
+    }
+
+    // Fallback for dropdown-style main picker
+    if (!didDriveMainPicker) {
+      const sel = document.querySelector(`select[name="options[${selectedOption}]"]`);
+      if (sel && sel.value !== selectedValue) {
+        sel.value = selectedValue;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    // Keep other sticky controls in sync (e.g. swatch + dropdown both exist for same option)
+    if (stickyEl) {
+      stickyEl.querySelectorAll(`select.forge-sticky-atc__dropdown[data-option="${CSS.escape(selectedOption)}"]`).forEach((ctrl) => {
+        if (ctrl !== event.target && ctrl.value !== selectedValue) ctrl.value = selectedValue;
+      });
+      stickyEl.querySelectorAll(`input.sticky-atc__swatch-input[data-option="${CSS.escape(selectedOption)}"]`).forEach((inp) => {
+        if (inp !== event.target) inp.checked = inp.value === selectedValue;
+      });
+    }
+
+    publishStickyVariantSync();
+    setTimeout(updateVariantId, 100);
+  };
+
+  // Store current variant ID for Buy Now (global scope)
+  let currentVariantId = null;
+
+  // Store bundle selection data
+  let bundleSelection = null;
+
+  // Format money helper - extract currency symbol from existing price display
+  const formatMoneyStickyATC = (cents) => {
+    if (typeof Shopify !== 'undefined' && typeof Shopify.formatMoney === 'function') {
+      try {
+        return Shopify.formatMoney(cents);
+      } catch(e) {
+        console.warn('Shopify.formatMoney failed:', e);
+      }
+    }
+
+    const amount = (cents / 100).toFixed(2);
+    let currencySymbol = null;
+
+    // Try Shopify currency object first
+    if (typeof Shopify !== 'undefined' && Shopify.currency && Shopify.currency.active) {
+        const currencyMap = {
+          'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'CAD': 'C$', 'AUD': '$',
+          'CHF': 'CHF', 'CNY': '¥', 'SEK': 'kr', 'NOK': 'kr', 'DKK': 'kr', 'PLN': 'zł',
+          'RUB': '₽', 'INR': '₹', 'BRL': 'R$', 'ZAR': 'R', 'MXN': '$', 'KRW': '₩'
+        };
+      currencySymbol = currencyMap[Shopify.currency.active] || Shopify.currency.active;
+    }
+
+    // Try to extract currency symbol from existing price on the page
+    if (!currencySymbol) {
+      const existingPrice = document.querySelector('.forge-price:not(.forge-bundle-price-display .forge-price), .forge-price-item, .product__price');
+      if (existingPrice && existingPrice.textContent) {
+        const priceText = existingPrice.textContent.trim();
+        const currencyMatch = priceText.match(/^([^\d\s.,]+)|([^\d\s.,]+)$/);
+        if (currencyMatch) {
+          currencySymbol = currencyMatch[1] || currencyMatch[2];
+        }
+      }
+    }
+
+    // Return formatted price with currency symbol
+    return currencySymbol ? currencySymbol + amount : amount;
+  };
+
+  // Update sticky price display from bundle selection
+  const updateStickyPriceFromBundle = () => {
+    if (!bundleSelection) return;
+
+    const stickyPrice = document.getElementById('atc-price-{{ section.id }}');
+    if (!stickyPrice) return;
+
+    const { discountedTotal, originalTotal } = bundleSelection;
+
+    // Get savings label directly from DOM (selected bundle card)
+    // This works even if the extension hasn't been redeployed with savingsLabel in event data
+    let savingsLabel = bundleSelection.savingsLabel;
+    if (!savingsLabel) {
+      const selectedCard = document.querySelector('.forge-bundle-card.selected');
+      if (selectedCard) {
+        const savingsBadge = selectedCard.querySelector('.forge-bundle-savings-badge');
+        savingsLabel = savingsBadge ? savingsBadge.textContent.trim() : null;
+      }
+    }
+
+    // Build badge HTML if savings label exists
+    const showBadge = {{ block.settings.show_price_badge | json }};
+    let badgeHtml = '';
+    if (showBadge && savingsLabel) {
+      badgeHtml = `<span class="forge-badge price__badge-sale forge-bundle-badge">${savingsLabel}</span>`;
+    }
+
+    // Build custom price HTML for bundle - inline layout with proper styling
+    let priceHtml = '';
+
+    if (discountedTotal < originalTotal) {
+      priceHtml = `
+        <div class="forge-price price--sale forge-bundle-price-display">
+          ${badgeHtml}
+          <span class="forge-price-item forge-price-item--sale">${formatMoneyStickyATC(discountedTotal)}</span>
+          <span class="forge-compare-at-price">${formatMoneyStickyATC(originalTotal)}</span>
+        </div>
+      `;
+    } else {
+      // Regular price display
+      priceHtml = `
+        <div class="forge-price forge-bundle-price-display">
+          ${badgeHtml}
+          <span class="forge-price-item">${formatMoneyStickyATC(discountedTotal)}</span>
+        </div>
+      `;
+    }
+
+    stickyPrice.innerHTML = priceHtml;
+  };
+
+  // Listen for bundle selection changes
+  document.addEventListener('forge:bundleSelected', (e) => {
+    if (e.detail) {
+      bundleSelection = e.detail;
+      updateStickyPriceFromBundle();
+    }
+  });
+
+  // Also check for existing bundle selection on load
+  if (window.forgeBundleSelection) {
+    bundleSelection = window.forgeBundleSelection;
+  }
+
+  // Listen for variant changes to update currentVariantId
+  const updateVariantId = () => {
+    const productForm = findProductForm();
+    if (!productForm) return;
+
+    // Try to get variant ID from form
+    const variantInput = productForm.querySelector('input[name="id"]');
+    if (variantInput && variantInput.value) {
+      currentVariantId = variantInput.value;
+    }
+
+    // Also try from forge-product-form-component
+    const productFormComponent = productForm.closest('forge-product-form-component');
+    if (productFormComponent) {
+      const variantIdRef = productFormComponent.querySelector('[ref="variantId"]');
+      if (variantIdRef && variantIdRef.value) {
+        currentVariantId = variantIdRef.value;
+      }
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const atcButton = document.getElementById('atc-button-{{ section.id }}');
+    const productFormId = 'BuyButtons-ProductForm-{{ section.id }}';
+    {%- if block.settings.button_action == 'buy_now' -%}
+    const isBuyNow = true;
+    {%- else -%}
+    const isBuyNow = false;
+    {%- endif -%}
+
+    // Listen for variant update events (correct theme event - variant:change does not exist)
+    document.addEventListener('variant:update', (e) => {
+      if (e.detail && e.detail.resource && e.detail.resource.id) {
+        currentVariantId = e.detail.resource.id.toString();
+      } else {
+        updateVariantId();
+      }
+    });
+
+    // Initial variant ID update
+    updateVariantId();
+
+    // Also update when form changes
+    const productForm = findProductForm();
+    if (productForm) {
+      const observer = new MutationObserver(updateVariantId);
+      observer.observe(productForm, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['value']
+      });
+    }
+
+    if (atcButton) {
+      if (isBuyNow && atcButton.dataset.buyNow === 'true') {
+        // Buy Now functionality - add to cart and redirect to checkout
+        atcButton.addEventListener('click', async (e) => {
+          e.preventDefault();
+
+          if (atcButton.disabled) {
+            return;
+          }
+
+          const productForm = findProductForm();
+          if (!productForm) {
+            console.error('Product form not found. Trying alternative methods...');
+            // Try to get variant ID directly without form
+          }
+
+          // Show loading state
+          atcButton.disabled = true;
+          const spinner = atcButton.querySelector('.forge-loading-overlay__spinner');
+          const buttonText = atcButton.querySelector('.forge-product-form-button-text');
+          if (spinner) spinner.classList.remove('forge-hidden');
+          // Opacity is handled by CSS when spinner is visible
+
+          try {
+            // Get variant ID - use stored currentVariantId first, then try other methods
+            let variantId = currentVariantId;
+
+            // Update variant ID from form
+            updateVariantId();
+            if (!variantId) {
+              variantId = currentVariantId;
+            }
+
+            if (!variantId) {
+              if (productForm) {
+                const variantInput = productForm.querySelector('input[name="id"]');
+                if (variantInput && variantInput.value) {
+                  variantId = variantInput.value;
+                }
+              } else {
+                // Search globally for variant input
+                const variantInput = document.querySelector('input[name="id"][type="hidden"]');
+                if (variantInput && variantInput.value) {
+                  variantId = variantInput.value;
+                }
+              }
+            }
+
+            if (!variantId) {
+              const productFormComponent = document.querySelector('forge-product-form-component');
+              if (productFormComponent) {
+                const variantIdRef = productFormComponent.querySelector('[ref="variantId"]');
+                if (variantIdRef && variantIdRef.value) {
+                  variantId = variantIdRef.value;
+                }
+                // Also try direct property access
+                if (!variantId && productFormComponent.variantId) {
+                  variantId = productFormComponent.variantId;
+                }
+              }
+            }
+
+            if (!variantId) {
+              const variantSelects = document.querySelectorAll('variant-selects, variant-radios');
+              for (const selector of variantSelects) {
+                if (selector.currentVariant && selector.currentVariant.id) {
+                  variantId = selector.currentVariant.id.toString();
+                  break;
+                }
+                if (selector.selectedVariant && selector.selectedVariant.id) {
+                  variantId = selector.selectedVariant.id.toString();
+                  break;
+                }
+              }
+            }
+
+            if (!variantId) {
+              const productData = window.productData || window.Shopify?.analytics?.meta?.product;
+              if (productData && productData.selected_or_first_available_variant) {
+                variantId = productData.selected_or_first_available_variant.id.toString();
+              }
+            }
+
+            console.log('Variant ID found:', variantId);
+
+            if (!variantId) {
+              throw new Error('Variant ID not found. Please select a variant.');
+            }
+
+            // Ensure variant ID is a string
+            variantId = variantId.toString();
+
+            // Get quantity - prioritize bundle selection
+            let quantity = 1;
+
+            // First check for bundle selection
+            if (bundleSelection && bundleSelection.quantity) {
+              quantity = bundleSelection.quantity;
+            } else if (window.forgeBundleSelection && window.forgeBundleSelection.quantity) {
+              quantity = window.forgeBundleSelection.quantity;
+            } else if (productForm) {
+              const quantityInput = productForm.querySelector('input[name="quantity"]');
+              quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+            } else {
+              // Try to find quantity input globally
+              const quantityInput = document.querySelector('input[name="quantity"]');
+              quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+            }
+
+            console.log('Buy now:', { variantId, quantity });
+
+            const checkoutForm = findProductForm();
+
+            // Payment apps (Razorpay COD, Releasit COD, etc.) hook into Shopify's native payment button.
+            if (typeof window.forgeTriggerAcceleratedCheckout === 'function') {
+              const triggered = window.forgeTriggerAcceleratedCheckout({
+                form: checkoutForm,
+                variantId,
+                quantity,
+              });
+              if (triggered) return;
+            }
+
+            // Fallback: add to cart, then redirect to checkout
+            const response = await fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                items: [{
+                  id: variantId,
+                  quantity: quantity
+                }]
+              })
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+              window.location.href = '/checkout';
+            } else {
+              throw new Error(responseData.description || responseData.message || 'Failed to add to cart');
+            }
+          } catch (error) {
+            console.error('Buy Now error:', error);
+
+            // Reset button state on error
+            atcButton.disabled = false;
+            if (spinner) spinner.classList.add('forge-hidden');
+            if (buttonText) buttonText.style.opacity = '';
+
+            // Show error message
+            alert(error.message || 'Unable to add product to cart. Please try again.');
+          }
+        });
+      } else {
+        // Regular Add to Cart functionality
+      atcButton.addEventListener('click', (e) => {
+        // First, ensure quantity input reflects bundle selection
+        if (bundleSelection && bundleSelection.quantity) {
+          const quantityInput = document.querySelector('input[name="quantity"]');
+          if (quantityInput && parseInt(quantityInput.value) !== bundleSelection.quantity) {
+            quantityInput.value = bundleSelection.quantity;
+            quantityInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        } else if (window.forgeBundleSelection && window.forgeBundleSelection.quantity) {
+          const quantityInput = document.querySelector('input[name="quantity"]');
+          if (quantityInput && parseInt(quantityInput.value) !== window.forgeBundleSelection.quantity) {
+            quantityInput.value = window.forgeBundleSelection.quantity;
+            quantityInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }
+
+        const productForm = document.getElementById(productFormId);
+
+        if (productForm) {
+          // Find the submit button in the form and click it
+          const formSubmitButton = productForm.querySelector('button[type="submit"], [id^="BuyButtons-ProductSubmitButton-"]');
+          if (formSubmitButton && !formSubmitButton.disabled) {
+            e.preventDefault();
+            formSubmitButton.click();
+            return;
+          }
+        }
+
+        // Fallback: Try to find and click the actual add to cart button
+        const buyButton = document.querySelector('[id^="BuyButtons-ProductSubmitButton-"]');
+        const addToCartBtn = document.querySelector('.forge-add-to-cart-button button, .add-to-cart-with-price__button');
+
+        if (buyButton && !buyButton.disabled) {
+          e.preventDefault();
+          buyButton.click();
+        } else if (addToCartBtn && !addToCartBtn.disabled) {
+          e.preventDefault();
+          addToCartBtn.click();
+        }
+      });
+      }
+    }
+
+    // Attach dropdown change handlers - only to the current sticky ATC
+    const stickyAtcElement = document.getElementById('section-block-{{ block.id }}') || document.querySelector('.forge-sticky-atc');
+    if (stickyAtcElement) {
+      stickyAtcElement.querySelectorAll('.forge-sticky-atc__dropdown, .sticky-atc__swatch-input').forEach(control => {
+        // Remove existing listeners to prevent duplicates
+        control.removeEventListener('change', handleDropdownChange);
+        control.addEventListener('change', handleDropdownChange);
+      });
+    }
+
+    // Listen for variant changes from the main product form and update sticky ATC price
+    let isUpdatingPrice = false;
+    const updateStickyPrice = () => {
+      // Prevent duplicate updates
+      if (isUpdatingPrice) return;
+
+      // Don't override bundle price - bundle takes priority
+      if (bundleSelection || window.forgeBundleSelection) {
+        return;
+      }
+
+      isUpdatingPrice = true;
+
+      // Find the main product price - prioritize product-details price, then any price in product-details section
+      const productDetailsSection = document.querySelector('.forge-product-details');
+      let mainPrice = null;
+
+      if (productDetailsSection) {
+        // First try to find price within product-details
+        mainPrice = productDetailsSection.querySelector('forge-product-price');
+      }
+
+      // Fallback to finding any forge-product-price in the main product section
+      if (!mainPrice) {
+        const productInfoSection = document.querySelector('.product-information');
+        if (productInfoSection) {
+          mainPrice = productInfoSection.querySelector('forge-product-price');
+        }
+      }
+
+      // Last resort: find any forge-product-price (but avoid product cards)
+      if (!mainPrice) {
+        const allPrices = document.querySelectorAll('forge-product-price');
+        for (let price of allPrices) {
+          // Skip if it's in a product card or collection
+          if (!price.closest('.forge-product-card') && !price.closest('.collection-item')) {
+            mainPrice = price;
+            break;
+          }
+        }
+      }
+
+      const stickyPrice = document.getElementById('atc-price-{{ section.id }}');
+
+      if (mainPrice && stickyPrice) {
+        // Get the price container content, not the entire innerHTML
+        const priceContainer = mainPrice.querySelector('[ref="priceContainer"]');
+        if (priceContainer) {
+          stickyPrice.innerHTML = priceContainer.innerHTML;
+        } else {
+          // Fallback to innerHTML if priceContainer not found
+          stickyPrice.innerHTML = mainPrice.innerHTML;
+        }
+
+      }
+
+      isUpdatingPrice = false;
+    };
+
+    // Mirror selections from the main picker into sticky controls.
+    // variant:update fires after the picker's server fetch resolves - detail.resource
+    // contains the full variant object with an .options array in option-position order.
+    const syncStickyControlsFromOptions = (options) => {
+      if (!options || !Array.isArray(options)) return;
+
+      const sticky = document.getElementById('section-block-{{ block.id }}') || document.querySelector('.forge-sticky-atc');
+      if (!sticky) return;
+
+      options.forEach((value, index) => {
+        const optName = stickyAtcProductOptionNames[index];
+        if (!optName) return;
+        sticky.querySelectorAll(`select.forge-sticky-atc__dropdown[data-option="${CSS.escape(optName)}"]`).forEach((dd) => {
+          if (dd.value !== value) dd.value = value;
+        });
+        sticky.querySelectorAll(`input.sticky-atc__swatch-input[data-option="${CSS.escape(optName)}"]`).forEach((inp) => {
+          inp.checked = inp.value === value;
+        });
+      });
+    };
+
+    document.addEventListener('variant:update', (e) => {
+      updateStickyPrice();
+
+      const variant = e.detail && e.detail.resource;
+      if (!variant || !Array.isArray(variant.options)) return;
+
+      // Update variant ID for Buy Now
+      if (variant.id) currentVariantId = String(variant.id);
+
+      syncStickyControlsFromOptions(variant.options);
+
+      const sticky = document.getElementById('section-block-{{ block.id }}') || document.querySelector('.forge-sticky-atc');
+      if (!sticky) return;
+
+      // Update sticky image.
+      // Root cause of "doesn't update": image_tag generates both src AND srcset;
+      // changing only src has no visual effect when the browser uses srcset.
+      // Fix: read the new image from e.detail.data.html (the server response the
+      // forge-media-gallery itself uses), then update BOTH src and srcset on the sticky img.
+      const stickyImg = sticky.querySelector('.forge-sticky-atc__image img');
+      if (stickyImg) {
+        const resizeSrc = (src) => {
+          try {
+            const url = new URL(src);
+            url.searchParams.set('width', '200');
+            url.searchParams.set('height', '200');
+            url.searchParams.set('crop', 'center');
+            return url.toString();
+          } catch (_) { return src; }
+        };
+
+        const applySrc = (src) => {
+          if (!src) return false;
+          const sized = resizeSrc(src);
+          stickyImg.src = sized;
+          stickyImg.srcset = sized; // single-entry srcset overrides the old multi-width one
+          return true;
+        };
+
+        // Priority 1: server response HTML - same source forge-media-gallery uses, always correct.
+        const responseHtml = e.detail && e.detail.data && e.detail.data.html;
+        let found = false;
+        if (responseHtml) {
+          const newGalleryImg = responseHtml.querySelector('forge-media-gallery img.forge-product-media__image, forge-media-gallery img[src]');
+          if (newGalleryImg) found = applySrc(newGalleryImg.getAttribute('src'));
+        }
+
+        // Priority 2: variant JSON (featured_image.src is what Shopify JSON actually outputs)
+        if (!found) {
+          const fi = (variant.featured_media && variant.featured_media.preview_image) || variant.featured_image;
+          if (fi && fi.src) found = applySrc(fi.src);
+        }
+
+        // Priority 3: live DOM after forge-media-gallery has replaced itself (rAF)
+        if (!found) {
+          requestAnimationFrame(() => {
+            const galleryImg = document.querySelector('forge-media-gallery img.forge-product-media__image, forge-media-gallery img[src]');
+            if (galleryImg) applySrc(galleryImg.getAttribute('src'));
+          });
+        }
+      }
+
+      // Sync available/disabled state of the ATC button
+      const atcBtn = document.getElementById('atc-button-{{ section.id }}');
+      if (atcBtn && variant.available !== undefined) {
+        if (variant.available) {
+          atcBtn.disabled = false;
+          const btnText = atcBtn.querySelector('.forge-product-form-button-text');
+          if (btnText) btnText.textContent = atcBtn.dataset.buyNow === 'true'
+            ? (atcBtn.dataset.buyNowLabel || {{ satc_buynow_label | json }})
+            : (atcBtn.dataset.buttonLabel || {{ satc_atc_label | json }});
+        } else {
+          atcBtn.disabled = true;
+          const btnText = atcBtn.querySelector('.forge-product-form-button-text');
+          if (btnText) btnText.textContent = {% capture satc_sold_out %}{% render 'forge-t', key: 'products.product.sold_out', fallback: 'Sold out' %}{% endcapture %}{{ satc_sold_out | capitalize | json }};
+        }
+      }
+    });
+
+    // Sync sticky controls when bundle variant pickers change (before variant:update resolves).
+    document.addEventListener('forge:variantSync', (e) => {
+      const detail = e.detail || {};
+      if (detail.source === 'sticky-atc') return;
+
+      if (detail.variantId) {
+        currentVariantId = String(detail.variantId);
+      }
+
+      if (detail.options && detail.options.length) {
+        syncStickyControlsFromOptions(detail.options);
+      } else if (detail.variantId) {
+        const variants = getStickyVariantCatalog();
+        const numericId = String(detail.variantId).split('/').pop();
+        const variant = variants.find(v => String(v.id).split('/').pop() === numericId);
+        if (variant) {
+          syncStickyControlsFromOptions(getVariantOptionsFromRecord(variant));
+        }
+      }
+    });
+
+    // Also watch for any changes to the main price element using MutationObserver
+    // Wait a bit for the page to fully load
+    setTimeout(() => {
+      const productDetailsSection = document.querySelector('.forge-product-details');
+      let mainPrice = null;
+
+      if (productDetailsSection) {
+        mainPrice = productDetailsSection.querySelector('forge-product-price');
+      }
+
+      if (!mainPrice) {
+        const productInfoSection = document.querySelector('.product-information');
+        if (productInfoSection) {
+          mainPrice = productInfoSection.querySelector('forge-product-price');
+        }
+      }
+
+      if (mainPrice) {
+        let priceUpdateTimeout = null;
+        const priceObserver = new MutationObserver(() => {
+          // Debounce the update
+          clearTimeout(priceUpdateTimeout);
+          priceUpdateTimeout = setTimeout(updateStickyPrice, 50);
+        });
+        priceObserver.observe(mainPrice, { childList: true, subtree: true, characterData: true });
+      }
+    }, 500);
+
+    // Initial sync - try multiple times to ensure price is synced
+    const initialSync = () => {
+      // Check for bundle selection first
+      if (window.forgeBundleSelection) {
+        bundleSelection = window.forgeBundleSelection;
+        updateStickyPriceFromBundle();
+      } else {
+        updateStickyPrice();
+      }
+
+      // Try again after a short delay in case price element wasn't ready
+      setTimeout(() => {
+        if (window.forgeBundleSelection) {
+          bundleSelection = window.forgeBundleSelection;
+          updateStickyPriceFromBundle();
+        } else {
+          updateStickyPrice();
+        }
+      }, 200);
+
+      // Final attempt after page is fully loaded
+      setTimeout(() => {
+        if (window.forgeBundleSelection) {
+          bundleSelection = window.forgeBundleSelection;
+          updateStickyPriceFromBundle();
+        } else {
+          updateStickyPrice();
+        }
+      }, 1000);
+    };
+
+    initialSync();
+
+    checkATCScroll();
+
+    // Set up auto-wiggle for sticky ATC if enabled
+    const setupStickyAtcWiggle = () => {
+      const autoWiggleInterval = '{{ block.settings.auto_wiggle_interval | default: "off" }}';
+      if (autoWiggleInterval === 'off') return;
+
+      const intervalSeconds = parseInt(autoWiggleInterval, 10);
+      if (Number.isNaN(intervalSeconds)) return;
+
+      setInterval(() => {
+        const targetStickyAtc = document.getElementById('section-block-{{ block.id }}');
+        if (!targetStickyAtc) return;
+
+        const button = targetStickyAtc.querySelector('.forge-sticky-atc__button .forge-button');
+        if (!button || button.hasAttribute('disabled') || button.disabled) return;
+
+        button.classList.remove('auto-wiggle');
+        void button.offsetWidth;
+        button.classList.add('auto-wiggle');
+
+        setTimeout(() => {
+          if (button) button.classList.remove('auto-wiggle');
+        }, 600);
+      }, intervalSeconds * 1000);
+    };
+
+    setTimeout(() => {
+      setupStickyAtcWiggle();
+    }, 0);
+  });
+
+  document.addEventListener('scroll', checkATCScroll, true);
+
+  // Monitor for bundler button visibility changes
+  const observeBundlerButton = () => {
+    const bundlerButton = document.getElementById('atlas-add-bundle-btn');
+    if (bundlerButton) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            // Re-check scroll position when bundler button visibility changes
+            checkATCScroll();
+          }
+        });
+      });
+
+      observer.observe(bundlerButton, {
+        attributes: true,
+        attributeFilter: ['style']
+      });
+    }
+  };
+
+  // Initialize bundler button observer
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', observeBundlerButton);
+  } else {
+    observeBundlerButton();
+  }
+
+  // Function to update button text from data attributes or current DOM content
+  const updateButtonText = () => {
+    const atcButton = document.getElementById('atc-button-{{ section.id }}');
+    if (!atcButton) return;
+
+    const buttonText = atcButton.querySelector('.forge-product-form-button-text');
+    if (!buttonText) return;
+
+    // Check if button is disabled (sold out)
+    if (atcButton.disabled) {
+      buttonText.textContent = {% capture satc_sold_out %}{% render 'forge-t', key: 'products.product.sold_out', fallback: 'Sold out' %}{% endcapture %}{{ satc_sold_out | capitalize | json }};
+      return;
+    }
+
+    // Update text based on button type - read from data attributes first, then fallback to current content
+    if (atcButton.dataset.buyNow === 'true') {
+      const buyNowLabel = atcButton.dataset.buyNowLabel || buttonText.innerHTML || {{ satc_buynow_label | json }};
+      buttonText.innerHTML = buyNowLabel;
+    } else {
+      const buttonLabel = atcButton.dataset.buttonLabel || buttonText.innerHTML || {{ satc_atc_label | json }};
+      buttonText.innerHTML = buttonLabel;
+    }
+  };
+
+  // Handle theme editor section reloads
+  if (typeof Shopify !== 'undefined' && Shopify.designMode) {
+    const sectionId = "{{ section.id }}";
+    const blockId = "{{ block.id }}";
+
+    // Re-initialize when section is reloaded (settings changed)
+    document.addEventListener('shopify:section:load', (event) => {
+      if (event.detail.sectionId === sectionId) {
+        setTimeout(() => {
+          initializeStickyATC();
+          checkATCScroll();
+          updateButtonText();
+        }, 200);
+      }
+    });
+
+    // Update button text when block is selected/deselected (settings panel opens/closes)
+    document.addEventListener('shopify:block:select', (event) => {
+      if (event.detail.blockId === blockId) {
+        setTimeout(updateButtonText, 150);
+      }
+    });
+
+    document.addEventListener('shopify:block:deselect', (event) => {
+      if (event.detail.blockId === blockId) {
+        setTimeout(updateButtonText, 150);
+      }
+    });
+
+    // Watch for changes to the button text element itself (when Shopify updates it)
+    const observeButtonTextChanges = () => {
+      const atcButton = document.getElementById('atc-button-{{ section.id }}');
+      if (!atcButton) return;
+
+      const buttonText = atcButton.querySelector('.forge-product-form-button-text');
+      if (!buttonText) return;
+
+      // Watch for changes to data attributes (when section reloads)
+      const attributeObserver = new MutationObserver(() => {
+        updateButtonText();
+      });
+
+      attributeObserver.observe(atcButton, {
+        attributes: true,
+        attributeFilter: ['data-buy-now-label', 'data-button-label', 'data-buy-now']
+      });
+
+      // Watch for changes to button text content (when Shopify updates it directly)
+      const contentObserver = new MutationObserver((mutations) => {
+        // Only update if the change came from Shopify (not from our own update)
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList' || mutation.type === 'characterData') {
+            // Small delay to ensure data attributes are also updated
+            setTimeout(() => {
+              updateButtonText();
+            }, 50);
+          }
+        });
+      });
+
+      contentObserver.observe(buttonText, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+    };
+
+    // Start observing after a delay to ensure button exists
+    setTimeout(observeButtonTextChanges, 500);
+
+    // Also set up a periodic check in case events are missed
+    let lastButtonText = '';
+    setInterval(() => {
+      const atcButton = document.getElementById('atc-button-{{ section.id }}');
+      if (!atcButton) return;
+
+      const buttonText = atcButton.querySelector('.forge-product-form-button-text');
+      if (!buttonText) return;
+
+      const currentText = buttonText.innerHTML;
+      if (currentText !== lastButtonText) {
+        lastButtonText = currentText;
+        // Check if data attributes need updating
+        if (atcButton.dataset.buyNow === 'true' && atcButton.dataset.buyNowLabel !== currentText) {
+          updateButtonText();
+        } else if (atcButton.dataset.buyNow !== 'true' && atcButton.dataset.buttonLabel !== currentText) {
+          updateButtonText();
+        }
+      }
+    }, 500);
+  }
+</script>

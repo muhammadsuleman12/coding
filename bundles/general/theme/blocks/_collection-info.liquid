@@ -1,0 +1,168 @@
+
+
+{% assign block_settings = block.settings %}
+<div
+  class="collection-info collection-info--{{ block_settings.placement }} forge-color-{{ block_settings.color_scheme }}"
+  style="{% render 'spacing-style', settings: block_settings %} {% if block_settings.icons_style contains 'large' %} --slideshow-icon-padding: 0px{% endif %}"
+  {{ block.shopify_attributes }}
+>
+  <div class="collection-info__content">
+    {% content_for 'blocks' %}
+  </div>
+
+  <div class="collection-info__controls collection-info__controls--{{ block_settings.navigation }}">
+    {%- render 'slideshow-controls', icon_style: block_settings.icons_style, shape: block_settings.background_style -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:forge.names.collection_info",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "placement",
+      "label": "t:forge.settings.placement",
+      "options": [
+        {
+          "label": "t:forge.options.above_carousel",
+          "value": "above-carousel"
+        },
+        {
+          "label": "t:forge.options.next_to_carousel",
+          "value": "next-to-carousel"
+        }
+      ]
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.arrows"
+    },
+    {
+      "type": "select",
+      "id": "navigation",
+      "label": "t:forge.settings.navigation",
+      "options": [
+        {
+          "label": "t:forge.options.above_carousel",
+          "value": "above-carousel"
+        },
+        {
+          "label": "t:forge.options.inside_carousel",
+          "value": "inside-carousel"
+        }
+      ],
+      "visible_if": "{{ block.settings.placement == 'above-carousel' }}"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "t:forge.settings.icons",
+      "options": [
+        {
+          "value": "arrows",
+          "label": "t:forge.options.arrows"
+        },
+        {
+          "value": "chevron",
+          "label": "t:forge.options.chevrons"
+        },
+        {
+          "value": "arrows_large",
+          "label": "t:forge.options.large_arrows"
+        },
+        {
+          "value": "chevron_large",
+          "label": "t:forge.options.large_chevrons"
+        },
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "background_style",
+      "label": "t:forge.settings.background",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "circle",
+          "label": "t:forge.options.circle"
+        },
+        {
+          "value": "square",
+          "label": "t:forge.options.square"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.collection_info"
+    }
+  ]
+}
+{% endschema %}

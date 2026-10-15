@@ -1,0 +1,354 @@
+
+{% liquid
+  assign block_settings = block.settings
+  assign alignment = block_settings.alignment | default: 'center'
+  assign text_size = block_settings.text_size | default: 'medium'
+
+  case text_size
+    when 'small'
+      assign text_size_px = '0.8125rem'
+      assign text_size_mobile_px = '0.75rem'
+      assign icon_size_px = '16px'
+    when 'large'
+      assign text_size_px = '1rem'
+      assign text_size_mobile_px = '0.9375rem'
+      assign icon_size_px = '20px'
+    else
+      assign text_size_px = '0.875rem'
+      assign text_size_mobile_px = '0.8125rem'
+      assign icon_size_px = '18px'
+  endcase
+%}
+
+{% capture icon_lock %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{% endcapture %}
+{% capture icon_shield %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg>{% endcapture %}
+{% capture icon_arrow %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>{% endcapture %}
+{% capture icon_heart %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>{% endcapture %}
+{% capture icon_truck %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="11" height="9" rx="1"/><path d="M13 10h5l3 3v3h-8z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>{% endcapture %}
+{% capture icon_leaf %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-9 6-14 15-14-1 9-6 15-15 15z"/><path d="M5 19c2-2.5 5-5 9-7"/></svg>{% endcapture %}
+{% capture icon_check %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>{% endcapture %}
+{% capture icon_clock %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{% endcapture %}
+{% capture icon_gift %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="1"/><path d="M3 13h18M12 9v11"/><path d="M8.5 9c-2 0-3-1-3-2.5s1.2-2.5 2.5-2.5c2 0 3.5 2 4 5"/><path d="M15.5 9c2 0 3-1 3-2.5S17.3 4 16 4c-2 0-3.5 2-4 5"/></svg>{% endcapture %}
+{% capture icon_refresh %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 0 1-14 5.3L4 16"/><path d="M4 20v-4h4"/></svg>{% endcapture %}
+{% capture icon_star %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.7 6.3.9-4.6 4.4 1.1 6.2L12 17.3 6.5 20.2l1.1-6.2L3 9.6l6.3-.9z"/></svg>{% endcapture %}
+{% capture icon_package %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>{% endcapture %}
+
+{%- assign render_count = 0 -%}
+{%- for i in (1..5) -%}
+  {%- assign text_key = 'item_' | append: i | append: '_text' -%}
+  {%- assign text_val = block_settings[text_key] -%}
+  {%- if text_val != blank -%}
+    {%- assign render_count = render_count | plus: 1 -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{% if render_count > 0 %}
+  <div
+    class="icon-row icon-row--align-{{ alignment }} icon-row--size-{{ text_size }}"
+    style="
+      padding-top: {{ block_settings.padding_top | default: 16 }}px;
+      padding-bottom: {{ block_settings.padding_bottom | default: 16 }}px;
+      {% if block_settings.text_color != blank %}--icon-row-color: {{ block_settings.text_color }};{% endif %}
+      --icon-row-text-size: {{ text_size_px }};
+      --icon-row-text-size-mobile: {{ text_size_mobile_px }};
+      --icon-row-icon-size: {{ icon_size_px }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    <ul class="icon-row__list" role="list">
+      {% for i in (1..5) %}
+        {%- assign text_key = 'item_' | append: i | append: '_text' -%}
+        {%- assign icon_key = 'item_' | append: i | append: '_icon' -%}
+        {%- assign text_val = block_settings[text_key] -%}
+        {%- assign icon_val = block_settings[icon_key] -%}
+        {% if text_val != blank %}
+          <li class="icon-row__item">
+            {% case icon_val %}
+              {% when 'lock' %}<span class="icon-row__icon">{{ icon_lock }}</span>
+              {% when 'shield' %}<span class="icon-row__icon">{{ icon_shield }}</span>
+              {% when 'arrow' %}<span class="icon-row__icon">{{ icon_arrow }}</span>
+              {% when 'heart' %}<span class="icon-row__icon">{{ icon_heart }}</span>
+              {% when 'truck' %}<span class="icon-row__icon">{{ icon_truck }}</span>
+              {% when 'leaf' %}<span class="icon-row__icon">{{ icon_leaf }}</span>
+              {% when 'check' %}<span class="icon-row__icon">{{ icon_check }}</span>
+              {% when 'clock' %}<span class="icon-row__icon">{{ icon_clock }}</span>
+              {% when 'gift' %}<span class="icon-row__icon">{{ icon_gift }}</span>
+              {% when 'refresh' %}<span class="icon-row__icon">{{ icon_refresh }}</span>
+              {% when 'star' %}<span class="icon-row__icon">{{ icon_star }}</span>
+              {% when 'package' %}<span class="icon-row__icon">{{ icon_package }}</span>
+            {% endcase %}
+            <span class="icon-row__text">{{ text_val }}</span>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .icon-row {
+    width: 100%;
+    /* Default text color is intentionally muted (not pure black) for an
+       editorial-luxe feel. Falls through to the theme's --color-foreground-muted
+       token when present, otherwise a soft slate gray. The merchant can override
+       via the Text color setting (writes --icon-row-color inline). */
+    color: var(--icon-row-color, var(--color-foreground-muted, #5a5f66));
+  }
+
+  .icon-row__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(16px, 3vw, 36px);
+    align-items: center;
+  }
+
+  .icon-row--align-left .icon-row__list   { justify-content: flex-start; }
+  .icon-row--align-center .icon-row__list { justify-content: center; }
+  .icon-row--align-right .icon-row__list  { justify-content: flex-end; }
+
+  .icon-row__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+  }
+
+  .icon-row__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .icon-row__icon svg {
+    width: var(--icon-row-icon-size, 18px);
+    height: var(--icon-row-icon-size, 18px);
+    display: block;
+  }
+
+  .icon-row__text {
+    font-family: var(--font-body--family, inherit);
+    font-size: var(--icon-row-text-size, 0.875rem);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: inherit;
+  }
+
+  /* Mobile: tighter spacing + slightly smaller type so labels stay legible. */
+  @media (max-width: 500px) {
+    .icon-row__list {
+      gap: 12px 16px;
+    }
+    .icon-row__text {
+      font-size: var(--icon-row-text-size-mobile, 0.8125rem);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Icon Row",
+  "tag": "div",
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text size",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & icon color",
+      "info": "Leave blank to use a muted body color (recommended)."
+    },
+    { "type": "header", "content": "Item 1" },
+    {
+      "type": "select",
+      "id": "item_1_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "lock", "label": "Lock" },
+        { "value": "shield", "label": "Shield" },
+        { "value": "arrow", "label": "Arrow" },
+        { "value": "heart", "label": "Heart" },
+        { "value": "truck", "label": "Truck" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Clock" },
+        { "value": "gift", "label": "Gift" },
+        { "value": "refresh", "label": "Refresh" },
+        { "value": "star", "label": "Star" },
+        { "value": "package", "label": "Package" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "lock"
+    },
+    {
+      "type": "text",
+      "id": "item_1_text",
+      "label": "Text",
+      "default": "Secure checkout"
+    },
+    { "type": "header", "content": "Item 2" },
+    {
+      "type": "select",
+      "id": "item_2_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "lock", "label": "Lock" },
+        { "value": "shield", "label": "Shield" },
+        { "value": "arrow", "label": "Arrow" },
+        { "value": "heart", "label": "Heart" },
+        { "value": "truck", "label": "Truck" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Clock" },
+        { "value": "gift", "label": "Gift" },
+        { "value": "refresh", "label": "Refresh" },
+        { "value": "star", "label": "Star" },
+        { "value": "package", "label": "Package" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "shield"
+    },
+    {
+      "type": "text",
+      "id": "item_2_text",
+      "label": "Text",
+      "default": "30-day guarantee"
+    },
+    { "type": "header", "content": "Item 3" },
+    {
+      "type": "select",
+      "id": "item_3_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "lock", "label": "Lock" },
+        { "value": "shield", "label": "Shield" },
+        { "value": "arrow", "label": "Arrow" },
+        { "value": "heart", "label": "Heart" },
+        { "value": "truck", "label": "Truck" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Clock" },
+        { "value": "gift", "label": "Gift" },
+        { "value": "refresh", "label": "Refresh" },
+        { "value": "star", "label": "Star" },
+        { "value": "package", "label": "Package" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "arrow"
+    },
+    {
+      "type": "text",
+      "id": "item_3_text",
+      "label": "Text",
+      "default": "Ships in 24h"
+    },
+    { "type": "header", "content": "Item 4" },
+    {
+      "type": "select",
+      "id": "item_4_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "lock", "label": "Lock" },
+        { "value": "shield", "label": "Shield" },
+        { "value": "arrow", "label": "Arrow" },
+        { "value": "heart", "label": "Heart" },
+        { "value": "truck", "label": "Truck" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Clock" },
+        { "value": "gift", "label": "Gift" },
+        { "value": "refresh", "label": "Refresh" },
+        { "value": "star", "label": "Star" },
+        { "value": "package", "label": "Package" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "heart"
+    },
+    {
+      "type": "text",
+      "id": "item_4_text",
+      "label": "Text",
+      "default": "Premium quality"
+    },
+    { "type": "header", "content": "Item 5 (optional)" },
+    {
+      "type": "select",
+      "id": "item_5_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "lock", "label": "Lock" },
+        { "value": "shield", "label": "Shield" },
+        { "value": "arrow", "label": "Arrow" },
+        { "value": "heart", "label": "Heart" },
+        { "value": "truck", "label": "Truck" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Clock" },
+        { "value": "gift", "label": "Gift" },
+        { "value": "refresh", "label": "Refresh" },
+        { "value": "star", "label": "Star" },
+        { "value": "package", "label": "Package" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "text",
+      "id": "item_5_text",
+      "label": "Text",
+      "info": "Leave blank to hide this item."
+    },
+    { "type": "header", "content": "Spacing" },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    }
+  ],
+  "presets": [
+    {
+      "name": "Icon Row"
+    }
+  ]
+}
+{% endschema %}

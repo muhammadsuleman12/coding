@@ -1,0 +1,190 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign faq_blocks = section.blocks | where: 'type', 'faq'
+%}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-faq bold-section forge-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-faq__inner">
+    {% if heading != blank or subtitle != blank %}
+      <header class="bold-section-header" data-animate="fade-up">
+        {% if heading != blank %}
+          <h2 class="bold-section-title">{{ heading }}</h2>
+        {% endif %}
+        {% if subtitle != blank %}
+          <p class="bold-section-subtitle">{{ subtitle }}</p>
+        {% endif %}
+        <div class="bold-accent-line" aria-hidden="true"></div>
+      </header>
+    {% endif %}
+
+    {% if faq_blocks.size > 0 %}
+      <div class="bold-faq__list" data-bold-faq data-animate-group>
+        {% for block in faq_blocks %}
+          <div class="bold-faq__item" data-animate="fade-up" data-bold-faq-item {{ block.shopify_attributes }}>
+            <button type="button" class="bold-faq__question" aria-expanded="false" data-bold-faq-trigger>
+              <span>{{ block.settings.question }}</span>
+              <span class="bold-faq__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="bold-faq__answer-wrap" hidden data-bold-faq-panel>
+              <div class="bold-faq__answer forge-rte">{{ block.settings.answer }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-faq {
+    padding: 72px 24px;
+  }
+
+  .bold-faq__inner {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .bold-faq__list {
+    border-top: 1px solid var(--bold-glass-border);
+  }
+
+  .bold-faq__item {
+    border-bottom: 1px solid var(--bold-glass-border);
+  }
+
+  .bold-faq__question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--bold-font-body);
+    font-size: 16px;
+    font-weight: var(--font-h3--weight, 600);
+    color: var(--bold-text-light);
+  }
+
+  .bold-faq__icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-primary-button-text);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--color-primary) 40%, transparent);
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+
+  .bold-faq__item.is-open .bold-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .bold-faq__answer-wrap {
+    overflow: hidden;
+  }
+
+  .bold-faq__answer {
+    padding: 0 0 24px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--bold-text-muted);
+  }
+
+  .bold-faq__answer p {
+    margin: 0 0 12px;
+  }
+
+  .bold-faq__answer p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-faq {
+      padding: 48px 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    document.querySelectorAll('[data-bold-faq]').forEach(function (list) {
+      list.querySelectorAll('[data-bold-faq-trigger]').forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+          var item = trigger.closest('[data-bold-faq-item]');
+          var panel = item && item.querySelector('[data-bold-faq-panel]');
+          if (!item || !panel) return;
+
+          var isOpen = item.classList.contains('is-open');
+          list.querySelectorAll('[data-bold-faq-item].is-open').forEach(function (openItem) {
+            openItem.classList.remove('is-open');
+            var openTrigger = openItem.querySelector('[data-bold-faq-trigger]');
+            var openPanel = openItem.querySelector('[data-bold-faq-panel]');
+            if (openTrigger) openTrigger.setAttribute('aria-expanded', 'false');
+            if (openPanel) openPanel.hidden = true;
+          });
+
+          if (!isOpen) {
+            item.classList.add('is-open');
+            trigger.setAttribute('aria-expanded', 'true');
+            panel.hidden = false;
+          }
+        });
+      });
+    });
+  })();
+{% endjavascript %}
+
+{%- if faq_blocks.size > 0 -%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{%- for block in faq_blocks -%}{"@type":"Question","name":{{ block.settings.question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ block.settings.answer | strip_html | json }}}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]}
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Bold FAQ",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:forge.settings.color_scheme", "default": "scheme-1" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "FAQs" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Everything you need to know." }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "What is the warranty?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>All products include a lifetime warranty against manufacturing defects.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold FAQ",
+      "blocks": [
+        { "type": "faq", "settings": { "question": "What is the warranty?", "answer": "<p>All products include a lifetime warranty against manufacturing defects.</p>" } },
+        { "type": "faq", "settings": { "question": "How long does shipping take?", "answer": "<p>Orders ship within 1-2 business days. Standard delivery is 3-5 days.</p>" } },
+        { "type": "faq", "settings": { "question": "Can I return my order?", "answer": "<p>Yes. We offer a 30-day hassle-free return policy.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

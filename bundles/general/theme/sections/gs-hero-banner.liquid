@@ -1,0 +1,88 @@
+{%- liquid
+  assign img = section.settings.image
+  assign img_m = section.settings.image_mobile | default: img
+-%}
+<section class="gs-banner gs-banner--{{ section.settings.height }} forge-color-{{ section.settings.color_scheme }}">
+  <div class="gs-banner__media">
+    {%- if img -%}
+      <picture>
+        <source media="(max-width: 749px)" srcset="{{ img_m | image_url: width: 900 }} 900w, {{ img_m | image_url: width: 1200 }} 1200w" sizes="100vw">
+        {{ img | image_url: width: 2400 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '1200,1600,2000,2400', sizes: '100vw', class: 'gs-banner__img' }}
+      </picture>
+    {%- else -%}
+      <div class="gs-banner__slot"><span>Hero image 2400 × 900 (mobile 900 × 1000). Keep the left 45% calm for text.</span></div>
+    {%- endif -%}
+  </div>
+  <div class="gs-wrap gs-banner__inner">
+    <div class="gs-banner__copy" data-gs-reveal>
+      {%- if section.settings.show_breadcrumb and template.name == 'collection' -%}
+        <nav class="gs-crumbs" aria-label="Breadcrumb"><a href="{{ routes.root_url }}">Home</a><span aria-hidden="true">/</span><span>{{ collection.title | escape }}</span></nav>
+      {%- endif -%}
+      {%- if section.settings.kicker != blank -%}<p class="gs-kicker">{{ section.settings.kicker | escape }}</p>{%- endif -%}
+      <h1 class="gs-banner__title">{{ section.settings.heading }}</h1>
+      {%- if section.settings.text != blank -%}<div class="gs-banner__text">{{ section.settings.text }}</div>{%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a class="gs-btn gs-btn--auto" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">{{ section.settings.button_label | escape }} {% render 'gs-icon', name: 'arrow', size: 18 %}</a>
+      {%- endif -%}
+    </div>
+    {%- if section.blocks.size > 0 -%}
+      <nav class="gs-pills" aria-label="Categories">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign href = block.settings.link
+            if href == blank and block.settings.tag != blank
+              assign href = routes.all_products_collection_url | append: '/' | append: block.settings.tag
+            endif
+            if href == blank
+              assign href = routes.all_products_collection_url
+            endif
+            assign active = false
+            if block.settings.tag != blank and current_tags contains block.settings.tag
+              assign active = true
+            elsif block.settings.tag == blank and block.settings.link == blank and template.name == 'collection' and current_tags == blank
+              assign active = true
+            endif
+          -%}
+          <a class="gs-pill{% if active %} is-active{% endif %}" href="{{ href }}" {% if active %}aria-current="page"{% endif %} {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != 'none' -%}{% render 'gs-icon', name: block.settings.icon, size: 20 %}{%- endif -%}
+            <span>{{ block.settings.label | escape }}</span>
+          </a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero: image banner",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "select", "id": "height", "label": "Height", "default": "tall", "options": [ { "value": "tall", "label": "Tall" }, { "value": "medium", "label": "Medium" } ] },
+    { "type": "checkbox", "id": "show_breadcrumb", "label": "Show breadcrumb (collection pages)", "default": true },
+    { "type": "text", "id": "kicker", "label": "Small line above heading", "default": "Practical essentials. Brighter days." },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Good finds. Great everyday." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Thoughtfully selected products for a more comfortable, organized and joyful everyday life.</p>" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop all products" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "image_picker", "id": "image", "label": "Image (desktop)", "info": "2400 × 900 px. Keep the left side calm for text." },
+    { "type": "image_picker", "id": "image_mobile", "label": "Image (mobile)", "info": "900 × 1000 px. Keep the top third calm for text." }
+  ],
+  "blocks": [
+    { "type": "pill", "name": "Category pill", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "All" },
+      { "type": "text", "id": "tag", "label": "Product tag", "info": "Leave empty for All products." },
+      { "type": "url", "id": "link", "label": "Or custom link" },
+      { "type": "select", "id": "icon", "label": "Icon", "default": "none", "options": [
+        { "value": "none", "label": "None" }, { "value": "grid", "label": "All" }, { "value": "home", "label": "Home" }, { "value": "bolt", "label": "Tech" },
+        { "value": "laptop", "label": "Laptop" }, { "value": "paw", "label": "Pets" }, { "value": "shirt", "label": "Apparel" }, { "value": "person", "label": "Person" },
+        { "value": "gift", "label": "Gifts" }, { "value": "sofa", "label": "Furniture" }, { "value": "kitchen", "label": "Kitchen" }
+      ] }
+    ] }
+  ],
+  "max_blocks": 8,
+  "presets": [{ "name": "Hero: image banner" }]
+}
+{% endschema %}

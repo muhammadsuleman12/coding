@@ -1,0 +1,470 @@
+
+
+{%- doc -%}
+  Renders product recommendations.
+  {section.id} - identifies the parent section for the Section Rendering API
+
+  https://shopify.dev/docs/api/section-rendering-api
+{%- enddoc -%}
+
+<script
+  src="{{ 'product-recommendations.js' | asset_url }}"
+  type="module"
+></script>
+
+{% liquid
+  assign block_settings = block.settings
+  case block_settings.layout_type
+    when 'grid'
+      assign classes = 'forge-resource-list--grid'
+    when 'carousel'
+      assign classes = 'forge-resource-list--carousel'
+  endcase
+%}
+
+
+<forge-product-recommendations
+  id="product-recommendations-{{ block.id }}"
+  class="product-recommendations"
+  data-url="{{ routes.product_recommendations_url }}?limit={{ block_settings.max_products }}"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ closest.product.id }}"
+  data-intent="{{ block_settings.recommendation_type }}"
+  data-recommendations-performed="{{ recommendations.performed }}"
+  {% if request.visual_preview_mode %}
+    data-shopify-editor-preview
+  {% endif %}
+  data-testid="product-recommendations-block"
+  {{ block.shopify_attributes }}
+>
+  <div
+    class="
+      forge-color-{{ section.settings.color_scheme }}
+      forge-block-resource-list
+      forge-spacing-style
+      forge-gap-style
+    "
+    style="
+      {%  render 'spacing-style', settings: block_settings %}
+      {%  render 'gap-style', value: block_settings.gap %}
+      --resource-list-column-gap-desktop: {{ block_settings.columns_gap }}px;
+      --resource-list-row-gap-desktop: {{ block_settings.rows_gap }}px;
+      --resource-list-columns-mobile: repeat(auto-fill, minmax(9.25rem, 1fr));
+    "
+  >
+    <div class="forge-section-resource-list__content">
+      {% content_for 'blocks' %}
+    </div>
+
+    {%- if recommendations.performed or closest.product == blank -%}
+      {% liquid
+        assign products = recommendations.products
+
+        if closest.product == blank
+          for i in (1..block_settings.max_products)
+            assign products = products | append: ', '
+            assign products = products | split: ','
+          endfor
+        elsif recommendations.performed and recommendations.products_count == 0
+          if block_settings.recommendation_type == 'related'
+            assign products = collections.all.products | reject: 'id', closest.product.id
+          elsif block_settings.recommendation_type == 'complementary'
+            assign products = null
+          endif
+        else
+          assign products = recommendations.products
+        endif
+      %}
+      {% capture list_items %}
+        {% for product in products limit: block_settings.max_products %}
+          <div class="forge-resource-list__item">
+            {% content_for 'block',
+              type: '_product-card',
+              id: 'static-product-card',
+              closest.product: product
+            %}
+          </div>
+          {% if block_settings.layout_type == 'carousel' or block_settings.carousel_on_mobile %}
+            {% unless forloop.last %}
+              <!--@list/split-->
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+      {% endcapture %}
+
+      {% liquid
+        assign slide_content = list_items | strip
+        assign slides = slide_content | split: '<!--@list/split-->'
+
+        if products != blank and products.size > 0
+          assign has_recommendations = 'true'
+        else
+          assign has_recommendations = 'false'
+        endif
+      %}
+
+      <div
+        class="
+          forge-resource-list
+          {% if block_settings.carousel_on_mobile and block_settings.layout_type != 'carousel' %}
+            forge-hidden--mobile
+          {% endif %}
+          {{ classes }}
+        "
+        {% if block_settings.layout_type == 'grid' %}
+          data-testid="resource-list-grid"
+        {% endif %}
+        data-has-recommendations="{{ has_recommendations }}"
+      >
+        {% case block_settings.layout_type %}
+          {% when 'grid' %}
+            {{ list_items }}
+          {% when 'carousel' %}
+            {% render 'resource-list-carousel',
+              ref: 'resourceListCarousel',
+              slides: slides,
+              slide_count: recommendations.products.size,
+              settings: block_settings
+            %}
+        {% endcase %}
+      </div>
+
+      {% if block_settings.carousel_on_mobile and block_settings.layout_type != 'carousel' %}
+        {% liquid
+          assign mobile_carousel_gap = block_settings.columns_gap
+        %}
+        <div
+          class="
+            forge-resource-list
+            forge-hidden--desktop
+            forge-force-full-width
+          "
+          style="--resource-list-gap: {{ mobile_carousel_gap }}px;"
+        >
+          {% render 'resource-list-carousel',
+            ref: 'resourceListCarouselMobile',
+            slides: slides,
+            slide_count: recommendations.products.size,
+            settings: block_settings
+          %}
+        </div>
+      {% endif %}
+    {%- else -%}
+      <div class="forge-resource-list forge-resource-list--grid">
+        {% for i in (1..block_settings.max_products) %}
+          <div
+            class="forge-resource-list__item product-recommendations__skeleton-item"
+            aria-label="{% render 'forge-t', key: 'accessibility.loading_product_recommendations', fallback: 'Loading product recommendations' %}"
+          ></div>
+        {% endfor %}
+      </div>
+    {%- endif -%}
+  </div>
+</forge-product-recommendations>
+
+{% stylesheet %}
+  .product-recommendations-wrapper {
+    width: 100%;
+  }
+
+  .product-recommendations-wrapper:has(forge-product-recommendations[data-shopify-editor-preview]) {
+    width: 100vw;
+  }
+
+  .product-recommendations {
+    display: block;
+  }
+
+  .product-recommendations__skeleton-item {
+    aspect-ratio: 3 / 4;
+    background-color: var(--color-foreground);
+    opacity: var(--skeleton-opacity);
+    border-radius: var(--style-border-radius-cards);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.product_recommendations",
+  "class": "product-recommendations-wrapper",
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:forge.content.resource_reference_product_recommendations"
+    },
+    {
+      "type": "select",
+      "id": "recommendation_type",
+      "label": "t:forge.settings.type",
+      "options": [
+        {
+          "value": "related",
+          "label": "t:forge.options.related"
+        },
+        {
+          "value": "complementary",
+          "label": "t:forge.options.complementary"
+        }
+      ],
+      "default": "related"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:forge.content.complementary_products"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.cards_layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "t:forge.settings.layout_style",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:forge.options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "t:forge.options.carousel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_on_mobile",
+      "label": "t:forge.settings.carousel_on_mobile",
+      "default": true,
+      "visible_if": "{{ block.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "t:forge.settings.product_count",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_gap",
+      "label": "t:forge.settings.horizontal_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
+      "visible_if": "{{ block.settings.layout_type == 'grid' or block.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "range",
+      "id": "rows_gap",
+      "label": "t:forge.settings.vertical_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
+      "visible_if": "{{ block.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.carousel_navigation",
+      "visible_if": "{{ block.settings.layout_type == 'carousel' or block.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "t:forge.settings.icon",
+      "options": [
+        {
+          "value": "arrow",
+          "label": "t:forge.options.arrows"
+        },
+        {
+          "value": "chevron",
+          "label": "t:forge.options.chevrons"
+        },
+        {
+          "value": "arrows_large",
+          "label": "t:forge.options.arrows_large"
+        },
+        {
+          "value": "chevron_large",
+          "label": "t:forge.options.chevron_large"
+        },
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        }
+      ],
+      "default": "arrow",
+      "visible_if": "{{ block.settings.layout_type == 'carousel' or block.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "icons_shape",
+      "label": "t:forge.settings.icon_background",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "circle",
+          "label": "t:forge.options.circle"
+        },
+        {
+          "value": "square",
+          "label": "t:forge.options.square"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ block.settings.icons_style != 'none' and block.settings.layout_type == 'carousel' or block.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.layout"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:forge.settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.product_recommendations",
+      "category": "t:forge.categories.product",
+      "settings": {
+        "recommendation_type": "related"
+      },
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "settings": {
+            "text": "t:forge.html_defaults.may_also_like"
+          }
+        },
+        "static-product-card": {
+          "type": "_product-card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 4
+          },
+          "blocks": {
+            "product-card-gallery": {
+              "type": "_product-card-gallery",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            },
+            "product_title": {
+              "type": "product-title",
+              "name": "t:forge.names.product_title",
+              "settings": {
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            },
+            "price": {
+              "type": "price",
+              "name": "t:forge.names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "color": "var(--color-foreground)",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            }
+          },
+          "block_order": ["product-card-gallery", "product_title", "price"]
+        }
+      },
+      "block_order": ["heading"]
+    }
+  ]
+}
+{% endschema %}

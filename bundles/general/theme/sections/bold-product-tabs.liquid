@@ -1,0 +1,342 @@
+{% render 'bold-typography' %}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-product-tabs bold-section forge-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} data-bold-tabs>
+  <div class="bold-product-tabs__inner">
+    <div class="bold-product-tabs__nav" role="tablist">
+      {% if section.settings.show_description_tab %}
+        <button type="button" class="bold-product-tabs__tab is-active" role="tab" aria-selected="true" data-bold-tab="description">
+          {{ section.settings.description_tab_label | default: 'Description' }}
+        </button>
+      {% endif %}
+      {% if section.settings.show_features_tab %}
+        <button type="button" class="bold-product-tabs__tab" role="tab" aria-selected="false" data-bold-tab="features">
+          {{ section.settings.features_tab_label | default: 'Features' }}
+        </button>
+      {% endif %}
+      {% if section.settings.show_specs_tab %}
+        <button type="button" class="bold-product-tabs__tab" role="tab" aria-selected="false" data-bold-tab="specs">
+          {{ section.settings.specs_tab_label | default: 'Specs' }}
+        </button>
+      {% endif %}
+      {% if section.settings.show_shipping_tab %}
+        <button type="button" class="bold-product-tabs__tab" role="tab" aria-selected="false" data-bold-tab="shipping">
+          {{ section.settings.shipping_tab_label | default: 'Shipping' }}
+        </button>
+      {% endif %}
+    </div>
+
+    <div class="bold-product-tabs__panels">
+      {% if section.settings.show_description_tab %}
+        <div class="bold-product-tabs__panel is-active" role="tabpanel" data-bold-panel="description" data-animate="fade-up">
+          <div class="bold-product-tabs__content forge-rte">
+            {% if section.settings.description_content != blank %}
+              {{ section.settings.description_content }}
+            {% elsif closest.product.description != blank %}
+              {{ closest.product.description }}
+            {% else %}
+              <p>Product description will appear here.</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_features_tab %}
+        <div class="bold-product-tabs__panel" role="tabpanel" hidden data-bold-panel="features" data-animate="fade-up">
+          <div class="bold-product-tabs__content forge-rte">
+            {{ section.settings.features_content }}
+          </div>
+          {% assign feature_blocks = section.blocks | where: 'type', 'feature' %}
+          {% if feature_blocks.size > 0 %}
+            <ul class="bold-product-tabs__feature-list">
+              {% for block in feature_blocks %}
+                <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_specs_tab %}
+        <div class="bold-product-tabs__panel" role="tabpanel" hidden data-bold-panel="specs" data-animate="fade-up">
+          <div class="bold-product-tabs__content forge-rte">
+            {{ section.settings.specs_content }}
+          </div>
+          {% assign spec_blocks = section.blocks | where: 'type', 'spec' %}
+          {% if spec_blocks.size > 0 %}
+            <dl class="bold-product-tabs__specs">
+              {% for block in spec_blocks %}
+                <div class="bold-product-tabs__spec-row" {{ block.shopify_attributes }}>
+                  <dt>{{ block.settings.label }}</dt>
+                  <dd>{{ block.settings.value }}</dd>
+                </div>
+              {% endfor %}
+            </dl>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_shipping_tab %}
+        <div class="bold-product-tabs__panel" role="tabpanel" hidden data-bold-panel="shipping" data-animate="fade-up">
+          <div class="bold-product-tabs__content forge-rte">
+            {{ section.settings.shipping_content }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-product-tabs {
+    padding: 64px 24px;
+    overflow-x: hidden;
+  }
+
+  .bold-product-tabs__inner {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    min-width: 0;
+  }
+
+  .bold-product-tabs__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid var(--bold-glass-border);
+    margin-bottom: 32px;
+  }
+
+  .bold-product-tabs__tab {
+    padding: 12px 20px;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    font-family: var(--bold-font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bold-text-muted);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .bold-product-tabs__tab.is-active {
+    color: var(--bold-accent2);
+    border-bottom-color: var(--bold-accent1);
+  }
+
+  .bold-product-tabs__tab:hover {
+    color: var(--bold-text-light);
+  }
+
+  .bold-product-tabs__panel {
+    display: none;
+  }
+
+  .bold-product-tabs__panel.is-active {
+    display: block;
+  }
+
+  .bold-product-tabs__content {
+    color: var(--bold-text-muted);
+    line-height: 1.7;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+  }
+
+  .bold-product-tabs__content img,
+  .bold-product-tabs__content video,
+  .bold-product-tabs__content iframe {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .bold-product-tabs__content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .bold-product-tabs__feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bold-product-tabs__feature-list li {
+    padding-left: 24px;
+    position: relative;
+    color: var(--bold-text-light);
+    font-size: 15px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .bold-product-tabs__feature-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bold-accent1);
+  }
+
+  .bold-product-tabs__specs {
+    margin: 20px 0 0;
+  }
+
+  .bold-product-tabs__spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--bold-glass-border);
+  }
+
+  .bold-product-tabs__spec-row dt {
+    font-weight: 600;
+    color: var(--bold-text-light);
+    font-size: 14px;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .bold-product-tabs__spec-row dd {
+    margin: 0;
+    color: var(--bold-text-subtle);
+    font-size: 14px;
+    text-align: right;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-product-tabs {
+      padding: 48px 16px;
+    }
+
+    .bold-product-tabs__nav {
+      flex-wrap: wrap;
+      gap: 0;
+    }
+
+    .bold-product-tabs__tab {
+      flex: 1 1 50%;
+      min-width: 0;
+      padding: 10px 8px;
+      font-size: 0.7rem;
+      letter-spacing: 0.3px;
+      text-align: center;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    .bold-product-tabs__spec-row {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .bold-product-tabs__spec-row dd {
+      text-align: left;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    document.querySelectorAll('[data-bold-tabs]').forEach(function (root) {
+      var tabs = root.querySelectorAll('[data-bold-tab]');
+      var panels = root.querySelectorAll('[data-bold-panel]');
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var target = tab.getAttribute('data-bold-tab');
+
+          tabs.forEach(function (t) {
+            t.classList.remove('is-active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          panels.forEach(function (p) {
+            p.classList.remove('is-active');
+            p.hidden = true;
+          });
+
+          tab.classList.add('is-active');
+          tab.setAttribute('aria-selected', 'true');
+          var panel = root.querySelector('[data-bold-panel="' + target + '"]');
+          if (panel) {
+            panel.classList.add('is-active');
+            panel.hidden = false;
+          }
+        });
+      });
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bold Product Tabs",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:forge.settings.color_scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Description tab" },
+    { "type": "checkbox", "id": "show_description_tab", "label": "Show description tab", "default": true },
+    { "type": "text", "id": "description_tab_label", "label": "Label", "default": "Description" },
+    { "type": "richtext", "id": "description_content", "label": "Content (overrides product description)" },
+    { "type": "header", "content": "Features tab" },
+    { "type": "checkbox", "id": "show_features_tab", "label": "Show features tab", "default": true },
+    { "type": "text", "id": "features_tab_label", "label": "Label", "default": "Features" },
+    { "type": "richtext", "id": "features_content", "label": "Content", "default": "<p>Key features of this product.</p>" },
+    { "type": "header", "content": "Specs tab" },
+    { "type": "checkbox", "id": "show_specs_tab", "label": "Show specs tab", "default": true },
+    { "type": "text", "id": "specs_tab_label", "label": "Label", "default": "Specs" },
+    { "type": "richtext", "id": "specs_content", "label": "Content" },
+    { "type": "header", "content": "Shipping tab" },
+    { "type": "checkbox", "id": "show_shipping_tab", "label": "Show shipping tab", "default": true },
+    { "type": "text", "id": "shipping_tab_label", "label": "Label", "default": "Shipping" },
+    { "type": "richtext", "id": "shipping_content", "label": "Content", "default": "<p>Free shipping on orders over $50. Standard delivery 3-5 business days.</p>" }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature item",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Feature text", "default": "Water-resistant design" }
+      ]
+    },
+    {
+      "type": "spec",
+      "name": "Spec row",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Weight" },
+        { "type": "text", "id": "value", "label": "Value", "default": "280g" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Product Tabs",
+      "blocks": [
+        { "type": "feature", "settings": { "text": "Water-resistant design" } },
+        { "type": "feature", "settings": { "text": "Lightweight materials" } },
+        { "type": "spec", "settings": { "label": "Weight", "value": "280g" } },
+        { "type": "spec", "settings": { "label": "Dimensions", "value": "30 x 20 x 10 cm" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

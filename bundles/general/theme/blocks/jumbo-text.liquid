@@ -1,0 +1,137 @@
+
+
+{% render 'jumbo-text' %}
+
+{% schema %}
+{
+  "name": "t:forge.names.jumbo_text",
+  "tag": null,
+  "settings": [
+    {
+      "id": "text",
+      "type": "textarea",
+      "label": "t:forge.settings.text",
+      "default": "t:forge.text_defaults.be_bold"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:forge.settings.font",
+      "options": [
+        {
+          "value": "body",
+          "label": "t:forge.options.body"
+        },
+        {
+          "value": "subheading",
+          "label": "t:forge.options.subheading"
+        },
+        {
+          "value": "heading",
+          "label": "t:forge.options.heading"
+        },
+        {
+          "value": "accent",
+          "label": "t:forge.options.accent"
+        }
+      ],
+      "default": "heading"
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "t:forge.settings.alignment",
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "t:forge.settings.line_height",
+      "options": [
+        {
+          "value": "0.8",
+          "label": "t:forge.options.tight"
+        },
+        {
+          "value": "1",
+          "label": "t:forge.options.normal"
+        },
+        {
+          "value": "1.2",
+          "label": "t:forge.options.loose"
+        }
+      ],
+      "default": "0.8"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:forge.settings.letter_spacing",
+      "options": [
+        {
+          "value": "-0.03em",
+          "label": "t:forge.options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:forge.options.normal"
+        },
+        {
+          "value": "0.03em",
+          "label": "t:forge.options.loose"
+        }
+      ],
+      "default": "-0.03em"
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "t:forge.settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:forge.options.uppercase"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "text_effect",
+      "label": "t:forge.settings.animation",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "blur",
+          "label": "t:forge.options.blur"
+        },
+        {
+          "value": "reveal",
+          "label": "t:forge.options.reveal"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "checkbox",
+      "id": "animation_repeat",
+      "label": "t:forge.settings.animation_repeat",
+      "default": false,
+      "visible_if": "{{ block.settings.text_effect == \"blur\" or block.settings.text_effect == \"reveal\" }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.jumbo_text",
+      "category": "t:forge.categories.decorative"
+    }
+  ]
+}
+{% endschema %}

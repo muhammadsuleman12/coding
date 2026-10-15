@@ -1,0 +1,390 @@
+{% liquid
+  assign eyebrow = section.settings.eyebrow | strip_html | strip
+  assign heading = section.settings.heading | strip_html | strip
+  assign subheading = section.settings.subheading | strip_html | strip
+  assign btn_label = section.settings.button_label
+  assign overlay_alpha = section.settings.overlay_opacity | default: 45 | divided_by: 100.0
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --edna-promo-overlay: {{ overlay_alpha }};
+  }
+{% endstyle %}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<forge-edna-countdown
+  class="edna-promo-countdown forge-spacing-style forge-color-{{ section.settings.color_scheme }}{% if section.settings.image != blank %} edna-promo-countdown--has-media{% endif %}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  data-countdown-end="{{ section.settings.countdown_end_date }}"
+  {{ section.shopify_attributes }}
+>
+  {% if section.settings.image != blank %}
+    <div
+      class="edna-promo-countdown__slot"
+      data-forge-slot-id="image"
+      data-forge-aspect-ratio="21:9"
+      data-forge-slot-label="Background"
+    ></div>
+    <div class="edna-promo-countdown__media" aria-hidden="true">
+      {{
+        section.settings.image
+        | image_url: width: 2400
+        | image_tag:
+          class: 'edna-promo-countdown__img',
+          loading: 'lazy',
+          widths: '750, 1100, 1600, 2000, 2400',
+          sizes: '100vw',
+          alt: ''
+      }}
+      <div class="edna-promo-countdown__overlay"></div>
+    </div>
+  {% endif %}
+
+  <div class="edna-promo-countdown__inner" data-animate="fade-up">
+    {% if eyebrow != blank %}
+      <p class="edna-promo-countdown__eyebrow">{{ eyebrow }}</p>
+    {% endif %}
+    {% if heading != blank %}
+      <h2 class="edna-promo-countdown__heading">{{ heading }}</h2>
+    {% endif %}
+    {% if subheading != blank %}
+      <p class="edna-promo-countdown__subheading">{{ subheading }}</p>
+    {% endif %}
+
+    <div class="edna-promo-countdown__timer" data-countdown aria-live="polite">
+      <div class="edna-promo-countdown__unit">
+        <span class="edna-promo-countdown__number" data-hours>00</span>
+        <span class="edna-promo-countdown__label">Hrs</span>
+      </div>
+      <span class="edna-promo-countdown__divider" aria-hidden="true">:</span>
+      <div class="edna-promo-countdown__unit">
+        <span class="edna-promo-countdown__number" data-minutes>00</span>
+        <span class="edna-promo-countdown__label">Min</span>
+      </div>
+      <span class="edna-promo-countdown__divider" aria-hidden="true">:</span>
+      <div class="edna-promo-countdown__unit">
+        <span class="edna-promo-countdown__number" data-seconds>00</span>
+        <span class="edna-promo-countdown__label">Sec</span>
+      </div>
+    </div>
+
+    {% if btn_label != blank %}
+      <a
+        href="{{ section.settings.button_link | default: '/collections/all' }}"
+        class="edna-promo-countdown__btn"
+      >
+        {{ btn_label }}
+      </a>
+    {% endif %}
+  </div>
+</forge-edna-countdown>
+
+{% stylesheet %}
+  .edna-promo-countdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 18rem;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .edna-promo-countdown__slot {
+    display: none;
+  }
+
+  .edna-promo-countdown__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .edna-promo-countdown__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .edna-promo-countdown__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--color-foreground);
+    opacity: var(--edna-promo-overlay, 0.45);
+  }
+
+  .edna-promo-countdown__inner {
+    position: relative;
+    z-index: 1;
+    width: min(44rem, calc(100% - 2.5rem));
+    margin-inline: auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .edna-promo-countdown__eyebrow {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .edna-promo-countdown--has-media .edna-promo-countdown__eyebrow {
+    color: var(--color-primary-button-text);
+  }
+
+  .edna-promo-countdown__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1.75rem, 4vw, var(--font-h2--size, 2.5rem));
+    font-weight: var(--font-h2--weight, 500);
+    line-height: 1.15;
+    letter-spacing: var(--font-h2--letter-spacing, 0.02em);
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .edna-promo-countdown--has-media .edna-promo-countdown__heading {
+    color: var(--color-primary-button-text);
+  }
+
+  .edna-promo-countdown__subheading {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-foreground-muted);
+    max-width: 36ch;
+  }
+
+  .edna-promo-countdown--has-media .edna-promo-countdown__subheading {
+    color: var(--color-primary-button-text);
+    opacity: 0.85;
+  }
+
+  .edna-promo-countdown__timer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-block: 0.5rem;
+  }
+
+  .edna-promo-countdown__unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 3.5rem;
+  }
+
+  .edna-promo-countdown__number {
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-primary);
+  }
+
+  .edna-promo-countdown--has-media .edna-promo-countdown__number {
+    color: var(--color-primary-button-text);
+  }
+
+  .edna-promo-countdown__label {
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-foreground-muted);
+  }
+
+  .edna-promo-countdown--has-media .edna-promo-countdown__label {
+    color: var(--color-primary-button-text);
+    opacity: 0.75;
+  }
+
+  .edna-promo-countdown__divider {
+    font-family: var(--font-heading--family, inherit);
+    font-size: 1.5rem;
+    line-height: 1.4;
+    color: var(--color-primary);
+  }
+
+  .edna-promo-countdown--has-media .edna-promo-countdown__divider {
+    color: var(--color-primary-button-text);
+  }
+
+  .edna-promo-countdown__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.75rem 1.5rem;
+    border: 0;
+    border-radius: 0;
+    background: var(--color-primary);
+    color: var(--color-primary-button-text);
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .edna-promo-countdown__btn:hover {
+    background: var(--color-primary-hover, var(--color-primary));
+  }
+
+  .edna-promo-countdown--has-media .edna-promo-countdown__btn {
+    background: var(--color-primary-button-text);
+    color: var(--color-foreground);
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class ForgeEdnaCountdown extends HTMLElement {
+    connectedCallback() {
+      this.hoursEl = this.querySelector("[data-hours]");
+      this.minutesEl = this.querySelector("[data-minutes]");
+      this.secondsEl = this.querySelector("[data-seconds]");
+      this.endTime = this.getEndTime();
+      this.updateCountdown();
+      this.timer = window.setInterval(() => this.updateCountdown(), 1000);
+    }
+
+    disconnectedCallback() {
+      if (this.timer) window.clearInterval(this.timer);
+    }
+
+    getEndTime() {
+      const configured = this.dataset.countdownEnd;
+      if (configured) {
+        const parsed = new Date(String(configured).replace(" ", "T"));
+        if (!Number.isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
+          return parsed.getTime();
+        }
+      }
+      return Date.now() + 48 * 60 * 60 * 1000;
+    }
+
+    updateCountdown() {
+      const distance = Math.max(0, this.endTime - Date.now());
+      const hours = Math.floor(distance / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      if (this.hoursEl) this.hoursEl.textContent = String(hours).padStart(2, "0");
+      if (this.minutesEl) this.minutesEl.textContent = String(minutes).padStart(2, "0");
+      if (this.secondsEl) this.secondsEl.textContent = String(seconds).padStart(2, "0");
+    }
+  }
+
+  customElements.define("forge-edna-countdown", ForgeEdnaCountdown);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Edna Promo Countdown",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Limited Time"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The Mid-Season Sale Ends Soon"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Selected edits, extra off through the weekend."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop the Sale"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "countdown_end_date",
+      "label": "Countdown end date",
+      "info": "Format: YYYY-MM-DD HH:MM:SS",
+      "default": "2026-12-31 23:59:59"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 45
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "Edna Promo Countdown"
+    }
+  ]
+}
+{% endschema %}

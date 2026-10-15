@@ -1,0 +1,78 @@
+
+<small>
+  {%- if cart.duties_included and cart.taxes_included -%}
+    {%- if shop.shipping_policy.body == blank -%}
+      {%- if has_discounts_enabled -%}
+        {% render 'forge-t', key: 'content.duties_and_taxes_included_shipping_at_checkout_without_policy_without_discounts', fallback: 'Duties and taxes included. Shipping is calculated at checkout.' %}
+      {%- else -%}
+        {% render 'forge-t', key: 'content.duties_and_taxes_included_shipping_at_checkout_without_policy', fallback: 'Duties and taxes included. Discounts and shipping calculated at checkout.' %}
+      {%- endif -%}
+    {%- else -%}
+      {%- if has_discounts_enabled -%}
+        {{
+          'content.duties_and_taxes_included_shipping_at_checkout_with_policy_without_discounts_html'
+          | t: link: shop.shipping_policy.url
+        }}
+      {%- else -%}
+        {{
+          'content.duties_and_taxes_included_shipping_at_checkout_with_policy_html'
+          | t: link: shop.shipping_policy.url
+        }}
+      {%- endif -%}
+    {%- endif -%}
+  {%- elsif cart.duties_included == false and cart.taxes_included -%}
+    {%- if shop.shipping_policy.body == blank -%}
+      {%- if has_discounts_enabled -%}
+        {% render 'forge-t', key: 'content.duties_and_taxes_included_shipping_at_checkout_without_policy_without_discounts', fallback: 'Duties and taxes included. Shipping is calculated at checkout.' %}
+      {%- else -%}
+        {% render 'forge-t', key: 'content.taxes_included_shipping_at_checkout_without_policy', fallback: 'Taxes included. Discounts and shipping calculated at checkout.' %}
+      {%- endif -%}
+    {%- else -%}
+      {%- if has_discounts_enabled -%}
+        {{
+          'content.duties_and_taxes_included_shipping_at_checkout_with_policy_without_discounts_html'
+          | t: link: shop.shipping_policy.url
+        }}
+      {%- else -%}
+        {{ 'content.taxes_included_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+      {%- endif -%}
+    {%- endif -%}
+  {%- elsif cart.duties_included and cart.taxes_included == false -%}
+    {%- if shop.shipping_policy.body == blank -%}
+      {%- if has_discounts_enabled -%}
+        {% render 'forge-t', key: 'content.duties_included_taxes_at_checkout_shipping_at_checkout_without_policy_without_discounts', fallback: 'Duties included. Shipping is calculated at checkout.' %}
+      {%- else -%}
+        {% render 'forge-t', key: 'content.duties_included_taxes_at_checkout_shipping_at_checkout_without_policy', fallback: 'Duties included. Taxes, discounts and shipping calculated at checkout.' %}
+      {%- endif -%}
+    {%- else -%}
+      {%- if has_discounts_enabled -%}
+        {{
+          'content.duties_included_taxes_at_checkout_shipping_at_checkout_with_policy_without_discounts_html'
+          | t: link: shop.shipping_policy.url
+        }}
+      {%- else -%}
+        {{
+          'content.duties_included_taxes_at_checkout_shipping_at_checkout_with_policy_html'
+          | t: link: shop.shipping_policy.url
+        }}
+      {%- endif -%}
+    {%- endif -%}
+  {%- elsif cart.duties_included == false and cart.taxes_included == false -%}
+    {%- if shop.shipping_policy.body == blank -%}
+      {%- if has_discounts_enabled -%}
+        {% render 'forge-t', key: 'content.taxes_at_checkout_shipping_at_checkout_without_policy_without_discounts', fallback: 'Taxes and shipping calculated at checkout.' %}
+      {%- else -%}
+        {% render 'forge-t', key: 'content.taxes_at_checkout_shipping_at_checkout_without_policy', fallback: 'Taxes, discounts and shipping calculated at checkout.' %}
+      {%- endif -%}
+    {%- else -%}
+      {%- if has_discounts_enabled -%}
+        {{
+          'content.taxes_at_checkout_shipping_at_checkout_with_policy_without_discounts_html'
+          | t: link: shop.shipping_policy.url
+        }}
+      {%- else -%}
+        {{ 'content.taxes_at_checkout_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+</small>

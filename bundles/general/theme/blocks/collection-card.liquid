@@ -1,0 +1,220 @@
+
+
+{% assign collection = block.settings.collection %}
+
+{% style %}
+  {% if request.visual_preview_mode %}
+    .forge-collection-card {
+      min-width: 250px;
+    }
+  {% endif %}
+{% endstyle %}
+
+{% capture card_image %}
+  {% content_for 'block',
+    type: '_collection-card-image',
+    id: 'collection-card-image',
+    closest.collection: collection,
+    parent_block_id: block.id %}
+{% endcapture %}
+
+{% capture children %}
+  {% content_for 'blocks' %}
+{% endcapture %}
+
+{% render 'collection-card',
+  card_image: card_image,
+  children: children,
+  block: block,
+  collection: collection,
+  section: section
+%}
+
+{% schema %}
+{
+  "name": "t:forge.names.collection_card",
+  "blocks": [
+    {
+      "type": "text"
+    },
+    {
+      "type": "spacer"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "collection-title"
+    }
+  ],
+  "tag": null,
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:forge.settings.collection"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.text"
+    },
+    {
+      "type": "select",
+      "id": "placement",
+      "label": "t:forge.settings.placement",
+      "options": [
+        {
+          "value": "on_image",
+          "label": "t:forge.options.on_image"
+        },
+        {
+          "value": "below_image",
+          "label": "t:forge.options.below_image"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "t:forge.settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.right"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "t:forge.settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.bottom"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ block.settings.placement == \"on_image\" }}"
+    },
+    {
+      "type": "range",
+      "id": "collection_card_gap",
+      "label": "t:forge.settings.vertical_gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:forge.settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:forge.settings.borders",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:forge.options.solid"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "t:forge.settings.border_width",
+      "default": 1,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:forge.settings.border_opacity",
+      "default": 100,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:forge.settings.border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.collection_card",
+      "category": "t:forge.categories.collection",
+      "settings": {
+        "collection": "",
+        "placement": "below_image"
+      },
+      "blocks": {
+        "collection-card-image": {
+          "type": "_collection-card-image",
+          "static": true
+        },
+        "collection-title": {
+          "type": "collection-title",
+          "settings": {
+            "type_preset": "h4"
+          }
+        }
+      },
+      "block_order": ["collection-title"]
+    }
+  ]
+}
+{% endschema %}

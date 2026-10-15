@@ -1,0 +1,2544 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "EPH Improved General",
+    "theme_version": "4.1.5",
+    "theme_author": "Shopify",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "t:forge.names.logo_and_favicon",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "t:forge.content.manage_store_name"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "t:forge.settings.default_logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_inverse",
+        "label": "t:forge.settings.inverse_logo",
+        "info": "t:forge.content.inverse_logo_info"
+      },
+      {
+        "type": "range",
+        "id": "logo_height",
+        "label": "t:forge.settings.desktop_height",
+        "min": 12,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 40,
+        "visible_if": "{{ settings.logo != blank or settings.logo_inverse != blank }}",
+        "info": "t:forge.info.logo_height"
+      },
+      {
+        "type": "range",
+        "id": "logo_height_mobile",
+        "label": "t:forge.settings.mobile_height",
+        "min": 12,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 30,
+        "visible_if": "{{ settings.logo != blank or settings.logo_inverse != blank }}",
+        "info": "t:forge.info.logo_height"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "t:forge.settings.favicon"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.colors",
+    "settings": [
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "definition": [
+          {
+            "type": "color",
+            "id": "background",
+            "label": "t:forge.settings.background",
+            "default": "#FFFFFF",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "background_secondary",
+            "label": "t:forge.settings.background_secondary",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "foreground_heading",
+            "label": "t:forge.settings.headings",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "foreground",
+            "label": "t:forge.settings.text",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "primary",
+            "label": "t:forge.settings.primary_color",
+            "default": "#000F9F",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "border",
+            "label": "t:forge.settings.borders",
+            "default": "#E6E6E6",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "shadow",
+            "label": "t:forge.settings.shadow_color",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "header",
+            "content": "t:forge.names.primary_button"
+          },
+          {
+            "type": "color",
+            "id": "primary_button_background",
+            "label": "t:forge.settings.background",
+            "default": "#000F9F",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "primary_button_text",
+            "label": "t:forge.settings.text",
+            "default": "#FFFFFF",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "primary_button_border",
+            "label": "t:forge.settings.borders",
+            "default": "#000F9F",
+            "alpha": true
+          },
+          {
+            "type": "header",
+            "content": "t:forge.names.secondary_button"
+          },
+          {
+            "type": "color",
+            "id": "secondary_button_background",
+            "label": "t:forge.settings.background",
+            "default": "#FFFFFF",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "secondary_button_text",
+            "label": "t:forge.settings.text",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "secondary_button_border",
+            "label": "t:forge.settings.borders",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "header",
+            "content": "t:forge.names.inputs"
+          },
+          {
+            "type": "color",
+            "id": "input_background",
+            "label": "t:forge.settings.background",
+            "default": "#FFFFFF",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "input_text_color",
+            "label": "t:forge.settings.text",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "input_border_color",
+            "label": "t:forge.settings.borders",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "header",
+            "content": "t:forge.names.variants"
+          },
+          {
+            "type": "color",
+            "id": "variant_background_color",
+            "label": "t:forge.settings.background",
+            "default": "#FFFFFF",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "variant_text_color",
+            "label": "t:forge.settings.text",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "variant_border_color",
+            "label": "t:forge.settings.borders",
+            "default": "#E6E6E6",
+            "alpha": true
+          },
+          {
+            "type": "header",
+            "content": "t:forge.names.selected_variants"
+          },
+          {
+            "type": "color",
+            "id": "selected_variant_background_color",
+            "label": "t:forge.settings.background",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "selected_variant_text_color",
+            "label": "t:forge.settings.text",
+            "default": "#FFFFFF",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "selected_variant_border_color",
+            "label": "t:forge.settings.borders",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "header",
+            "content": "Gradients"
+          },
+          {
+            "type": "color",
+            "id": "gradient_1",
+            "label": "Gradient color 1",
+            "default": "#000000",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "gradient_2",
+            "label": "Gradient color 2",
+            "default": "#333333",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "gradient_3",
+            "label": "Gradient color 3",
+            "default": "#666666",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "gradient_text_color",
+            "label": "Gradient text color",
+            "default": "#FFFFFF",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "wave_color",
+            "label": "Wave color",
+            "default": "#FFFFFF",
+            "alpha": true
+          }
+        ],
+        "role": {
+          "text": "foreground",
+          "background": "background",
+          "links": "primary",
+          "icons": "foreground",
+          "primary_button": "primary_button_background",
+          "on_primary_button": "primary_button_text",
+          "primary_button_border": "primary_button_border",
+          "secondary_button": "secondary_button_background",
+          "on_secondary_button": "secondary_button_text",
+          "secondary_button_border": "secondary_button_border"
+        }
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.typography",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:forge.content.fonts"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "default": "work_sans_n4",
+        "label": "t:forge.options.body"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_subheading_font",
+        "default": "work_sans_n5",
+        "label": "t:forge.options.subheading"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_heading_font",
+        "default": "anonymous_pro_n4",
+        "label": "t:forge.options.heading"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_accent_font",
+        "default": "anonymous_pro_n4",
+        "label": "t:forge.options.accent"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.content.text_presets"
+      },
+      {
+        "type": "paragraph",
+        "content": "t:forge.content.responsive_font_sizes"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.content.paragraph"
+      },
+      {
+        "type": "select",
+        "id": "type_size_paragraph",
+        "label": "t:forge.settings.size",
+        "options": [
+          {
+            "value": "10",
+            "label": "10px"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          }
+        ],
+        "default": "14"
+      },
+      {
+        "type": "select",
+        "id": "type_line_height_paragraph",
+        "label": "t:forge.settings.line_height",
+        "options": [
+          {
+            "value": "body-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "body-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "body-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "body-normal"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.h1"
+      },
+      {
+        "type": "select",
+        "id": "type_font_h1",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          }
+        ],
+        "default": "heading"
+      },
+      {
+        "type": "select",
+        "id": "type_size_h1",
+        "label": "t:forge.settings.size",
+        "options": [
+          {
+            "value": "10",
+            "label": "10px"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          },
+          {
+            "value": "20",
+            "label": "20px"
+          },
+          {
+            "value": "24",
+            "label": "24px"
+          },
+          {
+            "value": "32",
+            "label": "32px"
+          },
+          {
+            "value": "40",
+            "label": "40px"
+          },
+          {
+            "value": "48",
+            "label": "48px"
+          },
+          {
+            "value": "56",
+            "label": "56px"
+          },
+          {
+            "value": "72",
+            "label": "72px"
+          },
+          {
+            "value": "88",
+            "label": "88px"
+          },
+          {
+            "value": "120",
+            "label": "120px"
+          },
+          {
+            "value": "152",
+            "label": "152px"
+          },
+          {
+            "value": "184",
+            "label": "184px"
+          }
+        ],
+        "default": "40"
+      },
+      {
+        "type": "select",
+        "id": "type_line_height_h1",
+        "label": "t:forge.settings.line_height",
+        "options": [
+          {
+            "value": "display-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "display-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "display-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "display-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_letter_spacing_h1",
+        "label": "t:forge.settings.letter_spacing",
+        "options": [
+          {
+            "value": "heading-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "heading-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "heading-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "heading-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_case_h1",
+        "label": "t:forge.settings.text_case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.h2"
+      },
+      {
+        "type": "select",
+        "id": "type_font_h2",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          }
+        ],
+        "default": "heading"
+      },
+      {
+        "type": "select",
+        "id": "type_size_h2",
+        "label": "t:forge.settings.size",
+        "options": [
+          {
+            "value": "10",
+            "label": "10px"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          },
+          {
+            "value": "20",
+            "label": "20px"
+          },
+          {
+            "value": "24",
+            "label": "24px"
+          },
+          {
+            "value": "32",
+            "label": "32px"
+          },
+          {
+            "value": "36",
+            "label": "36px"
+          },
+          {
+            "value": "40",
+            "label": "40px"
+          },
+          {
+            "value": "48",
+            "label": "48px"
+          },
+          {
+            "value": "56",
+            "label": "56px"
+          },
+          {
+            "value": "72",
+            "label": "72px"
+          },
+          {
+            "value": "88",
+            "label": "88px"
+          },
+          {
+            "value": "120",
+            "label": "120px"
+          },
+          {
+            "value": "152",
+            "label": "152px"
+          },
+          {
+            "value": "184",
+            "label": "184px"
+          }
+        ],
+        "default": "36"
+      },
+      {
+        "type": "select",
+        "id": "type_line_height_h2",
+        "label": "t:forge.settings.line_height",
+        "options": [
+          {
+            "value": "display-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "display-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "display-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "display-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_letter_spacing_h2",
+        "label": "t:forge.settings.letter_spacing",
+        "options": [
+          {
+            "value": "heading-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "heading-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "heading-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "heading-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_case_h2",
+        "label": "t:forge.settings.text_case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.h3"
+      },
+      {
+        "type": "select",
+        "id": "type_font_h3",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          },
+          {
+            "value": "subheading",
+            "label": "t:forge.options.subheading"
+          },
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          }
+        ],
+        "default": "heading"
+      },
+      {
+        "type": "select",
+        "id": "type_size_h3",
+        "label": "t:forge.settings.size",
+        "options": [
+          {
+            "value": "10",
+            "label": "10px"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          },
+          {
+            "value": "20",
+            "label": "20px"
+          },
+          {
+            "value": "24",
+            "label": "24px"
+          },
+          {
+            "value": "32",
+            "label": "32px"
+          },
+          {
+            "value": "40",
+            "label": "40px"
+          },
+          {
+            "value": "48",
+            "label": "48px"
+          },
+          {
+            "value": "56",
+            "label": "56px"
+          },
+          {
+            "value": "72",
+            "label": "72px"
+          },
+          {
+            "value": "88",
+            "label": "88px"
+          },
+          {
+            "value": "120",
+            "label": "120px"
+          },
+          {
+            "value": "152",
+            "label": "152px"
+          },
+          {
+            "value": "184",
+            "label": "184px"
+          }
+        ],
+        "default": "32"
+      },
+      {
+        "type": "select",
+        "id": "type_line_height_h3",
+        "label": "t:forge.settings.line_height",
+        "options": [
+          {
+            "value": "display-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "display-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "display-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "display-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_letter_spacing_h3",
+        "label": "t:forge.settings.letter_spacing",
+        "options": [
+          {
+            "value": "heading-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "heading-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "heading-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "heading-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_case_h3",
+        "label": "t:forge.settings.text_case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.h4"
+      },
+      {
+        "type": "select",
+        "id": "type_font_h4",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          },
+          {
+            "value": "subheading",
+            "label": "t:forge.options.subheading"
+          },
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          }
+        ],
+        "default": "subheading"
+      },
+      {
+        "type": "select",
+        "id": "type_size_h4",
+        "label": "t:forge.settings.size",
+        "options": [
+          {
+            "value": "10",
+            "label": "10px"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          },
+          {
+            "value": "20",
+            "label": "20px"
+          },
+          {
+            "value": "24",
+            "label": "24px"
+          },
+          {
+            "value": "32",
+            "label": "32px"
+          },
+          {
+            "value": "40",
+            "label": "40px"
+          },
+          {
+            "value": "48",
+            "label": "48px"
+          },
+          {
+            "value": "56",
+            "label": "56px"
+          },
+          {
+            "value": "72",
+            "label": "72px"
+          },
+          {
+            "value": "88",
+            "label": "88px"
+          },
+          {
+            "value": "120",
+            "label": "120px"
+          },
+          {
+            "value": "152",
+            "label": "152px"
+          },
+          {
+            "value": "184",
+            "label": "184px"
+          }
+        ],
+        "default": "24"
+      },
+      {
+        "type": "select",
+        "id": "type_line_height_h4",
+        "label": "t:forge.settings.line_height",
+        "options": [
+          {
+            "value": "display-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "display-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "display-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "display-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_letter_spacing_h4",
+        "label": "t:forge.settings.letter_spacing",
+        "options": [
+          {
+            "value": "heading-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "heading-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "heading-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "heading-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_case_h4",
+        "label": "t:forge.settings.text_case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.h5"
+      },
+      {
+        "type": "select",
+        "id": "type_font_h5",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          },
+          {
+            "value": "subheading",
+            "label": "t:forge.options.subheading"
+          },
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          }
+        ],
+        "default": "subheading"
+      },
+      {
+        "type": "select",
+        "id": "type_size_h5",
+        "label": "t:forge.settings.size",
+        "options": [
+          {
+            "value": "10",
+            "label": "10px"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          },
+          {
+            "value": "20",
+            "label": "20px"
+          },
+          {
+            "value": "24",
+            "label": "24px"
+          },
+          {
+            "value": "32",
+            "label": "32px"
+          },
+          {
+            "value": "40",
+            "label": "40px"
+          },
+          {
+            "value": "48",
+            "label": "48px"
+          },
+          {
+            "value": "56",
+            "label": "56px"
+          },
+          {
+            "value": "72",
+            "label": "72px"
+          },
+          {
+            "value": "88",
+            "label": "88px"
+          },
+          {
+            "value": "120",
+            "label": "120px"
+          },
+          {
+            "value": "152",
+            "label": "152px"
+          },
+          {
+            "value": "184",
+            "label": "184px"
+          }
+        ],
+        "default": "18"
+      },
+      {
+        "type": "select",
+        "id": "type_line_height_h5",
+        "label": "t:forge.settings.line_height",
+        "options": [
+          {
+            "value": "display-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "display-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "display-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "display-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_letter_spacing_h5",
+        "label": "t:forge.settings.letter_spacing",
+        "options": [
+          {
+            "value": "heading-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "heading-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "heading-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "heading-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_case_h5",
+        "label": "t:forge.settings.text_case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.h6"
+      },
+      {
+        "type": "select",
+        "id": "type_font_h6",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          },
+          {
+            "value": "subheading",
+            "label": "t:forge.options.subheading"
+          },
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          }
+        ],
+        "default": "subheading"
+      },
+      {
+        "type": "select",
+        "id": "type_size_h6",
+        "label": "t:forge.settings.size",
+        "options": [
+          {
+            "value": "10",
+            "label": "10px"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          },
+          {
+            "value": "20",
+            "label": "20px"
+          },
+          {
+            "value": "24",
+            "label": "24px"
+          },
+          {
+            "value": "32",
+            "label": "32px"
+          },
+          {
+            "value": "40",
+            "label": "40px"
+          },
+          {
+            "value": "48",
+            "label": "48px"
+          },
+          {
+            "value": "56",
+            "label": "56px"
+          },
+          {
+            "value": "72",
+            "label": "72px"
+          },
+          {
+            "value": "88",
+            "label": "88px"
+          },
+          {
+            "value": "120",
+            "label": "120px"
+          },
+          {
+            "value": "152",
+            "label": "152px"
+          },
+          {
+            "value": "184",
+            "label": "184px"
+          }
+        ],
+        "default": "16"
+      },
+      {
+        "type": "select",
+        "id": "type_line_height_h6",
+        "label": "t:forge.settings.line_height",
+        "options": [
+          {
+            "value": "display-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "display-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "display-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "display-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_letter_spacing_h6",
+        "label": "t:forge.settings.letter_spacing",
+        "options": [
+          {
+            "value": "heading-tight",
+            "label": "t:forge.options.tight"
+          },
+          {
+            "value": "heading-normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "heading-loose",
+            "label": "t:forge.options.loose"
+          }
+        ],
+        "default": "heading-normal"
+      },
+      {
+        "type": "select",
+        "id": "type_case_h6",
+        "label": "t:forge.settings.text_case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "none"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.page_layout",
+    "settings": [
+      {
+        "type": "select",
+        "id": "page_width",
+        "label": "t:forge.settings.page_width",
+        "options": [
+          {
+            "value": "narrow",
+            "label": "t:forge.options.narrow"
+          },
+          {
+            "value": "normal",
+            "label": "t:forge.options.normal"
+          },
+          {
+            "value": "wide",
+            "label": "t:forge.options.wide"
+          }
+        ],
+        "default": "narrow"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.animations",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "page_transition_enabled",
+        "label": "t:forge.settings.page_transition_enabled",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "transition_to_main_product",
+        "label": "t:forge.settings.transition_to_main_product",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "add_to_cart_animation",
+        "label": "t:forge.settings.add_to_cart_animation",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "card_hover_effect",
+        "label": "t:forge.settings.card_hover_effect",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.none"
+          },
+          {
+            "value": "lift",
+            "label": "t:forge.options.lift"
+          },
+          {
+            "value": "scale",
+            "label": "t:forge.options.scale"
+          },
+          {
+            "value": "subtle-zoom",
+            "label": "t:forge.options.subtle_zoom"
+          }
+        ],
+        "default": "lift",
+        "info": "t:forge.info.hover_effects"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.badges",
+    "settings": [
+      {
+        "type": "select",
+        "id": "badge_position",
+        "options": [
+          {
+            "value": "bottom-left",
+            "label": "t:forge.options.bottom_left"
+          },
+          {
+            "value": "top-left",
+            "label": "t:forge.options.top_left"
+          },
+          {
+            "value": "top-right",
+            "label": "t:forge.options.top_right"
+          }
+        ],
+        "default": "top-left",
+        "label": "t:forge.settings.badge_position"
+      },
+      {
+        "type": "range",
+        "id": "badge_corner_radius",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "t:forge.settings.badge_corner_radius",
+        "default": 40
+      },
+      {
+        "type": "header",
+        "content": "t:forge.settings.colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "badge_sale_color_scheme",
+        "label": "t:forge.settings.badge_sale_color_scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "badge_sold_out_color_scheme",
+        "label": "t:forge.settings.badge_sold_out_color_scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.names.typography"
+      },
+      {
+        "type": "select",
+        "id": "badge_font_family",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          },
+          {
+            "value": "subheading",
+            "label": "t:forge.options.subheading"
+          },
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          }
+        ],
+        "default": "body"
+      },
+      {
+        "type": "select",
+        "id": "badge_text_transform",
+        "label": "t:forge.settings.text_case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "none"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.buttons",
+    "settings": [
+      {
+        "type": "range",
+        "id": "global_border_radius",
+        "min": 0,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "label": "Card border radius",
+        "default": 8
+      },
+      {
+        "type": "select",
+        "id": "button_shape",
+        "label": "Button shape",
+        "options": [
+          {
+            "value": "square",
+            "label": "Square"
+          },
+          {
+            "value": "soft",
+            "label": "Rounded"
+          },
+          {
+            "value": "pill",
+            "label": "Pill"
+          },
+          {
+            "value": "custom",
+            "label": "Custom"
+          }
+        ],
+        "default": "soft"
+      },
+      {
+        "type": "range",
+        "id": "button_radius_custom",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Button border radius (custom)",
+        "default": 4
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.button_primary"
+      },
+      {
+        "type": "range",
+        "id": "primary_button_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 0
+      },
+      {
+        "type": "select",
+        "id": "type_font_button_primary",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          }
+        ],
+        "default": "body"
+      },
+      {
+        "type": "select",
+        "id": "button_text_case_primary",
+        "label": "t:forge.settings.button_text_case",
+        "options": [
+          {
+            "value": "default",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "default"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.options.button_secondary"
+      },
+      {
+        "type": "range",
+        "id": "secondary_button_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 1
+      },
+      {
+        "type": "select",
+        "id": "type_font_button_secondary",
+        "label": "t:forge.settings.font",
+        "options": [
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          }
+        ],
+        "default": "body"
+      },
+      {
+        "type": "select",
+        "id": "button_text_case_secondary",
+        "label": "t:forge.settings.button_text_case",
+        "options": [
+          {
+            "value": "default",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "default"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.names.pills"
+      },
+      {
+        "type": "paragraph",
+        "content": "t:forge.info.pills_usage"
+      },
+      {
+        "type": "range",
+        "id": "pills_border_radius",
+        "label": "t:forge.settings.border_radius",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "default": 40
+      }
+    ]
+  },
+  {
+    "name": "Cards",
+    "settings": [
+      {
+        "type": "range",
+        "id": "card_gap",
+        "min": 0,
+        "max": 48,
+        "step": 4,
+        "unit": "px",
+        "label": "Card gap",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "card_shadow",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Card shadow",
+        "default": 33,
+        "info": "Shadow intensity behind cards, from flat (0) to deep (100)."
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "t:forge.settings.cart_type",
+        "options": [
+          {
+            "value": "page",
+            "label": "t:forge.options.page"
+          },
+          {
+            "value": "drawer",
+            "label": "t:forge.options.drawer"
+          }
+        ],
+        "default": "page"
+      },
+      {
+        "type": "select",
+        "id": "product_title_case",
+        "label": "t:forge.settings.product_title_case",
+        "options": [
+          {
+            "value": "default",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "default"
+      },
+      {
+        "type": "select",
+        "id": "cart_price_font",
+        "label": "t:forge.settings.font_price",
+        "options": [
+          {
+            "value": "body",
+            "label": "t:forge.options.body"
+          },
+          {
+            "value": "subheading",
+            "label": "t:forge.options.subheading"
+          },
+          {
+            "value": "heading",
+            "label": "t:forge.options.heading"
+          },
+          {
+            "value": "accent",
+            "label": "t:forge.options.accent"
+          }
+        ],
+        "default": "subheading"
+      },
+      {
+        "type": "checkbox",
+        "id": "auto_open_cart_drawer",
+        "label": "t:forge.settings.auto_open_cart_drawer",
+        "default": false,
+        "visible_if": "{{ settings.cart_type == 'drawer' }}"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.content.cart_features"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_cart_note",
+        "label": "t:forge.settings.seller_note",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_note_open_by_default",
+        "label": "t:forge.settings.seller_note_open_by_default",
+        "default": false,
+        "visible_if": "{{ settings.show_cart_note == true }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_add_discount_code",
+        "label": "t:forge.settings.add_discount_code",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_installments",
+        "label": "t:forge.settings.installments",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_accelerated_checkout_buttons",
+        "label": "t:forge.settings.checkout_buttons",
+        "info": "t:forge.info.checkout_buttons",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_original_price_strikethrough",
+        "label": "t:forge.settings.show_original_price_strikethrough",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "disable_free_gift_product_links",
+        "label": "t:forge.settings.disable_free_gift_product_links",
+        "info": "t:forge.info.disable_free_gift_product_links",
+        "default": false
+      },
+      {
+        "type": "url",
+        "id": "empty_cart_button_link",
+        "label": "t:forge.settings.empty_cart_button_link",
+        "default": "/collections/all"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.content.product_media"
+      },
+      {
+        "type": "select",
+        "id": "cart_thumbnail_border",
+        "label": "t:forge.settings.style",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.none"
+          },
+          {
+            "value": "solid",
+            "label": "t:forge.options.solid"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "cart_thumbnail_border_width",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 1,
+        "visible_if": "{{ settings.cart_thumbnail_border != 'none' }}"
+      },
+      {
+        "type": "range",
+        "id": "cart_thumbnail_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "t:forge.settings.border_opacity",
+        "default": 50,
+        "visible_if": "{{ settings.cart_thumbnail_border != 'none' }}"
+      },
+      {
+        "type": "range",
+        "id": "cart_thumbnail_border_radius",
+        "label": "t:forge.settings.border_radius",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.drawers",
+    "settings": [
+      {
+        "type": "color_scheme",
+        "id": "drawer_color_scheme",
+        "label": "t:forge.settings.color_scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "select",
+        "id": "drawer_border",
+        "label": "t:forge.settings.borders",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.none"
+          },
+          {
+            "value": "solid",
+            "label": "t:forge.options.solid"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "drawer_border_width",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 1,
+        "visible_if": "{{ settings.drawer_border != 'none' }}"
+      },
+      {
+        "type": "range",
+        "id": "drawer_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "t:forge.settings.border_opacity",
+        "default": 50,
+        "visible_if": "{{ settings.drawer_border != 'none' }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "drawer_drop_shadow",
+        "label": "t:forge.settings.drop_shadow",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.icons",
+    "settings": [
+      {
+        "type": "select",
+        "id": "icon_stroke",
+        "label": "t:forge.settings.stroke",
+        "options": [
+          {
+            "value": "thin",
+            "label": "t:forge.options.thin"
+          },
+          {
+            "value": "default",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "heavy",
+            "label": "t:forge.options.heavy"
+          }
+        ],
+        "default": "default"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.input_fields",
+    "settings": [
+      {
+        "type": "range",
+        "id": "input_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 1
+      },
+      {
+        "type": "range",
+        "id": "inputs_border_radius",
+        "min": 0,
+        "max": 32,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_radius",
+        "default": 8
+      },
+      {
+        "type": "select",
+        "id": "type_preset",
+        "label": "t:forge.settings.type_preset",
+        "options": [
+          {
+            "value": "",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "paragraph",
+            "label": "t:forge.options.paragraph"
+          },
+          {
+            "value": "h1",
+            "label": "t:forge.options.h1"
+          },
+          {
+            "value": "h2",
+            "label": "t:forge.options.h2"
+          },
+          {
+            "value": "h3",
+            "label": "t:forge.options.h3"
+          },
+          {
+            "value": "h4",
+            "label": "t:forge.options.h4"
+          },
+          {
+            "value": "h5",
+            "label": "t:forge.options.h5"
+          },
+          {
+            "value": "h6",
+            "label": "t:forge.options.h6"
+          }
+        ],
+        "default": "paragraph"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.popovers_and_modals",
+    "settings": [
+      {
+        "type": "color_scheme",
+        "id": "popover_color_scheme",
+        "label": "t:forge.settings.color_scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "popover_border_radius",
+        "label": "t:forge.settings.border_radius",
+        "min": 0,
+        "max": 16,
+        "step": 1,
+        "unit": "px",
+        "default": 8
+      },
+      {
+        "type": "select",
+        "id": "popover_border",
+        "label": "t:forge.settings.borders",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.none"
+          },
+          {
+            "value": "solid",
+            "label": "t:forge.options.solid"
+          }
+        ],
+        "default": "solid"
+      },
+      {
+        "type": "range",
+        "id": "popover_border_width",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 1,
+        "visible_if": "{{ settings.popover_border != 'none' }}"
+      },
+      {
+        "type": "range",
+        "id": "popover_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "t:forge.settings.border_opacity",
+        "default": 50,
+        "visible_if": "{{ settings.popover_border != 'none' }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "popover_drop_shadow",
+        "label": "t:forge.settings.drop_shadow",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.prices",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:forge.settings.currency_code"
+      },
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled_product_pages",
+        "label": "t:forge.settings.product_pages",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled_product_cards",
+        "label": "t:forge.settings.product_cards",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled_cart_items",
+        "label": "t:forge.settings.cart_items",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled_cart_total",
+        "label": "t:forge.settings.cart_total",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.product_cards",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "quick_add",
+        "label": "t:forge.settings.quick_add",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "mobile_quick_add",
+        "label": "t:forge.settings.mobile_quick_add",
+        "default": false,
+        "visible_if": "{{ settings.quick_add == true }}"
+      },
+      {
+        "type": "color_scheme",
+        "id": "quick_add_color_scheme",
+        "label": "t:forge.settings.quick_add_colors",
+        "default": "scheme-1",
+        "visible_if": "{{ settings.quick_add == true }}"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.settings.media"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_second_image_on_hover",
+        "label": "t:forge.settings.show_second_image_on_hover",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "product_card_carousel",
+        "label": "t:forge.settings.product_card_carousel",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.search",
+    "settings": [
+      {
+        "type": "collection",
+        "id": "empty_state_collection",
+        "label": "t:forge.settings.empty_state_collection",
+        "info": "t:forge.settings.empty_state_collection_info"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.names.predictive_search"
+      },
+      {
+        "type": "range",
+        "id": "product_corner_radius",
+        "min": 0,
+        "max": 32,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.product_corner_radius",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_corner_radius",
+        "min": 0,
+        "max": 16,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.card_corner_radius",
+        "default": 0
+      },
+      {
+        "type": "select",
+        "id": "card_title_case",
+        "label": "t:forge.settings.product_and_card_title_case",
+        "options": [
+          {
+            "value": "default",
+            "label": "t:forge.options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:forge.options.uppercase"
+          }
+        ],
+        "default": "default"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.swatches",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_variant_image",
+        "label": "t:forge.settings.variant_images",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "variant_swatch_width",
+        "min": 16,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.width",
+        "default": 30
+      },
+      {
+        "type": "range",
+        "id": "variant_swatch_height",
+        "min": 16,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.height",
+        "default": 30
+      },
+      {
+        "type": "range",
+        "id": "variant_swatch_radius",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_radius",
+        "default": 100
+      },
+      {
+        "type": "select",
+        "id": "variant_swatch_border_style",
+        "label": "t:forge.settings.borders",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:forge.options.none"
+          },
+          {
+            "value": "solid",
+            "label": "t:forge.options.solid"
+          }
+        ],
+        "default": "solid"
+      },
+      {
+        "type": "range",
+        "id": "variant_swatch_border_width",
+        "min": 0,
+        "max": 10,
+        "step": 0.5,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 1,
+        "visible_if": "{{ settings.variant_swatch_border_style != 'none' }}"
+      },
+      {
+        "type": "range",
+        "id": "variant_swatch_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "t:forge.settings.border_opacity",
+        "default": 10,
+        "visible_if": "{{ settings.variant_swatch_border_style != 'none' }}"
+      }
+    ]
+  },
+  {
+    "name": "t:forge.names.variant_pickers",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:forge.content.variant_settings"
+      },
+      {
+        "type": "header",
+        "content": "t:forge.content.buttons"
+      },
+      {
+        "type": "range",
+        "id": "variant_button_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_width",
+        "default": 1
+      },
+      {
+        "type": "range",
+        "id": "variant_button_radius",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "t:forge.settings.border_radius",
+        "default": 8
+      },
+      {
+        "type": "select",
+        "id": "variant_button_width",
+        "label": "t:forge.settings.width",
+        "options": [
+          {
+            "value": "default-width-buttons",
+            "label": "t:forge.options.fit"
+          },
+          {
+            "value": "equal-width-buttons",
+            "label": "t:forge.options.fill"
+          }
+        ],
+        "default": "equal-width-buttons"
+      }
+    ]
+  },
+  {
+    "name": "Style mode",
+    "settings": [
+      {
+        "type": "select",
+        "id": "style_mode",
+        "label": "Section style",
+        "default": "flat",
+        "options": [
+          {
+            "value": "flat",
+            "label": "Flat"
+          },
+          {
+            "value": "gradient",
+            "label": "Gradient"
+          }
+        ],
+        "info": "Controls whether sections use gradient or flat backgrounds"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "min": 70,
+        "max": 140,
+        "step": 1,
+        "unit": "%",
+        "label": "Heading size",
+        "default": 100,
+        "info": "Controls the size of section headlines across the theme. Individual sections can override this."
+      },
+      {
+        "type": "select",
+        "id": "font_weight",
+        "label": "Font weight",
+        "default": "regular",
+        "options": [
+          {
+            "value": "light",
+            "label": "Light"
+          },
+          {
+            "value": "regular",
+            "label": "Regular"
+          },
+          {
+            "value": "bold",
+            "label": "Bold"
+          }
+        ],
+        "info": "Controls how bold body copy and headings render across the theme, independent of which font is selected."
+      },
+      {
+        "type": "select",
+        "id": "heading_tracking",
+        "label": "Letter spacing",
+        "default": "normal",
+        "options": [
+          {
+            "value": "tight",
+            "label": "Tight"
+          },
+          {
+            "value": "normal",
+            "label": "Normal"
+          },
+          {
+            "value": "loose",
+            "label": "Loose"
+          }
+        ],
+        "info": "Controls letter spacing across all heading levels (h1-h6). Overrides the per-level letter spacing settings above."
+      },
+      {
+        "type": "select",
+        "id": "heading_case",
+        "label": "Heading case",
+        "default": "none",
+        "options": [
+          {
+            "value": "none",
+            "label": "As written"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          }
+        ],
+        "info": "Controls whether section headings render as written or uppercase across the theme. Overrides the per-level text case settings above."
+      }
+    ]
+  },
+  {
+    "name": "Section spacing",
+    "settings": [
+      {
+        "type": "range",
+        "id": "section_spacing",
+        "min": 50,
+        "max": 120,
+        "step": 1,
+        "unit": "%",
+        "label": "Section spacing",
+        "default": 80,
+        "info": "Controls the vertical gap between sections across the theme."
+      }
+    ]
+  },
+  {
+    "name": "Animations",
+    "settings": [
+      {
+        "type": "select",
+        "id": "animation_intensity",
+        "label": "Scroll animation intensity",
+        "default": "mild",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "mild",
+            "label": "Mild"
+          },
+          {
+            "value": "lots",
+            "label": "Lots"
+          },
+          {
+            "value": "custom",
+            "label": "Custom"
+          }
+        ],
+        "info": "Controls how much sections animate as the shopper scrolls the page"
+      },
+      {
+        "type": "range",
+        "id": "animation_speed_custom",
+        "label": "Custom animation speed",
+        "min": 100,
+        "max": 1500,
+        "step": 50,
+        "unit": "ms",
+        "default": 550,
+        "visible_if": "{{ settings.animation_intensity == 'custom' }}"
+      },
+      {
+        "type": "range",
+        "id": "animation_distance_custom",
+        "label": "Custom animation distance",
+        "min": 0,
+        "max": 80,
+        "step": 4,
+        "unit": "px",
+        "default": 24,
+        "visible_if": "{{ settings.animation_intensity == 'custom' }}"
+      }
+    ]
+  },
+  {
+    "name": "Page style overrides",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "page_style_overrides_json",
+        "label": "Per-page style overrides (managed by Forge)",
+        "default": "{}",
+        "info": "Do not edit manually - written automatically by the Forge app's per-page style customization feature. Editing or clearing it may cause individual pages to lose their custom style settings."
+      }
+    ]
+  },
+  {
+    "name": "Page header/footer color overrides",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "page_color_scheme_map_json",
+        "label": "Per-page header/footer color scheme map (managed by Forge)",
+        "default": "{}",
+        "info": "Do not edit manually - written automatically by the Forge app's per-page color customization feature."
+      }
+    ]
+  },
+  {
+    "name": "Store style",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "gs_motion",
+        "label": "Enable scroll animations",
+        "default": true,
+        "info": "Visitors who prefer reduced motion never see them."
+      },
+      {
+        "type": "checkbox",
+        "id": "gs_show_vendor",
+        "label": "Show vendor on product cards",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Social links"
+      },
+      {
+        "type": "url",
+        "id": "gs_social_facebook",
+        "label": "Facebook"
+      },
+      {
+        "type": "url",
+        "id": "gs_social_instagram",
+        "label": "Instagram"
+      },
+      {
+        "type": "url",
+        "id": "gs_social_tiktok",
+        "label": "TikTok"
+      },
+      {
+        "type": "url",
+        "id": "gs_social_pinterest",
+        "label": "Pinterest"
+      },
+      {
+        "type": "url",
+        "id": "gs_social_youtube",
+        "label": "YouTube"
+      },
+      {
+        "type": "url",
+        "id": "gs_social_x",
+        "label": "X"
+      }
+    ]
+  }
+]

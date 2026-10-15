@@ -1,0 +1,98 @@
+<script type="importmap">
+  {
+    "imports": {
+      "@forge/critical": "{{ 'critical.js' | asset_url }}",
+      "@forge/product-title": "{{ 'product-title-truncation.js' | asset_url }}",
+      "@forge/component": "{{ 'component.js' | asset_url }}",
+      "@forge/dialog": "{{ 'dialog.js' | asset_url }}",
+      "@forge/events": "{{ 'events.js' | asset_url }}",
+      "@forge/focus": "{{ 'focus.js' | asset_url }}",
+      "@forge/morph": "{{ 'morph.js' | asset_url }}",
+      "@forge/paginated-list": "{{ 'paginated-list.js' | asset_url }}",
+      "@forge/performance": "{{ 'performance.js' | asset_url }}",
+      "@forge/product-form": "{{ 'product-form.js' | asset_url }}",
+      "@forge/recently-viewed-products": "{{ 'recently-viewed-products.js' | asset_url }}",
+      "@forge/scrolling": "{{ 'scrolling.js' | asset_url }}",
+      "@forge/section-renderer": "{{ 'section-renderer.js' | asset_url }}",
+      "@forge/section-hydration": "{{ 'section-hydration.js' | asset_url }}",
+      "@forge/money-formatting": "{{ 'money-formatting.js' | asset_url }}",
+      "@forge/utilities": "{{ 'utilities.js' | asset_url }}",
+      "@forge/variant-picker": "{{ 'variant-picker.js' | asset_url }}",
+      "@forge/media-gallery": "{{ 'media-gallery.js' | asset_url }}",
+      "@forge/quick-add": "{{ 'quick-add.js' | asset_url }}",
+      "@forge/paginated-list-aspect-ratio": "{{ 'paginated-list-aspect-ratio.js' | asset_url }}",
+      "@forge/popover-polyfill": "{{ 'popover-polyfill.js' | asset_url }}",
+      "@forge/qr-code-generator": "{{ 'qr-code-generator.js' | asset_url }}"
+    }
+  }
+</script>
+
+<script>
+  const basePath = 'https://cdn.shopify.com/static/themes/horizon/placeholders';
+  window.__themeConfig = {
+    placeholders: {
+      general: [
+        basePath + '/general-1.png',
+        basePath + '/general-2.png',
+        basePath + '/general-3.png',
+        basePath + '/general-4.png',
+        basePath + '/general-5.png',
+        basePath + '/general-6.png',
+        basePath + '/general-7.png',
+      ],
+      product: [basePath + '/product-ball.png', basePath + '/product-cone.png', basePath + '/product-cube.png'],
+    },
+    translations: {
+      placeholder_image: {{ 'content.placeholder_image' | t | json }},
+      added: {{ 'actions.added' | t | json }},
+      recipient_form_fields_visible: {{ 'content.recipient_form_fields_visible' | t | json }},
+      recipient_form_fields_hidden: {{ 'content.recipient_form_fields_hidden' | t | json }},
+      recipient_form_error: {{ 'content.recipient_form_error' | t | json }},
+    },
+    routes: {
+      cart_add_url: {{ routes.cart_add_url | append: '.js' | json }},
+      cart_change_url: {{ routes.cart_change_url | json }},
+      cart_update_url: {{ routes.cart_update_url | json }},
+      cart_url: {{ routes.cart_url | json }},
+      predictive_search_url: {{ routes.predictive_search_url | json }},
+      search_url: {{ routes.search_url | json }},
+    },
+    template: {
+      name: {{ template | json }},
+    },
+    designMode: {{ request.design_mode | json }},
+  };
+  window.Theme = {
+    routes: window.__themeConfig.routes,
+    translations: window.__themeConfig.translations,
+    placeholders: window.__themeConfig.placeholders,
+    template: window.__themeConfig.template,
+  };
+</script>
+
+<script src="{{ 'popover-polyfill.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'quick-add.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'dialog.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'variant-picker.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'product-card.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'product-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'accordion-custom.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'disclosure-custom.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'media.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'product-price.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'product-title-truncation.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'product-inventory.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'show-more.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'slideshow.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'anchored-popover.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'floating-panel.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'video-background.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'component-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'media-gallery.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'rte-formatter.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'gift-card-recipient-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'auto-close-details.js' | asset_url }}" defer="defer"></script>
+
+{% if localization.available_countries.size > 1 or localization.available_languages.size > 1 %}
+  <script src="{{ 'localization.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{% endif %}

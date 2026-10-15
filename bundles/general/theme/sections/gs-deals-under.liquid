@@ -1,0 +1,53 @@
+{%- liquid
+  assign col = section.settings.collection | default: collections.all
+  assign caps = section.settings.caps | split: ','
+-%}
+<section class="gs-section gs-deals forge-color-{{ section.settings.color_scheme }}" data-gs-deals data-max="{{ section.settings.max }}">
+  <div class="gs-wrap">
+    <div class="gs-deals__band">
+      <div class="gs-head">
+        <div>
+          <h2 class="gs-title">{{ section.settings.heading | escape }}</h2>
+          {%- if section.settings.subheading != blank -%}<p class="gs-sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
+        </div>
+        <div class="gs-tabs gs-deals__caps" role="group" aria-label="Price limit">
+          {%- for c in caps -%}
+            {%- assign cap = c | strip | plus: 0 -%}
+            {%- if cap > 0 -%}
+              {%- assign cents = cap | times: 100 -%}
+              <button type="button" class="gs-tab" data-cap="{{ cents }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">Under {{ cents | money_without_trailing_zeros }}</button>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+      <ul class="gs-grid gs-grid--scroll" role="list" style="--cols: 4">
+        {%- for product in col.products limit: 48 -%}
+          <li data-price="{{ product.price }}">{% render 'gs-product-card', product: product %}</li>
+        {%- endfor -%}
+      </ul>
+      <p class="gs-deals__empty" data-gs-empty hidden>Nothing at this price right now. Try a higher budget.</p>
+      {%- if section.settings.link_label != blank -%}
+        <div class="gs-deals__more"><a class="gs-btn gs-btn--auto" href="{{ col.url }}">{{ section.settings.link_label | escape }}</a></div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "Deals under a price",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by budget" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Great finds at every price point." },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "First 48 products are checked. Uses all products if empty." },
+    { "type": "text", "id": "caps", "label": "Price limits", "default": "25, 50, 100", "info": "Whole numbers in your store currency, separated by commas." },
+    { "type": "range", "id": "max", "label": "Products shown per tag", "min": 4, "max": 12, "step": 4, "default": 8 },
+    { "type": "text", "id": "link_label", "label": "Button label", "default": "See all deals" }
+  ],
+  "presets": [{ "name": "Deals under a price" }]
+}
+{% endschema %}

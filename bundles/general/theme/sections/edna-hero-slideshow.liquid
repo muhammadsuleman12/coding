@@ -1,0 +1,531 @@
+{% liquid
+  assign slide_blocks = section.blocks | where: 'type', 'slide'
+  assign category_blocks = section.blocks | where: 'type', 'category'
+  assign show_rail = false
+  if section.settings.show_category_rail and category_blocks.size > 0
+    assign show_rail = true
+  endif
+  assign autoplay_ms = section.settings.autoplay_speed | default: 6 | times: 1000
+%}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<forge-edna-slideshow
+  class="edna-hero-slideshow forge-spacing-style forge-color-{{ section.settings.color_scheme }}{% if show_rail %} edna-hero-slideshow--with-rail{% endif %}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  data-autoplay="{% if section.settings.autoplay %}true{% else %}false{% endif %}"
+  data-interval="{{ autoplay_ms }}"
+  {{ section.shopify_attributes }}
+>
+  {% if show_rail %}
+    <nav class="edna-hero-slideshow__rail" aria-label="Shop categories">
+      <ul class="edna-hero-slideshow__rail-list" role="list">
+        {% for block in category_blocks %}
+          {% assign cat_title = block.settings.title | strip_html | strip %}
+          <li {{ block.shopify_attributes }}>
+            <a
+              class="edna-hero-slideshow__rail-link"
+              href="{{ block.settings.link | default: '/collections/all' }}"
+            >
+              {{ cat_title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  {% endif %}
+
+  <div class="edna-hero-slideshow__stage">
+    {% for block in slide_blocks %}
+      {% liquid
+        assign slide_heading = block.settings.heading | strip_html | strip
+        assign slide_sub = block.settings.subheading | strip_html | strip
+        assign slide_btn = block.settings.button_label
+        assign slide_image = block.settings.image
+        if slide_image == blank
+          assign slide_image = section.settings.image
+        endif
+        assign slide_loading = 'lazy'
+        assign slide_priority = 'auto'
+        if forloop.first
+          assign slide_loading = 'eager'
+          assign slide_priority = 'high'
+        endif
+      %}
+      <div
+        class="edna-hero-slideshow__slide{% if forloop.first %} is-active{% endif %}"
+        data-edna-slide
+        {% unless forloop.first %}hidden{% endunless %}
+        {{ block.shopify_attributes }}
+      >
+        <div
+          class="edna-hero-slideshow__media"
+          data-forge-slot-id="{{ block.id }}"
+          data-forge-aspect-ratio="16:9"
+          data-forge-slot-label="Slide {{ forloop.index }}"
+          {% if slide_image == blank %}data-forge-slot-blank="true"{% endif %}
+        >
+          {% if slide_image != blank %}
+            {{
+              slide_image
+              | image_url: width: 2400
+              | image_tag:
+                class: 'edna-hero-slideshow__img',
+                loading: slide_loading,
+                fetchpriority: slide_priority,
+                widths: '750, 1100, 1600, 2000, 2400',
+                sizes: '100vw',
+                alt: slide_heading
+            }}
+          {% else %}
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'edna-hero-slideshow__img edna-hero-slideshow__img--placeholder' }}
+          {% endif %}
+          <div class="edna-hero-slideshow__overlay"></div>
+        </div>
+
+        <div class="edna-hero-slideshow__content">
+          {% if slide_heading != blank %}
+            <h2 class="edna-hero-slideshow__heading">{{ slide_heading }}</h2>
+          {% endif %}
+          {% if slide_sub != blank %}
+            <p class="edna-hero-slideshow__subheading">{{ slide_sub }}</p>
+          {% endif %}
+          {% if slide_btn != blank %}
+            <a
+              class="edna-hero-slideshow__btn"
+              href="{{ block.settings.button_link | default: '/collections/all' }}"
+            >
+              {{ slide_btn }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+
+    {% if slide_blocks.size > 1 %}
+      <div class="edna-hero-slideshow__controls">
+        <button type="button" class="edna-hero-slideshow__arrow" data-edna-prev aria-label="Previous slide">
+          <span aria-hidden="true">‹</span>
+        </button>
+        <div class="edna-hero-slideshow__dots" role="tablist">
+          {% for block in slide_blocks %}
+            <button
+              type="button"
+              class="edna-hero-slideshow__dot{% if forloop.first %} is-active{% endif %}"
+              data-edna-dot="{{ forloop.index0 }}"
+              aria-label="Go to slide {{ forloop.index }}"
+            ></button>
+          {% endfor %}
+        </div>
+        <button type="button" class="edna-hero-slideshow__arrow" data-edna-next aria-label="Next slide">
+          <span aria-hidden="true">›</span>
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</forge-edna-slideshow>
+
+{% stylesheet %}
+  .edna-hero-slideshow {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    isolation: isolate;
+  }
+
+  .edna-hero-slideshow__rail {
+    display: none;
+  }
+
+  .edna-hero-slideshow__stage {
+    position: relative;
+    min-height: 78vh;
+    overflow: hidden;
+  }
+
+  .edna-hero-slideshow__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease;
+  }
+
+  .edna-hero-slideshow__slide.is-active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .edna-hero-slideshow__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .edna-hero-slideshow__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .edna-hero-slideshow__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgb(0 0 0 / 0.5), transparent 62%);
+  }
+
+  .edna-hero-slideshow__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 1rem;
+    min-height: 78vh;
+    padding: clamp(2rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem);
+    max-width: 40rem;
+  }
+
+  .edna-hero-slideshow__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: var(--font-h1--weight, 500);
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .edna-hero-slideshow__subheading {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #fff;
+    max-width: 34ch;
+  }
+
+  .edna-hero-slideshow__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    min-height: 2.75rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #fff;
+    border-radius: 0;
+    background: #fff;
+    color: var(--color-foreground);
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .edna-hero-slideshow__controls {
+    position: absolute;
+    inset-inline-end: 1.25rem;
+    inset-block-end: 1.5rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .edna-hero-slideshow__arrow,
+  .edna-hero-slideshow__dot {
+    appearance: none;
+    background: rgb(255 255 255 / 0.15);
+    border: 1px solid #fff;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .edna-hero-slideshow__arrow {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .edna-hero-slideshow__dots {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .edna-hero-slideshow__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .edna-hero-slideshow__dot.is-active {
+    background: #fff;
+  }
+
+  @media screen and (min-width: 990px) {
+    .edna-hero-slideshow--with-rail {
+      grid-template-columns: 11rem minmax(0, 1fr);
+    }
+
+    .edna-hero-slideshow__rail {
+      display: flex;
+      align-items: stretch;
+      border-inline-end: 1px solid var(--color-border);
+      background: var(--color-background);
+    }
+
+    .edna-hero-slideshow__rail-list {
+      list-style: none;
+      margin: 0;
+      padding: 2rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.25rem;
+      width: 100%;
+    }
+
+    .edna-hero-slideshow__rail-link {
+      font-family: var(--font-heading--family, inherit);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--color-foreground);
+    }
+
+    .edna-hero-slideshow__rail-link:hover {
+      color: var(--color-primary);
+    }
+
+    .edna-hero-slideshow__stage,
+    .edna-hero-slideshow__content {
+      min-height: 86vh;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .edna-hero-slideshow__slide {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class ForgeEdnaSlideshow extends HTMLElement {
+    connectedCallback() {
+      this.slides = [...this.querySelectorAll("[data-edna-slide]")];
+      this.dots = [...this.querySelectorAll("[data-edna-dot]")];
+      this.index = 0;
+      this.timer = null;
+      this.autoplay = this.dataset.autoplay === "true" && this.slides.length > 1;
+      this.interval = Number(this.dataset.interval) || 6000;
+      this.prevBtn = this.querySelector("[data-edna-prev]");
+      this.nextBtn = this.querySelector("[data-edna-next]");
+      this.onPrev = () => this.go(this.index - 1);
+      this.onNext = () => this.go(this.index + 1);
+      this.onDot = (event) => {
+        const i = Number(event.currentTarget.getAttribute("data-edna-dot"));
+        if (!Number.isNaN(i)) this.go(i);
+      };
+      this.prevBtn?.addEventListener("click", this.onPrev);
+      this.nextBtn?.addEventListener("click", this.onNext);
+      for (const dot of this.dots) {
+        dot.addEventListener("click", this.onDot);
+      }
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (this.autoplay && !reduce) this.start();
+    }
+
+    disconnectedCallback() {
+      this.stop();
+      this.prevBtn?.removeEventListener("click", this.onPrev);
+      this.nextBtn?.removeEventListener("click", this.onNext);
+      for (const dot of this.dots ?? []) {
+        dot.removeEventListener("click", this.onDot);
+      }
+    }
+
+    start() {
+      this.stop();
+      this.timer = window.setInterval(() => this.go(this.index + 1), this.interval);
+    }
+
+    stop() {
+      if (this.timer) window.clearInterval(this.timer);
+      this.timer = null;
+    }
+
+    go(next) {
+      if (this.slides.length === 0) return;
+      this.index = (next + this.slides.length) % this.slides.length;
+      this.slides.forEach((slide, i) => {
+        const active = i === this.index;
+        slide.classList.toggle("is-active", active);
+        slide.hidden = !active;
+      });
+      this.dots.forEach((dot, i) => {
+        dot.classList.toggle("is-active", i === this.index);
+      });
+    }
+  }
+
+  customElements.define("forge-edna-slideshow", ForgeEdnaSlideshow);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Edna Hero Slideshow",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 10,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay seconds",
+      "min": 4,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_category_rail",
+      "label": "Show category rail",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Fallback desktop image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Fallback mobile image"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "The New Season Edit"
+        },
+        {
+          "type": "textarea",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Tailored layers and the pieces the floor is selling first."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Women"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Edna Hero Slideshow",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "heading": "The New Season Edit",
+            "subheading": "Tailored layers and the pieces the floor is selling first.",
+            "button_label": "Shop Now"
+          }
+        },
+        { "type": "category", "settings": { "title": "Women" } },
+        { "type": "category", "settings": { "title": "Men" } },
+        { "type": "category", "settings": { "title": "Shoes" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,180 @@
+{% assign block_settings = block.settings %}
+
+<div
+  class="cart-title forge-spacing-style text-{{ block_settings.alignment }}"
+  style="{% render 'spacing-style', settings: block_settings %}"
+  {{ block.shopify_attributes }}
+>
+  <h1 class="{{ block_settings.type_preset | default: 'h2' }}">
+    {%- if cart.empty? -%}
+      {% render 'forge-t', key: 'content.your_cart_is_empty', fallback: 'Your cart is empty' %}
+    {%- else -%}
+      {{ block_settings.title }}
+      {%- if block_settings.show_count -%}{% render 'cart-bubble' %}{%- endif -%}
+    {%- endif -%}
+  </h1>
+</div>
+
+{% stylesheet %}
+  .cart-title h1 {
+    margin-block-end: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-sm);
+  }
+
+  .cart-title .forge-cart-bubble {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--style-border-radius-buttons-primary);
+    aspect-ratio: auto;
+    padding: var(--cart-padding);
+  }
+
+  .cart-title .forge-cart-bubble[data-maintain-ratio] {
+    aspect-ratio: 1;
+    min-width: 26px;
+  }
+
+  .cart-title .forge-cart-bubble__background {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+  }
+
+  .cart-title .forge-cart-bubble__text {
+    color: var(--color-foreground);
+    font-family: var(--font-paragraph--family);
+    font-size: clamp(var(--cart-font-size--2xs), 0.7lh, var(--cart-font-size--xs));
+  }
+
+  .color-gradient .cart-title .forge-cart-bubble__text,
+  .cart-title.color-gradient .forge-cart-bubble__text {
+    background: var(--color-card-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.title",
+  "tag": null,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "t:forge.settings.cart_title",
+      "default": "t:forge.text_defaults.cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "t:forge.settings.cart_count",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.typography"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:forge.settings.preset",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:forge.options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:forge.options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:forge.options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:forge.options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:forge.options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:forge.options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:forge.options.h6"
+        }
+      ],
+      "default": "",
+      "info": "t:forge.info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "t:forge.settings.alignment",
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.title"
+    }
+  ]
+}
+{% endschema %}

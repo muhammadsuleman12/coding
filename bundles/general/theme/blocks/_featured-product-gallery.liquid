@@ -1,0 +1,61 @@
+
+
+{% render 'card-gallery' %}
+
+{% schema %}
+{
+  "name": "t:forge.names.product_media",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:forge.content.resource_reference_product_media"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:forge.options.auto"
+        },
+        {
+          "value": "portrait",
+          "label": "t:forge.options.portrait"
+        },
+        {
+          "value": "square",
+          "label": "t:forge.options.square"
+        },
+        {
+          "value": "landscape",
+          "label": "t:forge.options.landscape"
+        }
+      ],
+      "default": "adapt",
+      "label": "t:forge.settings.aspect_ratio"
+    },
+    {
+      "type": "select",
+      "id": "constrain_to_viewport",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.off"
+        },
+        {
+          "value": "contain",
+          "label": "t:forge.options.maintain_aspect_ratio"
+        },
+        {
+          "value": "cover",
+          "label": "t:forge.options.crop_to_fit"
+        }
+      ],
+      "default": "contain",
+      "label": "t:forge.settings.limit_media_to_screen_height",
+      "visible_if": "{{ block.settings.image_ratio == 'adapt' }}"
+    }
+  ]
+}
+{% endschema %}

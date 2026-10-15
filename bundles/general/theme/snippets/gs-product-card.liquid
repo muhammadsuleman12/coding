@@ -1,0 +1,69 @@
+{%- comment -%}
+  Product card. Params: product (required), deal (bool, shows yellow price tag), loading ('lazy'|'eager')
+{%- endcomment -%}
+{%- liquid
+  assign img = product.featured_media
+  assign img2 = product.media[1]
+  assign variant = product.selected_or_first_available_variant
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+    assign save_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
+  endif
+  assign rating = product.metafields.reviews.rating.value
+  assign alt_text = img.alt | default: product.title | escape
+  assign load = loading | default: 'lazy'
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+-%}
+<article class="gs-card{% if deal %} gs-card--deal{% endif %}" data-gs-reveal>
+  <a class="gs-card__media gs-unveil" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if img -%}
+      {{ img | image_url: width: 720 | image_tag: loading: load, widths: '240,360,480,720', sizes: '(min-width: 990px) 22vw, 46vw', class: 'gs-card__img', alt: alt_text }}
+      {%- if img2 and img2.media_type == 'image' -%}
+        {{ img2 | image_url: width: 720 | image_tag: loading: 'lazy', widths: '240,360,480,720', sizes: '(min-width: 990px) 22vw, 46vw', class: 'gs-card__img gs-card__img--alt', alt: '' }}
+      {%- endif -%}
+    {%- else -%}
+      <span class="gs-card__noimg">{% render 'gs-icon', name: 'box', size: 48 %}</span>
+    {%- endif -%}
+    {%- if product.available == false -%}
+      <span class="gs-badge gs-badge--out">Sold out</span>
+    {%- elsif on_sale -%}
+      <span class="gs-badge gs-badge--sale">-{{ save_pct }}%</span>
+    {%- endif -%}
+  </a>
+  <div class="gs-card__body">
+    {%- if product.vendor != blank and settings.gs_show_vendor -%}
+      <p class="gs-card__vendor">{{ product.vendor }}</p>
+    {%- endif -%}
+    <h3 class="gs-card__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+    {%- if rating != blank -%}
+      {%- assign pct = rating.rating | divided_by: rating.scale_max | times: 100 -%}
+      <p class="gs-stars" aria-label="Rated {{ rating.rating | round: 1 }} out of {{ rating.scale_max }}">
+        <span class="gs-stars__bar" style="--pct: {{ pct }}%"></span>
+        {%- if rating_count > 0 -%}<span class="gs-stars__count">({{ rating_count }})</span>{%- endif -%}
+      </p>
+    {%- endif -%}
+    <div class="gs-card__foot">
+      <p class="gs-price{% if deal %} gs-price--tag{% endif %}">
+        {%- if product.price_varies -%}<span class="gs-price__from">From</span> {%- endif -%}
+        <span class="gs-price__now{% if on_sale %} is-sale{% endif %}">{{ product.price | money }}</span>
+        {%- if on_sale -%}<s class="gs-price__was">{{ product.compare_at_price | money }}</s>{%- endif -%}
+      </p>
+      {%- if product.available -%}
+        {%- if product.has_only_default_variant or product.variants.size == 1 -%}
+          <form class="gs-quickadd" action="{{ routes.cart_add_url }}" method="post" data-gs-add>
+            <input type="hidden" name="id" value="{{ variant.id }}">
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="gs-iconbtn" aria-label="Add {{ product.title | escape }} to cart">
+              {% render 'gs-icon', name: 'plus', size: 20 %}
+            </button>
+          </form>
+        {%- else -%}
+          <a class="gs-iconbtn" href="{{ product.url }}" aria-label="Choose options for {{ product.title | escape }}">
+            {% render 'gs-icon', name: 'arrow', size: 20 %}
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+</article>

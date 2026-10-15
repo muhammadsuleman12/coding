@@ -1,0 +1,70 @@
+{%- assign gs_r = product.metafields.reviews.rating.value -%}
+{%- if section.blocks.size > 0 or gs_r != blank -%}
+<section class="gs-section gs-reviews forge-color-{{ section.settings.color_scheme }}">
+  <div class="gs-wrap">
+    <div class="gs-head gs-head--row">
+      <div>
+        <h2 class="gs-title">{{ section.settings.heading | escape }}</h2>
+        {%- if section.settings.subheading != blank -%}<p class="gs-sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
+      </div>
+      {%- if section.settings.link_label != blank and section.settings.link != blank -%}
+        <a class="gs-textlink" href="{{ section.settings.link }}">{{ section.settings.link_label | escape }} {% render 'gs-icon', name: 'arrow', size: 16 %}</a>
+      {%- endif -%}
+    </div>
+    {%- assign r = product.metafields.reviews.rating.value -%}
+    <ul class="gs-grid gs-grid--scroll" role="list" style="--cols: {% if r != blank %}4{% else %}3{% endif %}">
+      {%- if r != blank -%}
+        {%- assign rc = product.metafields.reviews.rating_count.value | default: 0 -%}
+        {%- assign rpct = r.rating | divided_by: r.scale_max | times: 100 -%}
+        <li class="gs-review gs-review--sum">
+          <p class="gs-review__score">{{ r.rating | round: 1 }}</p>
+          <p class="gs-stars"><span class="gs-stars__bar" style="--pct: {{ rpct }}%"></span></p>
+          {%- if rc > 0 -%}<p class="gs-review__count">Based on {{ rc }} reviews</p>{%- endif -%}
+        </li>
+      {%- endif -%}
+      {%- for block in section.blocks -%}
+        {%- assign pct = block.settings.rating | times: 20 -%}
+        <li class="gs-review" data-gs-reveal {{ block.shopify_attributes }}>
+          <p class="gs-stars" aria-label="Rated {{ block.settings.rating }} out of 5"><span class="gs-stars__bar" style="--pct: {{ pct }}%"></span></p>
+          <blockquote class="gs-review__quote">{{ block.settings.quote }}</blockquote>
+          <p class="gs-review__by">
+            <span class="gs-review__avatar" aria-hidden="true">{{ block.settings.name | slice: 0 }}</span>
+            <span><strong>{{ block.settings.name | escape }}</strong>{%- if block.settings.item != blank -%}<span>Bought: {{ block.settings.item | escape }}</span>{%- endif -%}</span>
+          </p>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Customer reviews",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-4" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Customer reviews" },
+    { "type": "text", "id": "subheading", "label": "Subheading" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "See all reviews" },
+    { "type": "url", "id": "link", "label": "Link" }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "range", "id": "rating", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "richtext", "id": "quote", "label": "Review", "default": "<p>Arrived quickly and exactly as pictured. Great value for the price.</p>" },
+        { "type": "text", "id": "name", "label": "Customer name", "default": "Customer" },
+        { "type": "text", "id": "item", "label": "Item bought" }
+      ]
+    }
+  ],
+  "max_blocks": 9,
+  "presets": [{ "name": "Customer reviews", "blocks": [ { "type": "review" }, { "type": "review" }, { "type": "review" } ] }]
+}
+{% endschema %}

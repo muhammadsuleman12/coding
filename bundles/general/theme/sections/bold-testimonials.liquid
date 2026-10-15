@@ -1,0 +1,287 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign label = section.settings.label
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign review_blocks = section.blocks | where: 'type', 'review'
+  assign speed = section.settings.speed | default: 45
+%}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-testimonials bold-section forge-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-testimonials__inner">
+    {% if label != blank or heading != blank or subtitle != blank %}
+      <header class="bold-section-header" data-animate="fade-up">
+        {% if label != blank %}
+          <span class="bold-section-label">{{ label }}</span>
+        {% endif %}
+        {% if heading != blank %}
+          <h2 class="bold-section-title">{{ heading }}</h2>
+        {% endif %}
+        {% if subtitle != blank %}
+          <p class="bold-section-subtitle">{{ subtitle }}</p>
+        {% endif %}
+        <div class="bold-accent-line" aria-hidden="true"></div>
+      </header>
+    {% endif %}
+
+    {% if review_blocks.size > 0 %}
+      <div class="bold-testimonials__track-wrap" role="region" aria-label="{{ heading | default: 'Testimonials' }}">
+        <div class="bold-testimonials__track" data-animate="fade-in" style="--btm-speed: {{ speed }}s;">
+          {% for group_index in (1..2) %}
+            <div class="bold-testimonials__group" {% if group_index == 2 %}aria-hidden="true"{% endif %}>
+              {% for block in review_blocks %}
+                <article class="bold-testimonials__card" {% if group_index == 1 %}{{ block.shopify_attributes }}{% endif %}>
+                  <div class="bold-testimonials__avatar" aria-hidden="true">
+                    {{ block.settings.initials | default: block.settings.name | slice: 0, 2 | upcase }}
+                  </div>
+                  {% if block.settings.text != blank %}
+                    <blockquote class="bold-testimonials__text forge-rte">{{ block.settings.text }}</blockquote>
+                  {% endif %}
+                  {% if block.settings.name != blank %}
+                    <cite class="bold-testimonials__name">{{ block.settings.name }}</cite>
+                  {% endif %}
+                </article>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% javascript %}
+  (function () {
+    document.querySelectorAll('.bold-testimonials__track').forEach(function (track) {
+      var sourceGroup = track.querySelector('.bold-testimonials__group');
+      if (!sourceGroup) return;
+
+      function fillTrack() {
+        track.querySelectorAll('.bold-testimonials__group').forEach(function (el, i) {
+          if (i > 0) el.remove();
+        });
+
+        var groupWidth = sourceGroup.getBoundingClientRect().width;
+        if (!groupWidth) return;
+
+        var containerWidth = track.parentElement.getBoundingClientRect().width;
+        var target = Math.max(containerWidth * 2, groupWidth * 2);
+        var total = groupWidth;
+
+        while (total < target) {
+          var clone = sourceGroup.cloneNode(true);
+          clone.setAttribute('aria-hidden', 'true');
+          track.appendChild(clone);
+          total += groupWidth;
+        }
+
+        track.style.setProperty('--btm-distance', groupWidth + 'px');
+      }
+
+      fillTrack();
+      window.addEventListener('resize', fillTrack);
+    });
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  .bold-testimonials {
+    padding: calc(72px * var(--section-spacing-scale, 1)) 0;
+    overflow: hidden;
+  }
+
+  .bold-testimonials__inner {
+    max-width: 100%;
+  }
+
+  .bold-testimonials__inner .bold-section-header {
+    padding: 0 24px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .bold-testimonials__track-wrap {
+    overflow: hidden;
+    padding: 16px 0 32px;
+  }
+
+  .bold-testimonials__track {
+    display: flex;
+    width: max-content;
+    animation: boldTestimonialsScroll var(--btm-speed, 45s) linear infinite;
+  }
+
+  .bold-testimonials__track-wrap:hover .bold-testimonials__track,
+  .bold-testimonials__track-wrap:focus-within .bold-testimonials__track {
+    animation-play-state: paused;
+  }
+
+  .bold-testimonials__group {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--style-gap-cards, 20px);
+    padding-inline: calc(var(--style-gap-cards, 20px) / 2);
+  }
+
+  .bold-testimonials__card {
+    flex: 0 0 clamp(280px, 32vw, 360px);
+    background: var(--bold-card-bg);
+    border: 1px solid var(--bold-glass-border);
+    border-radius: var(--bold-radius-lg);
+    padding: 28px 24px;
+    box-shadow: var(--bold-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .bold-testimonials__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bold-accent2), var(--bold-accent1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--bold-font-heading);
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--bold-text-light);
+  }
+
+  .bold-testimonials__text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--bold-text-muted);
+    margin: 0;
+    font-style: normal;
+    flex: 1;
+  }
+
+  .bold-testimonials__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bold-accent2);
+    font-style: normal;
+  }
+
+  @keyframes boldTestimonialsScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-1 * var(--btm-distance, 50%))); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bold-testimonials__track {
+      animation: none;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .bold-testimonials__group:not(:first-child) {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-testimonials {
+      padding: calc(48px * var(--section-spacing-scale, 1)) 0;
+    }
+
+    .bold-testimonials__inner .bold-section-header {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bold Testimonials",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:forge.settings.color_scheme", "default": "scheme-1" },
+    { "type": "text", "id": "label", "label": "Section label", "default": "REVIEWS" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Loved by customers" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Real customer stories." },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll speed",
+      "min": 20,
+      "max": 90,
+      "step": 5,
+      "unit": "sec",
+      "default": 45
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Review text", "default": "<p>Holds up to everything I throw at it. Absolutely essential.</p>" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Alex M." },
+        { "type": "text", "id": "initials", "label": "Initials", "default": "AM" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Testimonials",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "text": "<p>Holds up to everything I throw at it. Absolutely essential.</p>",
+            "name": "Alex M.",
+            "initials": "AM"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "text": "<p>Lightweight, durable, and looks great. My go-to for every trip.</p>",
+            "name": "Jordan K.",
+            "initials": "JK"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "text": "<p>Holds up beautifully through everyday use. Impressive quality.</p>",
+            "name": "Sam R.",
+            "initials": "SR"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "text": "<p>Finally found a product that matches my high standards. Highly recommend.</p>",
+            "name": "Casey L.",
+            "initials": "CL"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "text": "<p>Set it up in seconds and immediately felt the difference. My posture is so much better now.</p>",
+            "name": "Morgan P.",
+            "initials": "MP"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "text": "<p>Can't imagine going back to looking down at my phone. This thing is a game changer for long calls.</p>",
+            "name": "Taylor W.",
+            "initials": "TW"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

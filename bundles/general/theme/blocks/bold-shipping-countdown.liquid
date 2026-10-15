@@ -1,0 +1,241 @@
+{%- liquid
+  assign cutoff_hour = block.settings.cutoff_hour | default: 16
+  assign cutoff_minute = block.settings.cutoff_minute | default: 0
+  assign timezone = block.settings.timezone | default: 'America/Chicago'
+-%}
+
+<forge-bold-shipping-countdown
+  class="bold-shipping-countdown forge-spacing-style"
+  data-cutoff-hour="{{ cutoff_hour }}"
+  data-cutoff-minute="{{ cutoff_minute }}"
+  data-timezone="{{ timezone }}"
+  {{ block.shopify_attributes }}
+>
+  <p class="bold-shipping-countdown__message">
+    {% if block.settings.prefix_text != blank %}
+      <span class="bold-shipping-countdown__prefix">{{ block.settings.prefix_text }}</span>
+    {% endif %}
+    <span class="bold-shipping-countdown__timer" data-countdown aria-live="polite">
+      <span data-hours>00</span>:<span data-minutes>00</span>:<span data-seconds>00</span>
+    </span>
+    {% if block.settings.suffix_text != blank %}
+      <span class="bold-shipping-countdown__suffix">{{ block.settings.suffix_text }}</span>
+    {% endif %}
+  </p>
+  <p class="bold-shipping-countdown__expired" data-expired hidden>
+    {{ block.settings.expired_text | default: 'Order now — ships next business day' }}
+  </p>
+</forge-bold-shipping-countdown>
+
+{% stylesheet %}
+  .bold-shipping-countdown {
+    --bold-shipping-accent: var(--color-gradient-2, var(--color-primary-hover));
+    padding-block: 10px 8px;
+  }
+
+  .bold-shipping-countdown__message {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    padding: 12px 16px;
+    border-radius: var(--style-border-radius-global, 12px);
+    border: 1px solid color-mix(in srgb, var(--bold-shipping-accent) 35%, var(--color-border));
+    background: color-mix(in srgb, var(--bold-shipping-accent) 10%, var(--color-background));
+    font-family: var(--font-body--family);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--color-foreground);
+    text-align: center;
+  }
+
+  .bold-shipping-countdown__timer {
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    color: var(--bold-shipping-accent);
+    letter-spacing: 0.04em;
+  }
+
+  .bold-shipping-countdown__expired {
+    margin: 8px 0 0;
+    font-family: var(--font-body--family);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-foreground);
+    text-align: center;
+    opacity: 0.85;
+  }
+
+  .bold-shipping-countdown__expired[hidden] {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-shipping-countdown__message {
+      font-size: 13px;
+      padding: 10px 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class BoldShippingCountdown extends HTMLElement {
+    constructor() {
+      super();
+      this.cutoffHour = parseInt(this.dataset.cutoffHour, 10) || 16;
+      this.cutoffMinute = parseInt(this.dataset.cutoffMinute, 10) || 0;
+      this.timeZone = this.dataset.timezone || 'America/Chicago';
+      this.hoursEl = this.querySelector('[data-hours]');
+      this.minutesEl = this.querySelector('[data-minutes]');
+      this.secondsEl = this.querySelector('[data-seconds]');
+      this.countdownEl = this.querySelector('[data-countdown]');
+      this.messageEl = this.querySelector('.bold-shipping-countdown__message');
+      this.expiredEl = this.querySelector('[data-expired]');
+      this.init();
+    }
+
+    init() {
+      this.updateCountdown();
+      this.interval = setInterval(() => this.updateCountdown(), 1000);
+    }
+
+    getChicagoDateParts() {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: this.timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+      const parts = formatter.formatToParts(new Date());
+      const get = (type) => parts.find((part) => part.type === type)?.value || '00';
+      return {
+        year: parseInt(get('year'), 10),
+        month: parseInt(get('month'), 10),
+        day: parseInt(get('day'), 10),
+        hour: parseInt(get('hour'), 10),
+        minute: parseInt(get('minute'), 10),
+        second: parseInt(get('second'), 10)
+      };
+    }
+
+    getMsUntilCutoff() {
+      const nowParts = this.getChicagoDateParts();
+      const nowMs =
+        ((nowParts.hour * 60 + nowParts.minute) * 60 + nowParts.second) * 1000;
+      const cutoffMs =
+        ((this.cutoffHour * 60 + this.cutoffMinute) * 60) * 1000;
+
+      if (nowMs < cutoffMs) {
+        return cutoffMs - nowMs;
+      }
+
+      return 24 * 60 * 60 * 1000 - nowMs + cutoffMs;
+    }
+
+    isPastCutoffToday() {
+      const nowParts = this.getChicagoDateParts();
+      const nowMs =
+        ((nowParts.hour * 60 + nowParts.minute) * 60 + nowParts.second) * 1000;
+      const cutoffMs =
+        ((this.cutoffHour * 60 + this.cutoffMinute) * 60) * 1000;
+      return nowMs >= cutoffMs;
+    }
+
+    updateCountdown() {
+      const diff = this.getMsUntilCutoff();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if (this.hoursEl) this.hoursEl.textContent = this.pad(hours);
+      if (this.minutesEl) this.minutesEl.textContent = this.pad(minutes);
+      if (this.secondsEl) this.secondsEl.textContent = this.pad(seconds);
+
+      const showExpired = this.isPastCutoffToday();
+      if (this.expiredEl) {
+        this.expiredEl.hidden = !showExpired;
+      }
+      if (this.messageEl) {
+        this.messageEl.hidden = showExpired;
+      }
+    }
+
+    pad(num) {
+      return num.toString().padStart(2, '0');
+    }
+
+    disconnectedCallback() {
+      if (this.interval) {
+        clearInterval(this.interval);
+      }
+    }
+  }
+
+  customElements.define('forge-bold-shipping-countdown', BoldShippingCountdown);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bold ship countdown",
+  "tag": "bold-shipping-countdown",
+  "settings": [
+    {
+      "type": "text",
+      "id": "prefix_text",
+      "label": "Text before countdown",
+      "default": "Order within"
+    },
+    {
+      "type": "text",
+      "id": "suffix_text",
+      "label": "Text after countdown",
+      "default": "for same-day shipping (4pm CST)"
+    },
+    {
+      "type": "text",
+      "id": "expired_text",
+      "label": "Message after cutoff",
+      "default": "Order now — ships next business day"
+    },
+    {
+      "type": "range",
+      "id": "cutoff_hour",
+      "label": "Cutoff hour (24h, CST)",
+      "min": 0,
+      "max": 23,
+      "step": 1,
+      "default": 16,
+      "info": "16 = 4:00 PM"
+    },
+    {
+      "type": "range",
+      "id": "cutoff_minute",
+      "label": "Cutoff minute",
+      "min": 0,
+      "max": 59,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "timezone",
+      "label": "Timezone",
+      "default": "America/Chicago",
+      "info": "IANA timezone (America/Chicago = CST/CDT)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold ship countdown"
+    }
+  ]
+}
+{% endschema %}

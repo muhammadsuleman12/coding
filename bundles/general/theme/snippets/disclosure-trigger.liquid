@@ -1,0 +1,85 @@
+{% doc %}
+  Disclosure Trigger Component
+
+  Renders a button that controls a disclosure/collapsible content area.
+  Includes proper ARIA attributes for accessibility.
+
+  @param is_expanded - {Boolean} Whether the disclosure is currently expanded
+  @param controls_id - {String} ID of the element this button controls
+  @param disclosure_name - {String} Translation key for the disclosure name
+  @param label_text - {String} Translation key for the button label
+
+  @example
+  {% render 'disclosure-trigger',
+    controls_id: 'cart-discount-disclosure',
+    is_expanded: discount_codes.size > 0,
+    disclosure_name: 'cart.discount_code',
+    label_text: 'content.discount'
+  %}
+{% enddoc %}
+
+{%- assign disclosure_name_fb = disclosure_name | split: '.' | last | replace: '_', ' ' | capitalize -%}
+{%- assign label_fb = label_fallback | default: label_text | split: '.' | last | replace: '_', ' ' | capitalize -%}
+<button
+  aria-controls="{{ controls_id }}"
+  aria-expanded="{% if is_expanded %}true{% else %}false{% endif %}"
+  aria-label="{% if is_expanded %}{% render 'forge-t', key: 'actions.close', fallback: 'Close' %}{% else %}{% render 'forge-t', key: 'actions.open', fallback: 'Open' %}{% endif %} {% render 'forge-t', key: disclosure_name, fallback: disclosure_name_fb %}"
+  class="disclosure-trigger"
+  data-disclosure-open="{% render 'forge-t', key: 'actions.open', fallback: 'Open' %} {% render 'forge-t', key: disclosure_name, fallback: disclosure_name_fb %}"
+  data-disclosure-close="{% render 'forge-t', key: 'actions.close', fallback: 'Close' %} {% render 'forge-t', key: disclosure_name, fallback: disclosure_name_fb %}"
+  on:click="/toggleDisclosure"
+  ref="disclosureTrigger"
+  type="button"
+>
+  <span class="disclosure-trigger__label forge-h6">{% render 'forge-t', key: label_text, fallback: label_fb %}</span>
+
+  <span class="forge-svg-wrapper forge-icon-plus">
+    {{- 'icon-plus.svg' | inline_asset_content -}}
+  </span>
+</button>
+
+{% stylesheet %}
+  .disclosure-trigger {
+    cursor: pointer;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--padding-sm);
+    padding-inline: 0;
+    width: 100%;
+    border: none;
+    background: #0000;
+
+    &[aria-expanded='true'] .horizontal {
+      rotate: 90deg;
+    }
+
+    &:is(:hover, :focus-visible) {
+      color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
+    }
+
+    .horizontal {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    svg {
+      aspect-ratio: 1;
+      width: var(--icon-size-xs);
+    }
+  }
+
+  .disclosure-trigger__label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap-2xs);
+    font-size: var(--cart-font-size--sm);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .disclosure-trigger .horizontal {
+      transition: rotate var(--surface-transition-duration) var(--surface-transition-timing);
+    }
+  }
+{% endstylesheet %}

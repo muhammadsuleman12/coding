@@ -1,0 +1,87 @@
+<section id="shop-categories" class="gs-section gs-cats forge-color-{{ section.settings.color_scheme }}">
+  <div class="gs-wrap">
+    <div class="gs-head gs-head--row">
+      <div>
+        <h2 class="gs-title">{{ section.settings.heading | escape }}</h2>
+        {%- if section.settings.subheading != blank -%}<p class="gs-sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
+      </div>
+      {%- if section.settings.link_label != blank -%}<a class="gs-textlink" href="{{ section.settings.link | default: routes.all_products_collection_url }}">{{ section.settings.link_label | escape }} {% render 'gs-icon', name: 'arrow', size: 16 %}</a>{%- endif -%}
+    </div>
+    <ul class="gs-cats__grid gs-grid gs-grid--scroll" role="list" style="--cols: {{ section.settings.columns }}">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign col = block.settings.collection
+          assign label = block.settings.label | default: col.title | default: 'Collection'
+          assign pic = block.settings.image | default: col.featured_image
+          assign url = col.url
+          if col == blank and block.settings.tag != blank
+            assign url = routes.all_products_collection_url | append: '/' | append: block.settings.tag
+            if pic == blank
+              for p in collections.all.products
+                if p.tags contains block.settings.tag and p.featured_image
+                  assign pic = p.featured_image
+                  break
+                endif
+              endfor
+            endif
+          endif
+          if url == blank
+            assign url = routes.all_products_collection_url
+          endif
+        -%}
+        <li class="gs-tile" data-gs-reveal {{ block.shopify_attributes }}>
+          <a href="{{ url }}">
+            <span class="gs-tile__media gs-unveil">
+              {%- if pic -%}
+                {{ pic | image_url: width: 600 | image_tag: loading: 'lazy', widths: '200,300,400,600', sizes: '(min-width: 990px) 16vw, 40vw', alt: '' }}
+              {%- else -%}
+                {% render 'gs-icon', name: block.settings.icon, size: 48 %}
+              {%- endif -%}
+            </span>
+            <span class="gs-tile__label">{{ label | escape }} {% render 'gs-icon', name: 'arrow', size: 18 %}</span>
+            {%- if section.settings.show_count and col.products_count > 0 -%}<span class="gs-tile__count">{{ col.products_count }} items</span>{%- endif -%}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "Shop by category",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by category" },
+    { "type": "text", "id": "subheading", "label": "Subheading" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "All categories" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "range", "id": "columns", "label": "Columns (desktop)", "min": 3, "max": 8, "step": 1, "default": 6 },
+    { "type": "checkbox", "id": "show_count", "label": "Show item count", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Category",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "tag", "label": "Or product tag", "info": "Used when no collection is picked. Links to all products with this tag." },
+        { "type": "text", "id": "label", "label": "Custom label" },
+        { "type": "image_picker", "id": "image", "label": "Tile image", "info": "600 × 600 px, square. Uses collection image if empty." },
+        { "type": "select", "id": "icon", "label": "Icon (when no image)", "default": "box", "options": [
+          { "value": "box", "label": "Box" }, { "value": "sparkle", "label": "New" }, { "value": "tag", "label": "Sale" }, { "value": "home", "label": "Home" }, { "value": "kitchen", "label": "Kitchen" },
+          { "value": "bolt", "label": "Tech" }, { "value": "gift", "label": "Gift" }, { "value": "shirt", "label": "Apparel" },
+          { "value": "sofa", "label": "Furniture" }, { "value": "leaf", "label": "Outdoor" }, { "value": "paw", "label": "Pets" },
+          { "value": "baby", "label": "Baby" }, { "value": "spray", "label": "Cleaning" }, { "value": "wrench", "label": "Tools" },
+          { "value": "book", "label": "Books" }, { "value": "ball", "label": "Sports" }, { "value": "sun", "label": "Summer" }
+        ] }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [{ "name": "Shop by category", "blocks": [ { "type": "collection" }, { "type": "collection" }, { "type": "collection" }, { "type": "collection" }, { "type": "collection" }, { "type": "collection" } ] }]
+}
+{% endschema %}

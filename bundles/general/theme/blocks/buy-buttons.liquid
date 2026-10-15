@@ -1,0 +1,775 @@
+
+{% liquid
+  assign block_settings = block.settings
+  assign product = closest.product
+  if request.visual_preview_mode and product == blank
+    assign product = collections.all.products.first
+  endif
+
+  assign variant = closest.product.selected_or_first_available_variant
+  assign inventory_quantity = variant.inventory_quantity
+  assign inventory_policy = variant.inventory_policy
+
+  if variant.inventory_management == 'shopify'
+    assign inventory_managed = true
+  endif
+
+  if variant.quantity_rule.min > variant.inventory_quantity and inventory_managed and inventory_policy == 'deny'
+    assign quantity_rule_soldout = true
+  endif
+
+  if inventory_managed
+    if inventory_quantity <= 0 and inventory_policy == 'deny' or quantity_rule_soldout
+      assign can_add_to_cart = false
+      assign add_to_cart_text = 'products.product.sold_out' | t
+    else
+      assign can_add_to_cart = true
+      assign add_to_cart_text = 'products.product.add_to_cart' | t
+    endif
+  else
+    if closest.product.selected_or_first_available_variant != null
+      assign can_add_to_cart = true
+      assign add_to_cart_text = 'products.product.add_to_cart' | t
+    else
+      assign can_add_to_cart = false
+      assign add_to_cart_text = 'products.product.unavailable' | t
+    endif
+  endif
+%}
+
+<span
+  class="buy-buttons-block buy-buttons-block--{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if product != blank -%}
+    {%- assign product_form_id = 'BuyButtons-ProductForm-' | append: section.id -%}
+    <forge-product-form-component
+      data-section-id="{{ section.id }}"
+      data-product-id="{{ product.id }}"
+      data-product-url="{{ product.url }}"
+      on:submit="/handleSubmit"
+      data-quantity-default="{% if product.selected_or_first_available_variant.quantity_rule.min %}{{ product.selected_or_first_available_variant.quantity_rule.min }}{% else %}1{% endif %}"
+    >
+      <div
+        class="forge-visually-hidden"
+        aria-live="assertive"
+        role="status"
+        aria-atomic="true"
+        ref="liveRegion"
+      ></div>
+      {%- form 'product', product, id: product_form_id, data-type: 'add-to-cart-form' -%}
+        <input
+          type="hidden"
+          name="id"
+          ref="variantId"
+          value="{{ product.selected_or_first_available_variant.id }}"
+        >
+        {%- if block_settings.gift_card_form and product.gift_card? -%}
+          {%- render 'gift-card-recipient-form', product: product, form: form, section: section, block: block -%}
+        {%- endif -%}
+        <div
+          class="forge-product-form-buttons forge-spacing-style{% if block_settings.stacking %} product-form-buttons--stacked{% endif %}"
+          style="{% render 'spacing-style', settings: block_settings %}"
+        >
+          {% content_for 'block', type: 'quantity', id: 'quantity' %}
+
+          {% content_for 'block',
+            type: 'add-to-cart',
+            id: 'add-to-cart',
+            can_add_to_cart: can_add_to_cart,
+            add_to_cart_text: add_to_cart_text
+          %}
+          {%- unless block_settings.gift_card_form and product.gift_card? -%}
+            <span
+              class="product-form-text__error forge-hidden"
+              ref="addToCartTextError"
+            >
+              <span class="forge-svg-wrapper product-form-icon--error">
+                {{- 'icon-error.svg' | inline_asset_content -}}
+              </span>
+            </span>
+          {%- endunless -%}
+          {% content_for 'block',
+            type: 'accelerated-checkout',
+            id: 'accelerated-checkout',
+            can_add_to_cart: can_add_to_cart,
+            form_obj: form
+          %}
+          {%- if block_settings.show_buy_now -%}
+            <button
+              type="button"
+              class="forge-button forge-add-to-cart-button buy-now-button--{{ block.id }}"
+              data-buy-now
+              {%- unless can_add_to_cart -%} disabled{%- endunless -%}
+            >
+              {{- block_settings.buy_now_text | default: 'Buy it now' -}}
+            </button>
+          {%- endif -%}
+        </div>
+      {%- endform -%}
+    </forge-product-form-component>
+  {%- else -%}
+    <div class="forge-product-form-buttons">
+      <button
+        type="submit"
+        name="add"
+        class="forge-button"
+        disabled
+      >
+        {% render 'forge-t', key: 'blocks.sold_out', fallback: 'Sold out' %}
+      </button>
+    </div>
+  {%- endif -%}
+</span>
+
+{% if block_settings.show_pickup_availability %}
+  <script
+    src="{{ 'local-pickup.js' | asset_url }}"
+    type="module"
+  ></script>
+
+  {%- assign pick_up_availabilities = closest.product.selected_or_first_available_variant.store_availabilities
+    | where: 'pick_up_enabled', true
+  -%}
+
+  <forge-local-pickup
+    class="forge-spacing-style product__pickup-availabilities"
+    {% if pick_up_availabilities.size == 0 %}
+      hidden
+    {% endif %}
+    data-section-id="{{ section.id }}"
+    data-product-url="{{ closest.product.url }}"
+    data-variant-id="{{ closest.product.selected_or_first_available_variant.id }}"
+    style="{% render 'spacing-style', settings: block_settings %}"
+    ref="localPickupButton"
+  >
+    {% if can_add_to_cart %}
+      <forge-dialog-component>
+        <div class="pickup-availability__row">
+          <div class="pickup-availability__column">
+            <span class="forge-svg-wrapper">
+              {% if pick_up_availabilities.first.available %}
+                {{- 'icon-available.svg' | inline_asset_content -}}
+              {% else %}
+                {{- 'icon-unavailable.svg' | inline_asset_content -}}
+              {% endif %}
+            </span>
+          </div>
+          <div class="pickup-availability__column">
+            {% if pick_up_availabilities.first.available %}
+              <p class="pickup-location__text-sm">
+                {{ 'content.pickup_available_at_html' | t: location: pick_up_availabilities.first.location.name }}
+              </p>
+              <p class="pickup-location__text-xs">
+                {{ 'content.pickup_ready_in' | t: pickup_time: pick_up_availabilities.first.pick_up_time }}
+              </p>
+            {% else %}
+              <p class="pickup-location__text-sm">
+                {% render 'forge-t', key: 'content.pickup_not_available', fallback: 'Pickup currently not available' %}
+              </p>
+            {% endif %}
+            <button
+              on:click="/showDialog"
+              class="forge-button-unstyled pickup-location__button"
+            >
+              {% render 'forge-t', key: 'actions.view_store_information', fallback: 'View store information' %}
+            </button>
+          </div>
+        </div>
+        <dialog
+          ref="dialog"
+          class="forge-dialog-modal forge-dialog-drawer pickup-location__dialog forge-color-{{ settings.drawer_color_scheme }}"
+          scroll-lock
+          aria-labelledby="pickup-dialog-heading"
+        >
+          <h2
+            id="pickup-dialog-heading"
+            class="forge-visually-hidden"
+          >
+            {% render 'forge-t', key: 'actions.view_store_information', fallback: 'View store information' %}
+          </h2>
+          <div class="pickup-availability__dialog-row pickup-availability__header-container">
+            <div class="pickup-availability__column">
+              <h4 class="pickup-location__h4">{{ closest.product.title }}</h4>
+              <p class="pickup-location__text-sm">
+                {{ closest.product.selected_or_first_available_variant.title }}
+              </p>
+            </div>
+            <button
+              ref="closeButton"
+              on:click="/closeDialog"
+              class="forge-button forge-button-unstyled forge-close-button pickup-location__close-button"
+              aria-label="{% render 'forge-t', key: 'actions.close_dialog', fallback: 'Close dialog' %}"
+            >
+              <span class="forge-svg-wrapper">
+                {{- 'icon-close.svg' | inline_asset_content -}}
+              </span>
+            </button>
+          </div>
+          {% for pick_up_availability in pick_up_availabilities %}
+            <div class="pickup-location__wrapper">
+              <p class="pickup-location__text-bold">{{ pick_up_availability.location.name }}</p>
+              <div class="pickup-location__address-wrapper">
+                <span class="pickup-location__availability-wrapper">
+                  {% if pick_up_availability.available %}
+                    {{- 'icon-available.svg' | inline_asset_content -}}
+                    {% assign pickup_time = pick_up_availability.pick_up_time | downcase %}
+                    {{ 'content.pickup_available_in' | t: pickup_time: pickup_time }}
+                  {% else %}
+                    {{- 'icon-unavailable.svg' | inline_asset_content -}}
+                    {% render 'forge-t', key: 'content.pickup_not_available', fallback: 'Pickup currently not available' %}
+                  {% endif %}
+                </span>
+                <address class="pickup-location__address">
+                  {{ pick_up_availability.location.address | format_address }}
+                  {{ pick_up_availability.location.address.phone }}
+                </address>
+              </div>
+            </div>
+          {% endfor %}
+        </dialog>
+      </forge-dialog-component>
+    {% endif %}
+  </forge-local-pickup>
+{% endif %}
+
+{% style %}
+  .buy-buttons-block--{{ block.id }},
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons {
+    --button-mobile-font-size: {{ block.settings.mobile_font_size }}px;
+    --button-mobile-padding-block: {{ block.settings.mobile_padding_block }}px;
+    --button-mobile-padding-inline: {{ block.settings.mobile_padding_inline }}px;
+    --button-desktop-font-size: {{ block.settings.desktop_font_size }}px;
+    --button-desktop-padding-block: {{ block.settings.desktop_padding_block }}px;
+    --button-desktop-padding-inline: {{ block.settings.desktop_padding_inline }}px;
+  }
+
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector {
+    border-radius: {{ block.settings.quantity_picker_corner_radius }}px !important;
+  }
+
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-quantity-minus {
+    border-start-start-radius: {{ block.settings.quantity_picker_corner_radius }}px !important;
+    border-end-start-radius: {{ block.settings.quantity_picker_corner_radius }}px !important;
+  }
+
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-quantity-plus {
+    border-start-end-radius: {{ block.settings.quantity_picker_corner_radius }}px !important;
+    border-end-end-radius: {{ block.settings.quantity_picker_corner_radius }}px !important;
+  }
+
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector input[type='number'] {
+    border-radius: 0 !important;
+  }
+
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons shopify-accelerated-checkout,
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons shopify-accelerated-checkout-cart {
+    --shopify-accelerated-checkout-button-border-radius: {{ block.settings.buy_buttons_cta_corner_radius }}px;
+  }
+
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .shopify-payment-button__button,
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .shopify-payment-button__button--unbranded {
+    border-radius: {{ block.settings.buy_buttons_cta_corner_radius }}px !important;
+  }
+
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button.forge-button,
+  .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button.forge-add-to-cart-button {
+    border-radius: {{ block.settings.buy_buttons_cta_corner_radius }}px !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button.forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus),
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button.forge-button.forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus),
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button:not(.forge-quantity-minus):not(.forge-quantity-plus),
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button.forge-button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .shopify-payment-button__button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .shopify-payment-button__button--unbranded,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button.shopify-payment-button__button--unbranded,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button[type="submit"]:not(.forge-quantity-minus):not(.forge-quantity-plus),
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button[type="button"]:not(.forge-quantity-minus):not(.forge-quantity-plus) {
+      font-size: {{ block.settings.mobile_font_size }}px !important;
+      padding-block: {{ block.settings.mobile_padding_block }}px !important;
+      padding-inline: {{ block.settings.mobile_padding_inline }}px !important;
+      min-height: calc({{ block.settings.mobile_padding_block }}px * 2 + 1em) !important;
+      height: calc({{ block.settings.mobile_padding_block }}px * 2 + 1em) !important;
+    }
+
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-button.forge-button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button.forge-button.forge-button.forge-button {
+      font-size: {{ block.settings.mobile_font_size }}px !important;
+    }
+
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button .add-to-cart-text,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button .add-to-cart-text__content,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button .add-to-cart-text,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button .add-to-cart-text__content {
+      font-size: {{ block.settings.mobile_font_size }}px !important;
+    }
+
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-quantity-minus,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-quantity-plus,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-svg-wrapper {
+      font-size: inherit !important;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button.forge-button:not(.forge-quantity-minus):not(.forge-quantity-plus),
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button:not(.forge-quantity-minus):not(.forge-quantity-plus),
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .shopify-payment-button__button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .shopify-payment-button__button--unbranded {
+      font-size: {{ block.settings.desktop_font_size }}px !important;
+      padding-block: {{ block.settings.desktop_padding_block }}px !important;
+      padding-inline: {{ block.settings.desktop_padding_inline }}px !important;
+      min-height: calc({{ block.settings.desktop_padding_block }}px * 2 + 1em) !important;
+      height: calc({{ block.settings.desktop_padding_block }}px * 2 + 1em) !important;
+    }
+
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button .add-to-cart-text,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons button .add-to-cart-text__content,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button .add-to-cart-text,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-add-to-cart-button .add-to-cart-text__content {
+      font-size: {{ block.settings.desktop_font_size }}px !important;
+    }
+
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector button,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-quantity-minus,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-quantity-plus,
+    .buy-buttons-block--{{ block.id }} .forge-product-form-buttons .forge-quantity-selector .forge-svg-wrapper {
+      font-size: inherit !important;
+    }
+  }
+{% endstyle %}
+
+{% stylesheet %}
+  .buy-buttons-block {
+    width: 100%;
+  }
+
+  .forge-product-form-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--gap-sm) / 2);
+
+    @media screen and (min-width: 750px) {
+      gap: var(--gap-sm);
+    }
+  }
+
+  .forge-product-form-buttons > *:not(.forge-quantity-selector-wrapper) {
+    flex: 1 1 185px;
+    min-width: fit-content;
+  }
+
+  .forge-product-form-buttons {
+    container-type: inline-size;
+  }
+
+  @container (max-width: 520px) {
+    .forge-product-form-buttons > *:not(.forge-quantity-selector-wrapper) {
+      flex-basis: 100%;
+    }
+  }
+
+  .product-form-buttons--stacked > *:not(.forge-quantity-selector-wrapper) {
+    flex-basis: 51%;
+  }
+
+  .forge-quantity-selector-wrapper {
+    flex-grow: 0;
+  }
+
+  .forge-quantity-selector-wrapper--full-width {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .forge-quantity-selector {
+    flex-grow: 0;
+  }
+
+  .forge-product-form-buttons button {
+    width: 100%;
+    padding-inline: var(--padding-4xl);
+    padding-block: var(--padding-lg);
+  }
+
+  .forge-add-to-cart-button {
+    text-transform: var(--button-text-case-primary);
+  }
+
+  .forge-add-to-cart-button.forge-button-secondary {
+    text-transform: var(--button-text-case-secondary);
+  }
+
+  .forge-product-form-buttons .shopify-payment-button__button {
+    width: 100%;
+    min-height: var(--minimum-touch-target);
+  }
+
+  .forge-quantity-selector-wrapper .forge-quantity-selector,
+  .forge-add-to-cart-button {
+    height: var(--height-buy-buttons);
+  }
+
+  .forge-quantity-selector-wrapper {
+    height: auto;
+  }
+
+  .product__pickup-availabilities {
+    width: 100%;
+  }
+
+  .pickup-availability__column {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .pickup-availability__row {
+    display: flex;
+    gap: var(--padding-xs);
+  }
+
+  .pickup-availability__dialog-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .pickup-availability__header-container {
+    padding-block-end: var(--padding-2xl);
+  }
+
+  .pickup-location__wrapper {
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--padding-2xl);
+    border-top: 1px solid var(--color-border);
+    gap: var(--padding-xs);
+  }
+
+  .pickup-location__address-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-md);
+  }
+
+  .pickup-location__dialog {
+    padding: var(--padding-2xl);
+    position: fixed;
+    border-radius: 0;
+    width: var(--sidebar-width);
+    max-width: 95vw;
+    height: 100%;
+    margin: 0 0 0 auto;
+    border: var(--style-border-drawer);
+    box-shadow: var(--shadow-drawer);
+    background-color: var(--color-background);
+  }
+
+  .pickup-location__dialog:modal {
+    max-height: 100dvh;
+  }
+
+  .pickup-location__text-sm {
+    font-size: var(--font-size--sm);
+    margin: 0;
+  }
+
+  .pickup-location__text-xs {
+    font-size: var(--font-size--xs);
+    margin: 0;
+  }
+
+  .product-form-text__error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap-xs);
+  }
+
+  .pickup-location__button {
+    width: fit-content;
+    color: var(--color-primary);
+    font-size: var(--font-size--xs);
+    font-family: var(--font-body--family);
+    padding: 0;
+    cursor: pointer;
+    margin-block: var(--margin-xs);
+  }
+
+  .pickup-location__button:hover {
+    color: var(--color-primary-hover);
+  }
+
+  .pickup-location__h4 {
+    margin: 0;
+  }
+
+  .pickup-location__text-bold {
+    font-size: var(--font-size--md);
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .pickup-location__availability-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+    font-family: var(--font-paragraph--family);
+  }
+
+  .pickup-location__address {
+    font-style: normal;
+  }
+
+  .pickup-location__close-button {
+    top: calc(var(--padding-2xl) - (var(--icon-size-xs) / 2));
+    right: calc(var(--padding-2xl) - var(--icon-size-xs));
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.querySelectorAll('[data-buy-now]').forEach(function (button) {
+    button.addEventListener('click', async function () {
+      var form = button.closest('form');
+      var variantId = form.querySelector('[name="id"]').value;
+      var quantityInput = form.querySelector('[name="quantity"]');
+      var quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+
+      button.disabled = true;
+
+      try {
+        var response = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: quantity })
+        });
+        if (response.ok) {
+          window.location.href = '/checkout';
+        } else {
+          button.disabled = false;
+        }
+      } catch (e) {
+        button.disabled = false;
+      }
+    });
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:forge.names.product_buy_buttons",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:forge.content.resource_reference_product"
+    },
+    {
+      "type": "checkbox",
+      "id": "stacking",
+      "label": "t:forge.settings.always_stack_buttons",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pickup_availability",
+      "label": "t:forge.settings.show_pickup_availability",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "gift_card_form",
+      "label": "t:forge.settings.gift_card_form",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "t:forge.content.gift_card_form_description"
+    },
+    {
+      "type": "header",
+      "content": "Buy Now Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_now",
+      "label": "Show buy now button",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "buy_now_text",
+      "label": "Buy now button text",
+      "default": "Buy it now"
+    },
+    {
+      "type": "header",
+      "content": "Button Size"
+    },
+    {
+      "type": "paragraph",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "range",
+      "id": "mobile_font_size",
+      "label": "Mobile font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_block",
+      "label": "Mobile vertical padding",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_inline",
+      "label": "Mobile horizontal padding",
+      "min": 16,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "paragraph",
+      "content": "Desktop Settings"
+    },
+    {
+      "type": "range",
+      "id": "desktop_font_size",
+      "label": "Desktop font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_block",
+      "label": "Desktop vertical padding",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_inline",
+      "label": "Desktop horizontal padding",
+      "min": 16,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "t:forge.settings.borders"
+    },
+    {
+      "type": "range",
+      "id": "quantity_picker_corner_radius",
+      "label": "t:forge.settings.quantity_picker_corner_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "buy_buttons_cta_corner_radius",
+      "label": "t:forge.settings.buy_buttons_cta_corner_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.product_buy_buttons",
+      "category": "t:forge.categories.product",
+      "blocks": {
+        "quantity": {
+          "type": "quantity",
+          "static": true
+        },
+        "add-to-cart": {
+          "type": "add-to-cart",
+          "static": true,
+          "settings": {
+            "style_class": "button-secondary"
+          }
+        },
+        "accelerated-checkout": {
+          "type": "accelerated-checkout",
+          "static": true
+        }
+      }
+    }
+  ]
+}
+{% endschema %}

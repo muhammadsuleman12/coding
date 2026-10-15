@@ -1,0 +1,239 @@
+{%- doc -%}
+  Renders a default variant picker, used to display the variant picker in the variants block.
+
+  @param {object} product_resource - The product object.
+  @param {object} [block] - The block object
+  @param {object} [section] - The section object (optional, used for color scheme and generating unique IDs).
+{%- enddoc -%}
+
+{% liquid
+  assign block_settings = block.settings
+  assign color_scheme = block_settings.color_scheme | default: section.settings.color_scheme | default: settings.color_scheme | default: 'scheme-1'
+%}
+
+{% unless product_resource.has_only_default_variant %}
+  {% liquid
+    if section and section.settings.color_scheme and section.settings.color_scheme.settings.foreground
+      assign button_background_brightness = section.settings.color_scheme.settings.foreground | color_brightness
+      if button_background_brightness < 105
+        assign strikethrough_color_mix = '#000'
+      else
+        assign strikethrough_color_mix = '#fff'
+      endif
+    else
+      assign strikethrough_color_mix = '#fff'
+    endif
+  %}
+  <forge-variant-picker
+    class="forge-variant-picker forge-spacing-style variant-picker--{{ block_settings.alignment }} forge-color-{{ color_scheme }}"
+    style="
+      --color-strikethrough-mix: {{ strikethrough_color_mix }};
+      --color-selected-variant-background: var(--color-primary-button-background);
+      --color-selected-variant-text: var(--color-primary-button-text);
+      --color-selected-variant-border: var(--color-primary-button-border);
+      --color-selected-variant-hover-background: var(--color-primary-button-hover-background);
+      --color-selected-variant-hover-text: var(--color-primary-button-hover-text);
+      --color-selected-variant-hover-border: var(--color-primary-button-hover-border);
+      --color-variant-background: var(--color-background);
+      --color-variant-text: var(--color-foreground);
+      --color-variant-border: var(--color-foreground-subdued, var(--color-foreground));
+      --color-variant-hover-background: var(--color-background);
+      --color-variant-hover-text: var(--color-foreground);
+      --color-variant-hover-border: var(--color-foreground);
+      {% if block_settings.selected_option_background != blank %}--color-selected-variant-background: {{ block_settings.selected_option_background }};{% endif %}
+      {% if block_settings.selected_option_text != blank %}--color-selected-variant-text: {{ block_settings.selected_option_text }};{% endif %}
+      {% if block_settings.selected_option_border != blank %}--color-selected-variant-border: {{ block_settings.selected_option_border }};{% endif %}
+      {% if block_settings.selected_option_hover_background != blank %}--color-selected-variant-hover-background: {{ block_settings.selected_option_hover_background }};{% endif %}
+      {% if block_settings.selected_option_hover_text != blank %}--color-selected-variant-hover-text: {{ block_settings.selected_option_hover_text }};{% endif %}
+      {% if block_settings.selected_option_hover_border != blank %}--color-selected-variant-hover-border: {{ block_settings.selected_option_hover_border }};{% endif %}
+      {% if block_settings.unselected_option_background != blank %}--color-variant-background: {{ block_settings.unselected_option_background }};{% endif %}
+      {% if block_settings.unselected_option_text != blank %}--color-variant-text: {{ block_settings.unselected_option_text }};{% endif %}
+      {% if block_settings.unselected_option_border != blank %}--color-variant-border: {{ block_settings.unselected_option_border }};{% endif %}
+      {% if block_settings.unselected_option_hover_background != blank %}--color-variant-hover-background: {{ block_settings.unselected_option_hover_background }};{% endif %}
+      {% if block_settings.unselected_option_hover_text != blank %}--color-variant-hover-text: {{ block_settings.unselected_option_hover_text }};{% endif %}
+      {% if block_settings.unselected_option_hover_border != blank %}--color-variant-hover-border: {{ block_settings.unselected_option_hover_border }};{% endif %}
+      --variant-picker-button-radius: {% if block_settings.option_border_radius > 0 %}{{ block_settings.option_border_radius }}px{% else %}var(--style-border-radius-global){% endif %};
+      --variant-picker-swatch-radius: {% if block_settings.swatch_border_radius > 0 %}{{ block_settings.swatch_border_radius }}px{% else %}var(--style-border-radius-global){% endif %};
+      {% render 'spacing-style', settings: block_settings %}
+    "
+    {% if section.id %}data-section-id="{{ section.id }}"{% endif %}
+    data-product-id="{{ product_resource.id }}"
+    data-block-id="{{ block.id }}"
+    data-product-url="{{ product_resource.url }}"
+    ref="mainVariantPicker"
+    {% if product.id == product_resource.id %}
+      data-template-product-match="true"
+    {% endif %}
+    {{ block.shopify_attributes }}
+    {% if request.visual_preview_mode %}
+      data-shopify-visual-preview
+    {% endif %}
+  >
+    <form class="variant-picker__form">
+      {%- for product_option in product_resource.options_with_values -%}
+        {%- liquid
+          assign swatch_count = product_option.values | map: 'swatch' | compact | size
+          assign variant_style = block_settings.variant_style
+
+          if swatch_count > 0 and block_settings.show_swatches
+            if block_settings.variant_style == 'dropdown'
+              assign variant_style = 'swatch_dropdown'
+            else
+              assign variant_style = 'swatch'
+            endif
+          endif
+
+          if variant_style == 'buttons' and settings.variant_button_width == 'equal-width-buttons'
+            if section.id
+              assign fieldset_id = section.id | append: '-' | append: product_resource.id | append: '-' | append: product_option.name | handleize
+            else
+              assign fieldset_id = 'variant-picker-' | append: product_resource.id | append: '-' | append: product_option.name | handleize
+            endif
+            assign option_id_attribute = 'data-option-id="' | append: fieldset_id | append: '"'
+            assign longest_value = 0
+          endif
+        -%}
+
+        {%- if variant_style == 'swatch' or block_settings.variant_style == 'buttons' -%}
+          {%- assign fieldset_index = forloop.index0 -%}
+          <fieldset
+            class="variant-option forge-variant-option--buttons{% if variant_style == 'swatch' %} forge-variant-option--swatches{% else %} forge-variant-option--{{ settings.variant_button_width }}{% endif %}"
+            data-fieldset-index="{{ fieldset_index }}"
+            ref="fieldsets[]"
+            {{ option_id_attribute }}
+          >
+            {%- if block_settings.show_variant_title -%}
+              <legend>
+                {{ product_option.name | escape -}}
+                {%- if variant_style == 'swatch' -%}
+                  <span class="variant-option__swatch-value">{{ product_option.selected_value }}</span>
+                {%- endif %}
+              </legend>
+            {%- endif %}
+            {%- for product_option_value in product_option.values -%}
+              {% if product_option_value.size > longest_value and option_id_attribute %}
+                {% assign longest_value = product_option_value.size %}
+              {% endif %}
+              <label
+                class="variant-option__button-label{% if variant_style == 'swatch' %} variant-option__button-label--has-swatch{% endif %}"
+              >
+                <input
+                  type="radio"
+                  name="{{ product_option.name | escape }}-{{ block.id }}-{{ product_resource.id }}"
+                  value="{{ product_option_value | escape }}"
+                  aria-label="{{ product_option_value.name }}"
+                  {% if product_option_value.available == false %}
+                    aria-disabled="true"
+                  {% endif %}
+                  data-previous-checked="false"
+                  data-fieldset-index="{{ fieldset_index }}"
+                  data-input-index="{{ forloop.index0 }}"
+                  data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
+                  data-option-value-id="{{ product_option_value.id }}"
+                  data-option-available="{{ product_option_value.available }}"
+                  data-connected-product-url="{{ product_option_value.product_url }}"
+                  {% if product_option_value.variant.id %}
+                    data-variant-id="{{ product_option_value.variant.id }}"
+                  {% endif %}
+                  {% if product_option_value.selected %}
+                    data-current-checked="true"
+                    checked
+                  {% else %}
+                    data-current-checked="false"
+                  {% endif %}
+                >
+                {% if variant_style == 'swatch' %}
+                  {% liquid
+                    assign featured_media = product_option_value.variant.featured_media
+
+                    if featured_media == blank and product_option_value.product_url
+                      assign featured_media = product_option_value.variant.product.featured_media
+                    endif
+                  %}
+
+                  {% render 'swatch',
+                    swatch: product_option_value.swatch,
+                    variant_image: featured_media,
+                    mode: 'unscaled'
+                  %}
+                {% else %}
+                  {% if product_option_value.available == true %}
+                    <span class="variant-option__button-label__pill"></span>
+                  {% endif %}
+                  <span class="variant-option__button-label__text">{{ product_option_value | escape }}</span>
+                {% endif %}
+                {% render 'strikethrough-variant', product_option: product_option_value %}
+              </label>
+            {%- endfor -%}
+            {% if option_id_attribute %}
+              {% style %}
+                [data-option-id="{{ fieldset_id }}"] {
+                  --variant-ch: {{ longest_value }}ch;
+                }
+              {% endstyle %}
+            {% endif %}
+          </fieldset>
+        {%- elsif block_settings.variant_style == 'dropdowns' -%}
+          {% liquid
+            assign property_being_updated = false
+            if settings.variant_swatch_width != settings.variant_swatch_height
+              assign property_being_updated = true
+              assign new_width = settings.variant_swatch_width | times: 1.0 | divided_by: settings.variant_swatch_height | times: 20
+            endif
+          %}
+
+          <div class="variant-option forge-variant-option--dropdowns">
+            {%- if block_settings.show_variant_title -%}
+              <label for="Option-{{ block.id }}-{{ forloop.index0 }}">{{ product_option.name | escape }}</label>
+            {%- endif %}
+            <div
+              class="variant-option__select-wrapper"
+              style="
+                {%- if property_being_updated  -%}
+                  --variant-picker-swatch-width: clamp(10px,{{ new_width }}px, 50px);
+                {%- endif -%}
+              "
+            >
+              <select
+                id="Option-{{ block.id }}-{{ forloop.index0 }}"
+                name="options[{{ product_option.name | escape }}]"
+                class="variant-option__select"
+              >
+                {%- for product_option_value in product_option.values -%}
+                  <option
+                    value="{{ product_option_value | escape }}"
+                    data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
+                    data-option-value-id="{{ product_option_value.id }}"
+                    data-variant-id="{{ product_option_value.variant.id }}"
+                    data-connected-product-url="{{ product_option_value.product_url }}"
+                    {% if product_option_value.selected %}
+                      selected="selected"
+                    {% endif %}
+                  >
+                    {% if product_option_value.available == false %}
+                      {{ product_option_value | escape }} - {% render 'forge-t', key: 'content.unavailable', fallback: 'Unavailable' %}
+                    {% else %}
+                      {{ product_option_value | escape }}
+                    {% endif %}
+                  </option>
+                {%- endfor -%}
+              </select>
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                class="forge-icon forge-icon-caret"
+                viewBox="0 0 10 6"
+              >
+                {%- render 'icon', icon: 'caret' -%}
+              </svg>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      <script type="application/json">
+        {{ product_resource.selected_or_first_available_variant | json }}
+      </script>
+    </form>
+  </forge-variant-picker>
+{% endunless %}

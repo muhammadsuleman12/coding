@@ -1,0 +1,167 @@
+<div class="bold-trust-badges forge-spacing-style" {{ block.shopify_attributes }}>
+  <div class="bold-trust-badges__grid" role="list">
+    {% for i in (1..4) %}
+      {% assign icon_key = 'badge_' | append: i | append: '_icon' %}
+      {% assign text_key = 'badge_' | append: i | append: '_text' %}
+      {% assign icon = block.settings[icon_key] %}
+      {% assign text = block.settings[text_key] %}
+      {% if icon != blank or text != blank %}
+        <div class="bold-trust-badges__item" role="listitem">
+          {% if icon != blank %}
+            <span class="bold-trust-badges__icon" aria-hidden="true">{{ icon }}</span>
+          {% endif %}
+          {% if text != blank %}
+            <div class="bold-trust-badges__text">
+              {% assign text_lines = text | newline_to_br | split: '<br />' %}
+              {% for line in text_lines %}
+                {% if line != blank %}
+                  <span class="bold-trust-badges__line">{{ line | strip }}</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bold-trust-badges {
+    padding-block: 10px 8px;
+  }
+
+  .bold-trust-badges__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .bold-trust-badges__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: 64px;
+    padding: 12px 14px;
+    border-radius: var(--style-border-radius-global, 12px);
+    border: 1px solid color-mix(in srgb, var(--color-foreground) 12%, var(--color-border));
+    background: color-mix(in srgb, var(--color-foreground) 4%, var(--color-background));
+  }
+
+  .bold-trust-badges__icon {
+    flex-shrink: 0;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .bold-trust-badges__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .bold-trust-badges__line {
+    display: block;
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--color-foreground);
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .bold-trust-badges__line:first-child {
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .bold-trust-badges__line:last-child:not(:first-child) {
+    font-weight: 500;
+    opacity: 0.8;
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-trust-badges__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bold trust badges",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Badge 1"
+    },
+    {
+      "type": "text",
+      "id": "badge_1_icon",
+      "label": "Icon emoji",
+      "default": "🛡️"
+    },
+    {
+      "type": "textarea",
+      "id": "badge_1_text",
+      "label": "Text (2 lines)",
+      "default": "Lifetime Warranty\nBuilt to last"
+    },
+    {
+      "type": "header",
+      "content": "Badge 2"
+    },
+    {
+      "type": "text",
+      "id": "badge_2_icon",
+      "label": "Icon emoji",
+      "default": "🚚"
+    },
+    {
+      "type": "textarea",
+      "id": "badge_2_text",
+      "label": "Text (2 lines)",
+      "default": "Free Shipping\nOn orders $50+"
+    },
+    {
+      "type": "header",
+      "content": "Badge 3"
+    },
+    {
+      "type": "text",
+      "id": "badge_3_icon",
+      "label": "Icon emoji",
+      "default": "↩️"
+    },
+    {
+      "type": "textarea",
+      "id": "badge_3_text",
+      "label": "Text (2 lines)",
+      "default": "30-Day Returns\nHassle-free"
+    },
+    {
+      "type": "header",
+      "content": "Badge 4"
+    },
+    {
+      "type": "text",
+      "id": "badge_4_icon",
+      "label": "Icon emoji",
+      "default": "🔒"
+    },
+    {
+      "type": "textarea",
+      "id": "badge_4_text",
+      "label": "Text (2 lines)",
+      "default": "Secure Checkout\nSSL encrypted"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold trust badges"
+    }
+  ]
+}
+{% endschema %}

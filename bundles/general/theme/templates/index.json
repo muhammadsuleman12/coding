@@ -1,0 +1,309 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "gs-hero-banner",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "height": "tall",
+        "show_breadcrumb": false,
+        "kicker": "Practical essentials. Brighter days.",
+        "heading": "Good finds. Great everyday.",
+        "text": "<p>Thoughtfully selected products for a more comfortable, organized and joyful everyday life.</p>",
+        "button_label": "Shop all products",
+        "button_link": "",
+        "image": "shopify://shop_images/Cool-toned_home_essentials_on_sculptural_plinths-1.png",
+        "image_mobile": "shopify://shop_images/Cool-toned_essentials_on_stone_plinths-2.png"
+      }
+    },
+    "trust": {
+      "type": "gs-trust-strip",
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Thoughtfully selected",
+            "text": "Useful products for everyday life"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "diamond",
+            "title": "Everyday solutions",
+            "text": "Make daily routines easier"
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "cart",
+            "title": "Easy shopping",
+            "text": "A smooth, secure experience"
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "headset",
+            "title": "Here to help",
+            "text": "Friendly support, always"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ],
+      "custom_css": [
+        ".gs-trust__item {align-items: center;}"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "layout": "stacked"
+      }
+    },
+    "cats": {
+      "type": "gs-category-tiles",
+      "blocks": {
+        "k1": {
+          "type": "collection",
+          "settings": {
+            "collection": "home-kitchen",
+            "tag": "furniture",
+            "label": "Home",
+            "image": "shopify://shop_images/Modern_Frosted_Dome_Lamp_Duo-6.png",
+            "icon": "home"
+          }
+        },
+        "k2": {
+          "type": "collection",
+          "settings": {
+            "collection": "tech-gadgets",
+            "tag": "electronics",
+            "label": "Tech",
+            "image": "shopify://shop_images/Charcoal_headphones_and_charging_essentials-8.png",
+            "icon": "bolt"
+          }
+        },
+        "k3": {
+          "type": "collection",
+          "settings": {
+            "collection": "pet-essentials",
+            "tag": "pets",
+            "label": "Pets",
+            "icon": "paw"
+          }
+        },
+        "k4": {
+          "type": "collection",
+          "settings": {
+            "collection": "clothing",
+            "tag": "apparel",
+            "label": "Apparel",
+            "icon": "shirt"
+          }
+        },
+        "k5": {
+          "type": "collection",
+          "settings": {
+            "collection": "gifts-accessories",
+            "tag": "gifts",
+            "label": "Gifts",
+            "icon": "gift"
+          }
+        }
+      },
+      "block_order": [
+        "k1",
+        "k2",
+        "k3",
+        "k4",
+        "k5"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Shop by category",
+        "subheading": "Explore popular categories for every part of your life.",
+        "link_label": "Shop all categories",
+        "link": "",
+        "columns": 5,
+        "show_count": false
+      }
+    },
+    "rail": {
+      "type": "gs-product-rail",
+      "blocks": {
+        "r1": {
+          "type": "tab",
+          "settings": {
+            "collection": "",
+            "tag": "",
+            "newest": true,
+            "label": "Everyday favorites"
+          }
+        }
+      },
+      "block_order": [
+        "r1"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Meet your everyday favorites",
+        "subheading": "Practical picks for brighter days, at home and beyond.",
+        "link_label": "Shop all products",
+        "link": "",
+        "columns": 4,
+        "limit": 8
+      }
+    },
+    "split": {
+      "type": "gs-split-banner",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "style": "dark",
+        "contained": false,
+        "kicker": "Everyday spaces",
+        "heading": "Made for your everyday.",
+        "text": "<p>Practical essentials, thoughtful details and timeless style for a more comfortable life at home and beyond.</p>",
+        "button_label": "Discover the collection",
+        "button_link": "",
+        "image": "shopify://shop_images/Cool-Toned_Modern_Entryway_Essentials-3.png"
+      }
+    },
+    "rail2": {
+      "type": "gs-product-rail",
+      "blocks": {
+        "a": {
+          "type": "tab",
+          "settings": {
+            "collection": "",
+            "tag": "electronics",
+            "newest": false,
+            "label": "Tech"
+          }
+        },
+        "b": {
+          "type": "tab",
+          "settings": {
+            "collection": "",
+            "tag": "furniture",
+            "newest": false,
+            "label": "Home"
+          }
+        },
+        "c": {
+          "type": "tab",
+          "settings": {
+            "collection": "",
+            "tag": "pets",
+            "newest": false,
+            "label": "Pets"
+          }
+        },
+        "d": {
+          "type": "tab",
+          "settings": {
+            "collection": "",
+            "tag": "apparel",
+            "newest": false,
+            "label": "Apparel"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Shop by department",
+        "subheading": "",
+        "link_label": "",
+        "link": "",
+        "columns": 4,
+        "limit": 8
+      }
+    },
+    "faq": {
+      "type": "gs-faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Delivery options and estimated times are shown at checkout before you pay. You'll receive a tracking link by email once your order ships.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>If something isn't right, contact us and we'll help with a return. You can find all the details in our Refund Policy.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>Available shipping destinations are shown at checkout once you enter your address.</p>"
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "How can I contact customer support?",
+            "answer": "<p>Send us a message through our contact page and we'll get back to you as soon as we can.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Frequently asked questions",
+        "subheading": "",
+        "contact_label": "Contact us",
+        "contact_link": "shopify://pages/contact",
+        "open_first": false
+      }
+    },
+    "news": {
+      "type": "gs-newsletter",
+      "settings": {
+        "color_scheme": "scheme-4",
+        "heading": "Good finds, straight to your inbox",
+        "text": "Be the first to know about new arrivals, exclusive offers and everyday inspiration.",
+        "button_label": "Subscribe",
+        "success": "Thanks for subscribing. Look out for our next email."
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "trust",
+    "cats",
+    "rail",
+    "split",
+    "rail2",
+    "faq",
+    "news"
+  ]
+}

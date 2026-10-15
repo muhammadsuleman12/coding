@@ -1,0 +1,26 @@
+
+
+<div class="blog-post-content forge-rte">
+  <forge-rte-formatter>
+    {{ article.content }}
+  </forge-rte-formatter>
+</div>
+
+{% stylesheet %}
+  .blog-post-content {
+    max-width: var(--normal-content-width);
+    margin: 0 auto;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.content",
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:forge.names.content"
+    }
+  ]
+}
+{% endschema %}

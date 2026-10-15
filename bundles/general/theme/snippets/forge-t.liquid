@@ -1,0 +1,7 @@
+{%- liquid
+  assign forge_t_value = key | t
+  if forge_t_value contains 'Translation missing'
+    assign forge_t_value = fallback
+  endif
+  echo forge_t_value
+-%}

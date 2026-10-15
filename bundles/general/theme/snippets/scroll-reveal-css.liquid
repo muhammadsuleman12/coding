@@ -1,0 +1,28 @@
+html.forge-animate-ready [data-animate] {
+  opacity: 0;
+  transform: translateY(var(--anim-reveal-distance, 28px));
+  transition: opacity var(--anim-reveal-duration, 750ms) var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1)), transform var(--anim-reveal-duration, 750ms) var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1));
+  transition-delay: calc(var(--anim-child-index, 0) * var(--anim-reveal-stagger, 85ms));
+}
+
+html.forge-animate-ready [data-animate="fade-in"] {
+  transform: none;
+}
+
+html.forge-animate-ready [data-animate="scale-in"] {
+  transform: scale(0.94);
+}
+
+html.forge-animate-ready [data-animate].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* !important: the rule above has higher specificity (0,2,1 vs 0,1,0). */
+@media (prefers-reduced-motion: reduce) {
+  [data-animate] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

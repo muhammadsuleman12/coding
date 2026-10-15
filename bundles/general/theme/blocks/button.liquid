@@ -1,0 +1,125 @@
+
+{% render 'button', link: block.settings.link %}
+
+{% schema %}
+{
+  "name": "t:forge.names.button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:forge.settings.label",
+      "default": "t:forge.text_defaults.button_label"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:forge.settings.link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "t:forge.settings.open_new_tab",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "style_class",
+      "label": "t:forge.settings.style",
+      "options": [
+        {
+          "value": "button",
+          "label": "t:forge.options.primary"
+        },
+        {
+          "value": "button-secondary",
+          "label": "t:forge.options.secondary"
+        },
+        {
+          "value": "link",
+          "label": "t:forge.options.link"
+        }
+      ],
+      "default": "button"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:forge.settings.width_desktop",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fit-content"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:forge.settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == \"custom\" }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:forge.settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fit-content"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:forge.settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == \"custom\" }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.button",
+      "category": "t:forge.categories.basic",
+      "settings": {
+        "link": "shopify://collections/all"
+      }
+    }
+  ]
+}
+{% endschema %}

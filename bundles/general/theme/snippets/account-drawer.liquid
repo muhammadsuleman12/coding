@@ -1,0 +1,96 @@
+{%- doc -%}
+  Renders the account drawer, which is used for mobile users.
+
+  @param {object} [block] - The block object (optional, used for shopify_attributes).
+{%- enddoc -%}
+
+<script
+  src="{{ 'dialog.js' | asset_url }}"
+  type="module"
+></script>
+
+<forge-dialog-component
+  class="account-drawer"
+  {% if block %}{{ block.shopify_attributes }}{% endif %}
+>
+  {% render 'account-button', attributes: 'on:click="/showDialog"' %}
+  <dialog
+    ref="dialog"
+    class="forge-color-{{ settings.popover_color_scheme }} forge-dialog-modal forge-dialog-drawer dialog-bottom-sheet account-drawer__dialog"
+    scroll-lock
+    aria-labelledby="account-drawer-heading"
+  >
+    <button
+      ref="closeButton"
+      on:click="/closeDialog"
+      class="forge-button forge-button-unstyled forge-close-button account-drawer__close-button"
+      aria-label="{% render 'forge-t', key: 'actions.close_dialog', fallback: 'Close dialog' %}"
+      autofocus
+    >
+      <span
+        class="forge-svg-wrapper"
+        aria-hidden="true"
+      >
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </span>
+    </button>
+    {% render 'account-actions' %}
+  </dialog>
+</forge-dialog-component>
+
+{% stylesheet %}
+  .account-drawer {
+    @media screen and (min-width: 750px) {
+      display: none;
+    }
+  }
+
+  .account-drawer__dialog {
+    --animation-speed: 0.24s;
+    --dialog-drawer-opening-animation: account-drawer-slide-in;
+    --dialog-drawer-closing-animation: account-drawer-slide-out;
+
+    height: fit-content;
+    margin: 0;
+    inset-block-end: 0;
+    inset-block-start: auto;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .account-drawer__close-button {
+    z-index: 1;
+    inset-block-start: var(--padding-xs);
+    inset-inline-end: var(--padding-xs);
+    color: var(--color-foreground);
+    background-color: transparent;
+  }
+
+  .account-drawer__close-button .forge-svg-wrapper {
+    display: flex;
+    width: var(--button-size);
+    height: var(--button-size);
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes account-drawer-slide-in {
+    from {
+      transform: translateY(100%);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes account-drawer-slide-out {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(100%);
+    }
+  }
+{% endstylesheet %}

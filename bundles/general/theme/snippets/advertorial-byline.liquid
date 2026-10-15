@@ -1,0 +1,110 @@
+{%- liquid
+  assign meta_parts = ''
+  if section.settings.byline_role != blank
+    assign meta_parts = section.settings.byline_role
+  endif
+  if section.settings.byline_read_time != blank
+    if meta_parts != blank
+      assign meta_parts = meta_parts | append: ' · ' | append: section.settings.byline_read_time
+    else
+      assign meta_parts = section.settings.byline_read_time
+    endif
+  endif
+  if section.settings.byline_date != blank
+    if meta_parts != blank
+      assign meta_parts = meta_parts | append: ' · ' | append: section.settings.byline_date
+    else
+      assign meta_parts = section.settings.byline_date
+    endif
+  endif
+-%}
+{%- capture avatar_class -%}advertorial-byline__avatar-{{ section_id }}{%- endcapture -%}
+
+<div class="advertorial-byline-{{ section_id }}">
+  {% if top_rule %}<hr class="advertorial-byline__rule-{{ section_id }}">{% endif %}
+  <div class="advertorial-byline__row-{{ section_id }}">
+    <div class="advertorial-byline__avatar-wrap-{{ section_id }}" data-forge-slot-id="byline_avatar"{% if section.settings.byline_avatar == blank %} data-forge-slot-blank="true"{% endif %}>
+      {% if section.settings.byline_avatar %}
+        {{
+          section.settings.byline_avatar
+          | image_url: width: 120
+          | image_tag: class: avatar_class, loading: 'lazy', widths: '60, 120', sizes: '46px'
+        }}
+      {% else %}
+        <span class="advertorial-byline__avatar-fallback-{{ section_id }}" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="9" r="3.2"/><path d="M5.5 19a6.5 6.5 0 0113 0"/>
+          </svg>
+        </span>
+      {% endif %}
+    </div>
+    <div class="advertorial-byline__text-{{ section_id }}">
+      <div class="advertorial-byline__name-{{ section_id }}">{{ section.settings.byline_name }}</div>
+      {% if meta_parts != blank %}
+        <div class="advertorial-byline__meta-{{ section_id }}">{{ meta_parts }}</div>
+      {% endif %}
+    </div>
+  </div>
+  <hr class="advertorial-byline__rule-{{ section_id }}">
+</div>
+
+{% style %}
+  .advertorial-byline-{{ section_id }} {
+    margin-top: 34px;
+  }
+
+  .advertorial-byline__rule-{{ section_id }} {
+    height: 1px;
+    border: 0;
+    margin: 0;
+    background: var(--color-border);
+  }
+
+  .advertorial-byline__row-{{ section_id }} {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 0;
+    text-align: left;
+  }
+
+  .advertorial-byline__avatar-wrap-{{ section_id }} {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+  }
+
+  .advertorial-byline__avatar-{{ section_id }},
+  .advertorial-byline__avatar-fallback-{{ section_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--style-border-radius-pills, 999px);
+    object-fit: cover;
+    background: var(--color-card-background);
+    color: var(--color-foreground-muted);
+  }
+
+  .advertorial-byline__avatar-fallback-{{ section_id }} svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .advertorial-byline__name-{{ section_id }} {
+    font-family: var(--font-body--family, inherit);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--color-foreground);
+  }
+
+  .advertorial-byline__meta-{{ section_id }} {
+    font-family: var(--font-body--family, inherit);
+    font-weight: var(--font-body--weight, 400);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--color-foreground-muted);
+  }
+{% endstyle %}

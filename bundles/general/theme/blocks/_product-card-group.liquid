@@ -1,0 +1,521 @@
+
+
+{% capture children %}
+  {% content_for 'blocks' %}
+{% endcapture %}
+
+{% render 'group', children: children, settings: block.settings, shopify_attributes: block.shopify_attributes %}
+
+{% schema %}
+{
+  "name": "t:forge.names.group",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "text"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "price"
+    },
+    {
+      "type": "review"
+    },
+    {
+      "type": "swatches"
+    },
+    {
+      "type": "_product-card-group"
+    },
+    {
+      "type": "product-title"
+    },
+    {
+      "type": "custom-liquid"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:forge.content.layout"
+    },
+    {
+      "type": "select",
+      "id": "content_direction",
+      "label": "t:forge.settings.direction",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:forge.options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:forge.options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "checkbox",
+      "id": "vertical_on_mobile",
+      "label": "t:forge.settings.vertical_on_mobile",
+      "default": true,
+      "visible_if": "{{ block.settings.content_direction == 'row' }}"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "t:forge.settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.right"
+        },
+        {
+          "value": "space-between",
+          "label": "t:forge.options.space_between"
+        }
+      ],
+      "default": "flex-start",
+      "visible_if": "{{ block.settings.content_direction == 'row' }}"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "t:forge.settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.bottom"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ block.settings.content_direction == 'row' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "align_baseline",
+      "label": "t:forge.settings.align_baseline",
+      "default": false,
+      "visible_if": "{{ block.settings.vertical_alignment == 'flex-end' }}"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment_flex_direction_column",
+      "label": "t:forge.settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.right"
+        }
+      ],
+      "default": "flex-start",
+      "visible_if": "{{ block.settings.content_direction != 'row' }}"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment_flex_direction_column",
+      "label": "t:forge.settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.bottom"
+        },
+        {
+          "value": "space-between",
+          "label": "t:forge.options.space_between"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ block.settings.content_direction == 'column' }}"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:forge.settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:forge.settings.width",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:forge.options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:forge.settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:forge.settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:forge.options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:forge.settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:forge.settings.height",
+      "options": [
+        {
+          "value": "fit",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:forge.options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "range",
+      "id": "custom_height",
+      "label": "t:forge.settings.custom_height",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.height == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:forge.settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "select",
+      "id": "background_media",
+      "label": "t:forge.settings.background_media",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "image",
+          "label": "t:forge.options.image"
+        },
+        {
+          "value": "video",
+          "label": "t:forge.options.video"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:forge.settings.video",
+      "visible_if": "{{ block.settings.background_media == 'video' }}"
+    },
+    {
+      "type": "select",
+      "id": "video_position",
+      "label": "t:forge.settings.video_position",
+      "options": [
+        {
+          "value": "cover",
+          "label": "t:forge.options.cover"
+        },
+        {
+          "value": "contain",
+          "label": "t:forge.options.contain"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ block.settings.background_media == 'video' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "t:forge.settings.image",
+      "visible_if": "{{ block.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "background_image_position",
+      "label": "t:forge.settings.image_position",
+      "options": [
+        {
+          "value": "cover",
+          "label": "t:forge.options.cover"
+        },
+        {
+          "value": "fit",
+          "label": "t:forge.options.fit"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ block.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:forge.settings.borders",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:forge.options.solid"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "t:forge.settings.border_width",
+      "default": 1,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:forge.settings.border_opacity",
+      "default": 100,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:forge.settings.border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "toggle_overlay",
+      "label": "t:forge.settings.background_overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "t:forge.settings.overlay_color",
+      "alpha": true,
+      "default": "#00000026",
+      "visible_if": "{{ block.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "t:forge.settings.overlay_style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "t:forge.options.solid"
+        },
+        {
+          "value": "gradient",
+          "label": "t:forge.options.gradient"
+        }
+      ],
+      "default": "solid",
+      "visible_if": "{{ block.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "gradient_direction",
+      "label": "t:forge.settings.gradient_direction",
+      "options": [
+        {
+          "value": "to top",
+          "label": "t:forge.options.up"
+        },
+        {
+          "value": "to bottom",
+          "label": "t:forge.options.down"
+        }
+      ],
+      "default": "to top",
+      "visible_if": "{{ block.settings.toggle_overlay and block.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.block_link"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:forge.settings.link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "t:forge.settings.open_new_tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.group",
+      "category": "t:forge.categories.layout"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,896 @@
+
+{% liquid
+  assign heading = section.settings.heading | strip_html | strip
+  assign subheading = section.settings.subheading | strip_html | strip
+  assign btn_label = section.settings.button_label
+  assign content_alignment = section.settings.content_alignment | default: 'center'
+
+  assign max_products = section.settings.max_products | default: 8
+  if max_products < 2
+    assign max_products = 2
+  endif
+  if max_products > 16
+    assign max_products = 16
+  endif
+
+  assign desktop_columns = section.settings.desktop_columns | default: 4
+  if desktop_columns < 3
+    assign desktop_columns = 3
+  endif
+  if desktop_columns > 5
+    assign desktop_columns = 5
+  endif
+
+  assign desktop_layout = section.settings.desktop_layout | default: 'carousel'
+  if desktop_layout != 'grid'
+    assign desktop_layout = 'carousel'
+  endif
+
+  assign mobile_layout = section.settings.mobile_layout | default: 'carousel'
+  if mobile_layout != 'grid'
+    assign mobile_layout = 'carousel'
+  endif
+
+  assign collection = section.settings.collection
+  if collection != blank
+    assign products_to_show = collection.products
+  else
+    assign products_to_show = collections['all'].products
+  endif
+
+  if section.settings.button_link != blank
+    assign btn_link = section.settings.button_link
+  elsif collection != blank
+    assign btn_link = collection.url
+  else
+    assign btn_link = '/collections/all'
+  endif
+
+  case desktop_columns
+    when 3
+      assign desktop_card_sizes = '30vw'
+    when 4
+      assign desktop_card_sizes = '22vw'
+    when 5
+      assign desktop_card_sizes = '17vw'
+  endcase
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --afc-desktop-columns: {{ desktop_columns }};
+  }
+{% endstyle %}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="affluence-featured-collection forge-spacing-style forge-color-{{ section.settings.color_scheme }} affluence-featured-collection--align-{{ content_alignment }}{% unless section.settings.show_image_frame %} affluence-featured-collection--no-image-frame{% endunless %}"
+  id="AffluenceFeaturedCollection-{{ section.id }}"
+  data-desktop-layout="{{ desktop_layout }}"
+  data-mobile-layout="{{ mobile_layout }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  {% if section.settings.section_label != blank or heading != blank or subheading != blank %}
+    <header class="affluence-featured-collection__header" data-animate="fade-up">
+      {% if section.settings.section_label != blank %}
+        <p class="affluence-featured-collection__eyebrow">{{ section.settings.section_label }}</p>
+      {% endif %}
+      {% if heading != blank %}
+        <h2
+          class="affluence-featured-collection__heading"
+          id="AffluenceFeaturedCollectionHeading-{{ section.id }}"
+        >
+          {{ heading }}
+        </h2>
+      {% endif %}
+      {% if subheading != blank %}
+        <p class="affluence-featured-collection__subheading">{{ subheading }}</p>
+      {% endif %}
+    </header>
+  {% endif %}
+
+  <div class="affluence-featured-collection__track-bleed">
+    <div
+      class="affluence-featured-collection__track"
+      id="AffluenceFeaturedCollectionTrack-{{ section.id }}"
+      role="region"
+      aria-labelledby="AffluenceFeaturedCollectionHeading-{{ section.id }}"
+      tabindex="0"
+      data-animate-group
+    >
+      {% if products_to_show.size > 0 %}
+        {% for product in products_to_show limit: max_products %}
+          <article class="afc-card" data-animate="fade-up">
+            <a href="{{ product.url }}" class="afc-card__link">
+              <div class="afc-card__image-wrap">
+                {% if product.featured_image %}
+                  {% assign afc_img_alt = product.featured_image.alt | default: product.title %}
+                  {%- capture afc_sizes -%}
+                    (min-width: 750px) {{ desktop_card_sizes }}, 78vw
+                  {%- endcapture -%}
+                  {{
+                    product.featured_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      class: 'afc-card__image',
+                      loading: 'lazy',
+                      widths: '400, 600, 800, 1000, 1200',
+                      sizes: afc_sizes,
+                      alt: afc_img_alt
+                  }}
+                {% else %}
+                  <div class="afc-card__placeholder">
+                    {{ 'product-1' | placeholder_svg_tag: 'afc-card__placeholder-svg' }}
+                  </div>
+                {% endif %}
+
+                {% if product.compare_at_price > product.price %}
+                  <span class="afc-card__badge afc-card__badge--sale" aria-hidden="true">SALE</span>
+                {% endif %}
+              </div>
+
+              <div class="afc-card__info">
+                {% if section.settings.show_vendor and product.vendor != blank %}
+                  <p class="afc-card__vendor">{{ product.vendor }}</p>
+                {% endif %}
+                <p class="afc-card__title">{{ product.title }}</p>
+                {% if section.settings.show_product_type and product.type != blank %}
+                  <p class="afc-card__type">{{ product.type }}</p>
+                {% endif %}
+                <div class="afc-card__prices">
+                  {% if product.compare_at_price > product.price %}
+                    <span class="afc-card__price afc-card__price--sale">{{ product.price | money }}</span>
+                    {% if section.settings.show_compare_at_price %}
+                      <span class="afc-card__price afc-card__price--compare">{{ product.compare_at_price | money }}</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="afc-card__price">{{ product.price | money }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..max_products) %}
+          <article class="afc-card afc-card--placeholder" data-animate="fade-up" aria-hidden="true">
+            <div class="afc-card__link" role="presentation">
+              <div class="afc-card__image-wrap">
+                <div class="afc-card__placeholder">
+                  {{ 'product-1' | placeholder_svg_tag: 'afc-card__placeholder-svg' }}
+                </div>
+              </div>
+              <div class="afc-card__info">
+                {% if section.settings.show_vendor %}
+                  <p class="afc-card__vendor">Vendor</p>
+                {% endif %}
+                <p class="afc-card__title">Product Name</p>
+                {% if section.settings.show_product_type %}
+                  <p class="afc-card__type">Eau de Parfum</p>
+                {% endif %}
+                <div class="afc-card__prices">
+                  <span class="afc-card__price">€35</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {% if desktop_layout == 'carousel' %}
+      <button
+        type="button"
+        class="affluence-featured-collection__nav affluence-featured-collection__nav--prev"
+        data-direction="prev"
+        aria-controls="AffluenceFeaturedCollectionTrack-{{ section.id }}"
+        aria-label="Scroll to previous products"
+        disabled
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="affluence-featured-collection__nav affluence-featured-collection__nav--next"
+        data-direction="next"
+        aria-controls="AffluenceFeaturedCollectionTrack-{{ section.id }}"
+        aria-label="Scroll to next products"
+        disabled
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {% endif %}
+  </div>
+
+  {% if btn_label != blank %}
+    <div class="affluence-featured-collection__footer">
+      <a href="{{ btn_link }}" class="affluence-featured-collection__shop-all">{{ btn_label }}</a>
+    </div>
+  {% endif %}
+</section>
+
+{%- if desktop_layout == 'carousel' or mobile_layout == 'carousel' -%}
+  <script>
+    (function () {
+      var section = document.getElementById('AffluenceFeaturedCollection-{{ section.id }}');
+      if (!section) return;
+      var track = section.querySelector('.affluence-featured-collection__track');
+      var prevBtn = section.querySelector('.affluence-featured-collection__nav--prev');
+      var nextBtn = section.querySelector('.affluence-featured-collection__nav--next');
+      if (!track) return;
+
+      function getStep() {
+        var card = track.querySelector('.afc-card');
+        if (!card) return Math.max(track.clientWidth * 0.8, 1);
+        var styles = window.getComputedStyle(track);
+        var gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+        return card.getBoundingClientRect().width + gap;
+      }
+
+      function updateState() {
+        var canScroll = track.scrollWidth - track.clientWidth > 1;
+        if (canScroll) {
+          section.setAttribute('data-scrollable', '');
+        } else {
+          section.removeAttribute('data-scrollable');
+        }
+        if (prevBtn && nextBtn) {
+          var atStart = track.scrollLeft <= 1;
+          var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1;
+          prevBtn.disabled = !canScroll || atStart;
+          nextBtn.disabled = !canScroll || atEnd;
+        }
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          track.scrollBy({ left: -getStep(), behavior: 'smooth' });
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          track.scrollBy({ left: getStep(), behavior: 'smooth' });
+        });
+      }
+
+      track.addEventListener('scroll', updateState, { passive: true });
+      window.addEventListener('resize', updateState);
+      updateState();
+    })();
+  </script>
+{%- endif -%}
+
+{% stylesheet %}
+  .affluence-featured-collection {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .affluence-featured-collection__header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 720px;
+    box-sizing: border-box;
+    margin: 0 auto 36px;
+    padding-inline: clamp(16px, 4vw, 36px);
+    text-align: center;
+  }
+
+  .affluence-featured-collection--align-left .affluence-featured-collection__header {
+    margin-left: 0;
+    text-align: left;
+    align-items: flex-start;
+  }
+  .affluence-featured-collection--align-right .affluence-featured-collection__header {
+    margin-right: 0;
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .affluence-featured-collection__eyebrow {
+    margin: 0;
+    font-family: var(--font-accent--family, inherit);
+    font-weight: 500;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-foreground-muted);
+    opacity: 0.65;
+  }
+
+  .affluence-featured-collection__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-weight: var(--font-h2--weight, 400);
+    font-size: clamp(1.5rem, 3vw, var(--font-h2--size));
+    letter-spacing: var(--font-h2--letter-spacing, 0.01em);
+    line-height: 1.15;
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .affluence-featured-collection__subheading {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--color-foreground);
+    opacity: 0.78;
+    max-width: 520px;
+  }
+
+  .affluence-featured-collection--align-center .affluence-featured-collection__subheading {
+    margin-inline: auto;
+  }
+
+  /* Footer button below the track */
+  .affluence-featured-collection__footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    padding-inline: clamp(16px, 4vw, 36px);
+  }
+
+  .affluence-featured-collection--align-left .affluence-featured-collection__footer {
+    justify-content: flex-start;
+  }
+  .affluence-featured-collection--align-right .affluence-featured-collection__footer {
+    justify-content: flex-end;
+  }
+
+  .affluence-featured-collection__shop-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0.95rem 2rem;
+    min-height: 48px;
+    background: var(--color-primary-button-background);
+    color: var(--color-primary-button-text);
+    border: 1px solid var(--color-primary-button-border);
+    border-radius: var(--style-border-radius-buttons-primary, 0px);
+    text-decoration: none;
+    font-family: var(--font-accent--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: var(--font-accent--weight, 500);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .affluence-featured-collection__shop-all:hover {
+    background: var(--color-primary-button-hover-background);
+    color: var(--color-primary-button-hover-text);
+    border-color: var(--color-primary-button-hover-border);
+  }
+
+  .affluence-featured-collection__shop-all:focus-visible {
+    outline: 2px solid var(--color-primary-button-background);
+    outline-offset: 3px;
+  }
+
+  /* Track */
+  .affluence-featured-collection__track-bleed {
+    position: relative;
+    width: 100%;
+  }
+
+  .affluence-featured-collection__track {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: var(--style-gap-cards, 16px);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* ---------- Desktop ---------- */
+
+  @media screen and (min-width: 750px) {
+    .affluence-featured-collection__track-bleed {
+      width: 100vw;
+      max-width: 100vw;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+    }
+
+    [data-desktop-layout='grid'] .affluence-featured-collection__track {
+      overflow-x: visible;
+      padding-inline: clamp(20px, 5vw, 56px);
+      scroll-snap-type: none;
+    }
+
+    [data-desktop-layout='grid'] .afc-card {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: none;
+    }
+
+    [data-desktop-layout='carousel'] .affluence-featured-collection__track {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+      padding-inline: clamp(20px, 5vw, 56px);
+      scroll-padding-inline: clamp(20px, 5vw, 56px);
+    }
+
+    [data-desktop-layout='carousel'] .affluence-featured-collection__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    [data-desktop-layout='carousel'] .afc-card {
+      flex: 0 0 calc((100% - (var(--afc-desktop-columns, 4) - 1) * clamp(8px, 1.2vw, 16px)) / var(--afc-desktop-columns, 4));
+      max-width: calc((100% - (var(--afc-desktop-columns, 4) - 1) * clamp(8px, 1.2vw, 16px)) / var(--afc-desktop-columns, 4));
+      scroll-snap-align: start;
+    }
+  }
+
+  /* Carousel nav */
+  .affluence-featured-collection__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--color-border, rgba(0, 0, 0, 0.12));
+    background: var(--color-background, #fff);
+    color: var(--color-foreground);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%);
+    box-shadow: var(--style-shadow-card, 0 2px 12px rgba(0, 0, 0, 0.12));
+    transition: opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .affluence-featured-collection__nav svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .affluence-featured-collection__nav--prev {
+    left: max(12px, 1.5vw);
+  }
+
+  .affluence-featured-collection__nav--next {
+    right: max(12px, 1.5vw);
+  }
+
+  .affluence-featured-collection__nav:hover {
+    box-shadow: var(--style-shadow-card, 0 4px 16px rgba(0, 0, 0, 0.18));
+  }
+
+  .affluence-featured-collection__nav:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .affluence-featured-collection__nav:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media screen and (min-width: 750px) and (hover: hover) {
+    [data-desktop-layout='carousel'][data-scrollable] .affluence-featured-collection__nav {
+      display: flex;
+    }
+
+    [data-desktop-layout='carousel'][data-scrollable] .affluence-featured-collection__track-bleed:hover .affluence-featured-collection__nav:not(:disabled) {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  /* ---------- Mobile ---------- */
+
+  @media screen and (max-width: 749px) {
+    .affluence-featured-collection__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    [data-mobile-layout='carousel'] .affluence-featured-collection__track {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 16px 8px;
+      scroll-padding-inline: 16px;
+    }
+
+    [data-mobile-layout='carousel'] .affluence-featured-collection__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    [data-mobile-layout='carousel'] .afc-card {
+      flex: 0 0 min(70vw, 280px);
+      max-width: min(70vw, 280px);
+      scroll-snap-align: start;
+    }
+
+    [data-mobile-layout='grid'] .affluence-featured-collection__track {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 16px;
+      overflow-x: visible;
+      scroll-snap-type: none;
+    }
+
+    [data-mobile-layout='grid'] .afc-card {
+      flex: none;
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .affluence-featured-collection__track {
+      scroll-behavior: auto;
+      scroll-snap-type: none;
+    }
+  }
+
+  /* ---------- Card ---------- */
+
+  .afc-card {
+    position: relative;
+  }
+
+  .afc-card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .afc-card__image-wrap {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--color-card-background);
+    border-radius: var(--style-border-radius-images, 0px);
+  }
+
+  .afc-card__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    padding: clamp(8px, 1.5vw, 24px);
+    box-sizing: border-box;
+    transition: transform 0.5s ease;
+  }
+
+  /* Frameless variant — drop the light-card background and padding so the
+     photo bleeds edge-to-edge inside the card. Default state: photo sits
+     directly on the section background and crops to fill (object-fit: cover). */
+  .affluence-featured-collection--no-image-frame .afc-card__image-wrap {
+    background: transparent;
+  }
+
+  .affluence-featured-collection--no-image-frame .afc-card__image {
+    padding: 0;
+    object-fit: cover;
+  }
+
+  .afc-card__link:hover .afc-card__image {
+    transform: scale(1.03);
+  }
+
+  .afc-card__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .afc-card__placeholder-svg {
+    width: 50%;
+    height: auto;
+    opacity: 0.2;
+  }
+
+  .afc-card__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 10px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: var(--color-foreground);
+    color: var(--color-background);
+    font-family: var(--font-accent--family, inherit);
+  }
+
+  /* Hairline divider above the info block (matches Amaraan/Luxe). */
+  .afc-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 18px 8px 0;
+    margin-top: 18px;
+    text-align: center;
+    align-items: center;
+    border-top: 1px solid var(--color-border, rgba(0, 0, 0, 0.12));
+  }
+
+  .affluence-featured-collection--align-left .afc-card__info {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .afc-card__vendor {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-foreground);
+    opacity: 0.7;
+  }
+
+  .afc-card__title {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.9375rem;
+    font-weight: var(--font-h3--weight, 400);
+    line-height: 1.4;
+    color: var(--color-foreground);
+    letter-spacing: var(--font-h3--letter-spacing, 0.01em);
+    max-width: 24ch;
+  }
+
+  .afc-card__type {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.8125rem;
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--color-foreground);
+    opacity: 0.7;
+  }
+
+  .afc-card__prices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .affluence-featured-collection--align-left .afc-card__prices {
+    justify-content: flex-start;
+  }
+
+  .afc-card__price {
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.875rem;
+    color: var(--color-foreground);
+  }
+
+  .afc-card__price--sale {
+    color: var(--color-error, #c0392b);
+    font-weight: 700;
+  }
+
+  .afc-card__price--compare {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Affluence Collection",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Leave empty to show all products"
+    },
+    {
+      "type": "text",
+      "id": "section_label",
+      "label": "Eyebrow",
+      "info": "Optional small uppercase label above the heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Collection"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Header alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Shop all button label",
+      "info": "Leave empty to hide the button"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Shop all button link",
+      "info": "Defaults to the selected collection's URL"
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Max products",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_type",
+      "label": "Show product type",
+      "info": "Adds the product type (e.g. 'Eau de Parfum') below the title.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_at_price",
+      "label": "Show compare-at price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_frame",
+      "label": "Show image frame",
+      "info": "Adds a soft card background and padding around each product photo. Off keeps photos edge-to-edge inside the card.",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Desktop layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop layout",
+      "options": [
+        { "value": "carousel", "label": "Carousel (scroll-snap)" },
+        { "value": "grid", "label": "Static grid" }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "label": "Cards per row",
+      "min": 3,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Mobile layout"
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        { "value": "carousel", "label": "Carousel" },
+        { "value": "grid", "label": "Two-column grid" }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence Collection",
+      "settings": {
+        "heading": "Featured Collection",
+        "max_products": 8,
+        "desktop_layout": "carousel",
+        "desktop_columns": 4,
+        "mobile_layout": "carousel"
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,313 @@
+
+{% liquid
+  assign heading = section.settings.heading | strip_html | strip
+  assign description = section.settings.description | strip_html | strip
+%}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="affluence-three-steps forge-spacing-style forge-color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  {% if heading != blank or description != blank %}
+    <header class="affluence-three-steps__header" data-animate="fade-up">
+      {% if heading != blank %}
+        <h2 class="affluence-three-steps__heading">{{ heading }}</h2>
+      {% endif %}
+      {% if description != blank %}
+        <p class="affluence-three-steps__description">{{ description }}</p>
+      {% endif %}
+    </header>
+  {% endif %}
+
+  <div class="affluence-three-steps__scroll">
+    <ol class="affluence-three-steps__grid" role="list" data-animate-group>
+      {% for block in section.blocks limit: 3 %}
+        {% liquid
+          assign step_number = block.settings.number | default: forloop.index | prepend: '0' | slice: -2, 2
+          assign step_title = block.settings.title | strip_html | strip
+          assign step_description = block.settings.description | strip_html | strip
+        %}
+        <li class="affluence-three-steps__step" data-animate="fade-up" {{ block.shopify_attributes }}>
+          <div class="affluence-three-steps__number" aria-hidden="true">{{ step_number }}</div>
+          {% if step_title != blank %}
+            <h3 class="affluence-three-steps__title">{{ step_title }}</h3>
+          {% endif %}
+          {% if step_description != blank %}
+            <p class="affluence-three-steps__text">{{ step_description }}</p>
+          {% endif %}
+          <div class="affluence-three-steps__media">
+            {% if block.settings.image != blank %}
+              {{
+                block.settings.image
+                | image_url: width: 900
+                | image_tag:
+                  class: 'affluence-three-steps__img',
+                  loading: 'lazy',
+                  widths: '300, 450, 600, 900',
+                  sizes: '(min-width: 768px) 33vw, 68vw',
+                  alt: step_title
+              }}
+            {% else %}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'affluence-three-steps__img affluence-three-steps__img--placeholder' }}
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+{% stylesheet %}
+  .affluence-three-steps {
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: clamp(20px, 5vw, 56px);
+  }
+
+  .affluence-three-steps__header {
+    max-width: 700px;
+    margin: 0 auto 50px;
+    text-align: center;
+  }
+
+  .affluence-three-steps__heading {
+    margin: 0 0 16px;
+    font-family: var(--font-heading--family, inherit);
+    font-weight: var(--font-h2--weight, 400);
+    font-size: clamp(1.625rem, 3.5vw, var(--font-h2--size));
+    line-height: 1.15;
+    letter-spacing: var(--font-h2--letter-spacing, 0.02em);
+    color: var(--color-foreground, #111);
+  }
+
+  .affluence-three-steps__description {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-weight: var(--font-body--weight, 300);
+    font-size: 1.05em;
+    line-height: 1.7;
+    color: var(--color-foreground-muted);
+  }
+
+  .affluence-three-steps__scroll {
+    width: 100%;
+  }
+
+  .affluence-three-steps__grid {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--style-gap-cards, 40px);
+    align-items: stretch;
+  }
+
+  .affluence-three-steps__step {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: left;
+  }
+
+  .affluence-three-steps__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--color-card-background);
+    color: var(--color-foreground, #111);
+    border-radius: var(--style-border-radius-cards, 12px);
+    font-family: var(--font-accent--family, inherit);
+    font-weight: 500;
+    font-size: 0.95em;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  .affluence-three-steps__title {
+    margin: 0 0 10px;
+    font-family: var(--font-heading--family, inherit);
+    font-weight: var(--font-h3--weight, 500);
+    font-size: 1.25em;
+    line-height: 1.3;
+    color: var(--color-foreground, #222);
+  }
+
+  .affluence-three-steps__text {
+    margin: 0 0 20px;
+    font-family: var(--font-body--family, inherit);
+    font-weight: var(--font-body--weight, 300);
+    font-size: 1em;
+    line-height: 1.6;
+    color: var(--color-foreground-muted);
+  }
+
+  .affluence-three-steps__media {
+    margin-top: auto;
+    width: 100%;
+    border-radius: var(--style-border-radius-images, 0px);
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+  }
+
+  .affluence-three-steps__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .affluence-three-steps__img--placeholder {
+    background: var(--color-card-background);
+    opacity: 0.4;
+  }
+
+  @media screen and (max-width: 749px) {
+    .affluence-three-steps {
+      padding-inline: 0;
+    }
+
+    .affluence-three-steps__header {
+      max-width: none;
+      padding: 0 20px;
+      margin-bottom: 36px;
+    }
+
+    .affluence-three-steps__scroll {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-snap-stop: always;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 20px 30px;
+      scrollbar-width: none;
+    }
+
+    .affluence-three-steps__scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .affluence-three-steps__grid {
+      display: flex;
+      gap: 20px;
+      max-width: none;
+    }
+
+    .affluence-three-steps__step {
+      flex: 0 0 68vw;
+      width: 68vw;
+      scroll-snap-align: start;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Affluence Three Steps",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "How it works"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "info": "Two-digit marker (e.g. 01).",
+          "default": "01"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Step title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Short sentence describing this step."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (3:4)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence Three Steps",
+      "blocks": [
+        { "type": "step", "settings": { "number": "01" } },
+        { "type": "step", "settings": { "number": "02" } },
+        { "type": "step", "settings": { "number": "03" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

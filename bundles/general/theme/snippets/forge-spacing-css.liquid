@@ -1,0 +1,30 @@
+@layer forge-spacing {
+  .forge-spacing-style {
+    --spacing-scale: calc(var(--spacing-scale-md) * var(--section-spacing-scale, 1));
+
+    @media screen and (min-width: 990px) {
+      --spacing-scale: calc(var(--spacing-scale-default) * var(--section-spacing-scale, 1));
+    }
+
+    --padding-block: 0px;
+    --padding-block-start: var(--padding-block, 0px);
+    --padding-block-end: var(--padding-block, 0px);
+    --padding-inline: 0px;
+    --padding-inline-start: var(--padding-inline, 0px);
+    --padding-inline-end: var(--padding-inline, 0px);
+    --margin-block: 0px;
+    --margin-block-start: var(--margin-block, 0px);
+    --margin-block-end: var(--margin-block, 0px);
+    --margin-inline: 0px;
+    --margin-inline-start: var(--margin-inline, 0px);
+    --margin-inline-end: var(--margin-inline, 0px);
+  }
+
+  .forge-spacing-style,
+  .inherit-spacing {
+    padding-block: calc(var(--padding-block-start) + var(--section-top-offset, 0px)) var(--padding-block-end);
+    padding-inline: var(--padding-inline-start) var(--padding-inline-end);
+    margin-block: var(--margin-block-start) var(--margin-block-end);
+    margin-inline: var(--margin-inline-start) var(--margin-inline-end);
+  }
+}

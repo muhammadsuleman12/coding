@@ -1,0 +1,130 @@
+{%- doc -%}
+  Renders a single compact product row for predictive search results.
+
+  @param {object} product - Shopify product object
+{%- enddoc -%}
+<a
+  href="{{ product.url }}"
+  class="predictive-search-product-row"
+  tabindex="0"
+>
+  <div class="predictive-search-product-row__image-wrap">
+    {%- if product.featured_image -%}
+      {% capture img_srcset_1 %}{{ product.featured_image | image_url: width: 160 }} 1x, {{ product.featured_image | image_url: width: 320 }} 2x{% endcapture %}
+      <img
+        src="{{ product.featured_image | image_url: width: 160 }}"
+        srcset="{{ img_srcset_1 }}"
+        alt="{{ product.featured_image.alt | escape }}"
+        width="80"
+        height="80"
+        loading="lazy"
+        class="predictive-search-product-row__image"
+      >
+    {%- else -%}
+      <div class="predictive-search-product-row__image predictive-search-product-row__image--placeholder"></div>
+    {%- endif -%}
+  </div>
+
+  <div class="predictive-search-product-row__info">
+    <span class="predictive-search-product-row__title">{{ product.title | escape }}</span>
+    <div class="predictive-search-product-row__price">
+      {%- if product.compare_at_price > product.price -%}
+        <span class="predictive-search-product-row__price-sale">{{ product.price | money }}</span>
+        <s class="predictive-search-product-row__price-compare">{{ product.compare_at_price | money }}</s>
+      {%- else -%}
+        <span>{{ product.price | money }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+</a>
+
+{% stylesheet %}
+  .predictive-search-product-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap-md);
+    padding: var(--padding-md) var(--padding-xl);
+    text-decoration: none;
+    color: var(--color-foreground);
+    transition: background-color var(--animation-speed-medium) var(--animation-timing-hover);
+    width: 100%;
+  }
+
+  .predictive-search-product-row:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  /* Override heavy card hover */
+  .forge-predictive-search-results__card--product:hover {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .forge-predictive-search-results__card--product:has(.predictive-search-product-row:hover) {
+    background-color: transparent;
+  }
+
+  .predictive-search-product-row__image-wrap {
+    flex: 0 0 76px;
+    width: 76px;
+    height: 76px;
+    border-radius: var(--style-border-radius-inputs);
+    overflow: hidden;
+    background-color: rgb(var(--color-foreground-rgb) / 0.06);
+  }
+
+  .predictive-search-product-row__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .predictive-search-product-row__image--placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  .predictive-search-product-row__info {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    padding-top: 2px;
+  }
+
+  .predictive-search-product-row__title {
+    font-size: var(--font-size--body-md);
+    font-weight: 500;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .predictive-search-product-row__price {
+    font-size: var(--font-size--body-lg, 1.1rem);
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-sm);
+    margin-top: 2px;
+  }
+
+  .predictive-search-product-row__price-sale {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .predictive-search-product-row__price-compare {
+    color: rgb(var(--color-foreground-rgb) / 0.45);
+    font-size: var(--font-size--body-sm);
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+{% endstylesheet %}

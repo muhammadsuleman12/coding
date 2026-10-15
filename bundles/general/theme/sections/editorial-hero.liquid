@@ -1,0 +1,384 @@
+{% render 'heading-scale-override', section: section %}
+{% liquid
+  assign heading = section.settings.heading | strip_html | strip
+  assign subheading = section.settings.subheading | strip_html | strip
+  assign btn_label = section.settings.button_label
+  assign btn_link = section.settings.button_link
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+
+  if section.settings.use_custom_colors
+    assign eh_text_color = section.settings.text_color
+  else
+    assign eh_text_color = section.settings.color_scheme.settings.foreground
+  endif
+  assign has_mobile_image = false
+  if section.settings.mobile_image != blank
+    assign has_mobile_image = true
+  endif
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --eh-overlay-opacity: {{ overlay_opacity }};
+    --eh-min-height: {{ section.settings.min_height }}px;
+    --eh-text-color: {{ eh_text_color }};
+    --eh-btn-bg: var(--color-primary-button-background);
+    --eh-btn-text: var(--color-primary-button-text);
+  }
+{% endstyle %}
+
+<div class="editorial-hero forge-spacing-style forge-color-{{ section.settings.color_scheme }}" style="{% render 'spacing-style', settings: section.settings %}">
+  <div class="editorial-hero__slot-desktop"
+    data-forge-slot-id="image"
+    data-forge-slot-group="hero-images"
+    data-forge-aspect-ratio="16:9"
+    data-forge-slot-label="Desktop"
+    {% if section.settings.image == blank %}data-forge-slot-blank="true"{% endif %}
+  ></div>
+  <div class="editorial-hero__slot-mobile"
+    data-forge-slot-id="mobile_image"
+    data-forge-slot-group="hero-images"
+    data-forge-aspect-ratio="9:16"
+    data-forge-slot-label="Mobile"
+    {% if section.settings.mobile_image == blank %}data-forge-slot-blank="true"{% endif %}
+  ></div>
+  <div class="editorial-hero__media">
+    {% if section.settings.image %}
+      {% assign desktop_img_class = 'editorial-hero__img' %}
+      {% if has_mobile_image %}{% assign desktop_img_class = 'editorial-hero__img editorial-hero__img--hide-on-mobile' %}{% endif %}
+      {{
+        section.settings.image
+        | image_url: width: 2000
+        | image_tag:
+          class: desktop_img_class,
+          loading: 'eager',
+          widths: '750, 1100, 1500, 2000',
+          sizes: '100vw'
+      }}
+    {% else %}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'editorial-hero__img editorial-hero__img--placeholder' }}
+    {% endif %}
+    {% if has_mobile_image %}
+      {{
+        section.settings.mobile_image
+        | image_url: width: 1200
+        | image_tag:
+          class: 'editorial-hero__img editorial-hero__img--mobile',
+          loading: 'eager',
+          widths: '375, 600, 900, 1200',
+          sizes: '100vw'
+      }}
+    {% endif %}
+    <div class="editorial-hero__overlay"></div>
+  </div>
+
+
+  <div class="editorial-hero__content">
+    <div class="editorial-hero__inner" data-animate="fade-up">
+      {% if heading != blank %}
+        <h1 class="editorial-hero__heading">{{ heading }}</h1>
+      {% endif %}
+      {% if subheading != blank %}
+        <p class="editorial-hero__subheading">{{ subheading }}</p>
+      {% endif %}
+      {% if btn_label != blank %}
+        <a href="{{ btn_link | default: '/collections/all' }}" class="editorial-hero__btn">
+          {{ btn_label }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .editorial-hero {
+    position: relative;
+    min-height: var(--eh-min-height, 520px);
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .editorial-hero__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .editorial-hero__slot-desktop,
+  .editorial-hero__slot-mobile {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .editorial-hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .editorial-hero__img--placeholder {
+    background: var(--color-card-background);
+  }
+
+  .editorial-hero__img--mobile {
+    display: none;
+  }
+
+  .editorial-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.18) 50%, transparent 100%);
+    opacity: var(--eh-overlay-opacity, 1);
+  }
+
+  .editorial-hero__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 48px;
+  }
+
+  .editorial-hero__inner {
+    max-width: 560px;
+  }
+
+  .editorial-hero__heading {
+    margin: 0 0 12px 0;
+    color: var(--eh-text-color, #ffffff);
+    font-family: var(--font-heading--family, inherit);
+    font-style: var(--font-heading--style, normal);
+    font-size: clamp(2rem, 4.5vw, calc(var(--font-h1--size) * 1.4));
+    font-weight: var(--font-h1--weight, 600);
+    letter-spacing: var(--font-h1--letter-spacing, -0.01em);
+    line-height: 1.1;
+    text-transform: var(--font-h1--case, uppercase);
+  }
+
+  .editorial-hero__subheading {
+    margin: 0 0 28px 0;
+    color: var(--eh-text-color, #ffffff);
+    font-family: var(--font-body--family, inherit);
+    opacity: 0.85;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .editorial-hero__btn {
+    display: inline-block;
+    padding: 12px 28px;
+    background: var(--eh-btn-bg, #ffffff);
+    color: var(--eh-btn-text, #000000);
+    border: none;
+    border-radius: var(--style-border-radius-buttons-primary, 0px);
+    font-family: var(--button-font-family, var(--font-body--family, inherit));
+    font-size: 0.875rem;
+    font-weight: var(--button-font-weight-primary, var(--font-body--weight, 600));
+    letter-spacing: 0.08em;
+    text-transform: var(--button-text-case, uppercase);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .editorial-hero__btn:hover {
+    opacity: 0.85;
+  }
+
+  @media screen and (max-width: 989px) {
+    .editorial-hero__content {
+      padding: 36px 32px;
+    }
+    .editorial-hero__inner {
+      max-width: 480px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .editorial-hero__img--hide-on-mobile {
+      display: none;
+    }
+
+    .editorial-hero__img--mobile {
+      display: block;
+    }
+
+    .editorial-hero {
+      min-height: 480px;
+      align-items: flex-end;
+    }
+    .editorial-hero__content {
+      padding: 24px 20px;
+    }
+    .editorial-hero__inner {
+      max-width: 100%;
+    }
+    .editorial-hero__heading {
+      font-size: clamp(1.3rem, 5.5vw, 1.9rem);
+      margin: 0 0 8px 0;
+    }
+    .editorial-hero__subheading {
+      font-size: 0.82rem;
+      margin: 0 0 18px 0;
+    }
+    .editorial-hero__btn {
+      padding: 10px 22px;
+      font-size: 0.8rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Editorial Hero",
+  "tag": "section",
+  "class": "section-wrapper",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile background image (optional)",
+      "info": "Shown instead of the desktop image on screens narrower than 750px. Portrait orientation recommended."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Essential T-Shirts"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Three fits. One refined everyday essential."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "heading_scale_override",
+      "label": "Heading size override",
+      "default": "default",
+      "options": [
+        { "value": "default", "label": "Use theme setting" },
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "xlarge", "label": "Extra large" }
+      ],
+      "info": "Overrides the theme's global Heading size setting for this section only."
+    },
+    {
+      "type": "checkbox",
+      "id": "use_custom_colors",
+      "label": "Use custom colors",
+      "info": "Override the color scheme for this section.",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Min height",
+      "min": 300,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "default": 560
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial Hero",
+      "settings": {
+        "heading": "Essential T-Shirts",
+        "subheading": "Three fits. One refined everyday essential.",
+        "button_label": "Shop Now",
+        "use_custom_colors": false,
+        "overlay_opacity": 100,
+        "min_height": 560
+      }
+    }
+  ]
+}
+{% endschema %}

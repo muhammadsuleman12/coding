@@ -1,0 +1,237 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign items = section.blocks | where: 'type', 'item'
+  assign speed = section.settings.speed | default: 25
+%}
+
+<div class="forge-section-background bold-bg--strip forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-trust-marquee bold-section forge-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-trust-marquee__track" data-animate="fade-in" style="--atm-speed: {{ speed }}s;">
+    {% for group_index in (1..2) %}
+      <div class="bold-trust-marquee__group" {% if group_index == 2 %}aria-hidden="true"{% endif %}>
+        {% for block in items %}
+          <div class="bold-trust-marquee__item" {% if group_index == 1 %}{{ block.shopify_attributes }}{% endif %}>
+            <div class="bold-trust-marquee__icon" aria-hidden="true">
+              {% render 'bold-icon', icon: block.settings.icon, size: 20 %}
+            </div>
+            <div class="bold-trust-marquee__text">
+              {% if block.settings.text != blank %}
+                <span class="bold-trust-marquee__title">{{ block.settings.text }}</span>
+              {% endif %}
+              {% if block.settings.subtext != blank %}
+                <small class="bold-trust-marquee__subtitle">{{ block.settings.subtext }}</small>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-trust-marquee {
+    overflow: hidden;
+    padding: calc(28px * var(--section-spacing-scale, 1)) 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bold-accent2) 6%, transparent),
+      transparent
+    );
+    border-top: 1px solid var(--bold-glass-border);
+    border-bottom: 1px solid var(--bold-glass-border);
+  }
+
+  .bold-trust-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: boldTrustScroll var(--atm-speed, 25s) linear infinite;
+  }
+
+  .bold-trust-marquee__group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 60px;
+    padding-inline: 30px;
+  }
+
+  .bold-trust-marquee__item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .bold-trust-marquee__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--style-border-radius-global, 10px);
+    background: color-mix(in srgb, var(--bold-accent2) 12%, transparent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bold-accent2);
+    flex-shrink: 0;
+  }
+
+  .bold-trust-marquee__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+
+  .bold-trust-marquee__title {
+    font-family: var(--bold-font-heading);
+    font-weight: var(--font-h3--weight, 600);
+    font-size: 0.88rem;
+    letter-spacing: var(--font-h3--letter-spacing, 0.2px);
+    color: var(--bold-text-light);
+  }
+
+  .bold-trust-marquee__subtitle {
+    font-size: 0.72rem;
+    font-weight: var(--font-body--weight, 400);
+    color: var(--bold-text-muted);
+    margin-top: 2px;
+  }
+
+  @keyframes boldTrustScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-1 * var(--atm-distance, 50%))); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bold-trust-marquee__track {
+      animation: none;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .bold-trust-marquee__group:last-child {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    document.querySelectorAll('.bold-trust-marquee__track').forEach(function (track) {
+      var sourceGroup = track.querySelector('.bold-trust-marquee__group');
+      if (!sourceGroup) return;
+
+      function fillTrack() {
+        track.querySelectorAll('.bold-trust-marquee__group').forEach(function (el, i) {
+          if (i > 0) el.remove();
+        });
+
+        var groupWidth = sourceGroup.getBoundingClientRect().width;
+        if (!groupWidth) return;
+
+        var containerWidth = track.parentElement.getBoundingClientRect().width;
+        var target = Math.max(containerWidth * 2, groupWidth * 2);
+        var total = groupWidth;
+
+        while (total < target) {
+          var clone = sourceGroup.cloneNode(true);
+          clone.setAttribute('aria-hidden', 'true');
+          track.appendChild(clone);
+          total += groupWidth;
+        }
+
+        track.style.setProperty('--atm-distance', groupWidth + 'px');
+      }
+
+      fillTrack();
+      window.addEventListener('resize', fillTrack);
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bold Trust Marquee",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "sec",
+      "default": 25
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Trust item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "truck",
+          "options": [
+            { "value": "truck", "label": "Truck" },
+            { "value": "shield-check", "label": "Shield" },
+            { "value": "star", "label": "Star" },
+            { "value": "trophy", "label": "Trophy" },
+            { "value": "return-arrow", "label": "Return arrow" },
+            { "value": "lock", "label": "Lock" },
+            { "value": "globe", "label": "Globe" },
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "recycle", "label": "Recycle" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "lightning", "label": "Lightning" },
+            { "value": "fire", "label": "Fire" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "users", "label": "Users" },
+            { "value": "sparkle", "label": "Sparkle" },
+            { "value": "check-circle", "label": "Check" },
+            { "value": "compass", "label": "Compass" },
+            { "value": "package", "label": "Package" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Heading",
+          "default": "Free Shipping Over $75"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Subheading",
+          "default": "On all qualifying orders"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Trust Marquee",
+      "blocks": [
+        { "type": "item", "settings": { "icon": "truck", "text": "Free Shipping $75+", "subtext": "On all qualifying orders" } },
+        { "type": "item", "settings": { "icon": "users", "text": "400,000+ Happy Customers", "subtext": "And counting every day" } },
+        { "type": "item", "settings": { "icon": "trophy", "text": "4.9★ Average Rating", "subtext": "Verified buyer reviews" } },
+        { "type": "item", "settings": { "icon": "return-arrow", "text": "30-Day Returns", "subtext": "Hassle-free guarantee" } },
+        { "type": "item", "settings": { "icon": "lock", "text": "Secure Checkout", "subtext": "256-bit SSL encryption" } },
+        { "type": "item", "settings": { "icon": "globe", "text": "Ships Worldwide", "subtext": "US, Canada, UK & more" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

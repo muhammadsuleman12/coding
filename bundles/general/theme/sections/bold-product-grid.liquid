@@ -1,0 +1,334 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign label = section.settings.label
+  assign heading = section.settings.heading
+  assign accent_word = section.settings.accent_word
+  assign subheading = section.settings.subheading
+  assign collection = section.settings.collection
+  assign limit = section.settings.products_limit | default: 8
+  assign columns = section.settings.desktop_columns | default: 4
+%}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-product-grid bold-section forge-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-product-grid__inner">
+    <div class="bold-section-header" data-animate="fade-up">
+      {% if label != blank %}
+        <span class="bold-section-label">{{ label }}</span>
+      {% endif %}
+      {% if heading != blank %}
+        <h2 class="bold-section-title">
+          {% assign words = heading | split: ' ' %}
+          {% for word in words %}
+            {% if accent_word != blank and word == accent_word %}
+              <span class="bold-accent">{{ word }}</span>
+            {% else %}
+              {{ word }}
+            {% endif %}
+            {% unless forloop.last %} {% endunless %}
+          {% endfor %}
+        </h2>
+      {% endif %}
+      {% if subheading != blank %}
+        <p class="bold-section-subtitle">{{ subheading }}</p>
+      {% endif %}
+      <div class="bold-accent-line"></div>
+    </div>
+
+    <div class="bold-product-grid__grid" data-animate-group style="--columns: {{ columns }};">
+      {% if collection != blank %}
+        {% for product in collection.products limit: limit %}
+          <a href="{{ product.url }}" class="bold-product-grid__card" data-animate="fade-up">
+            <div class="bold-product-grid__image-wrap">
+              {% if product.featured_image %}
+                {% capture img_srcset_1 %}{{ product.featured_image | image_url: width: 300 }} 300w, {{ product.featured_image | image_url: width: 600 }} 600w, {{ product.featured_image | image_url: width: 1200 }} 1200w{% endcapture %}
+                <img
+                  src="{{ product.featured_image | image_url: width: 600 }}"
+                  srcset="{{ img_srcset_1 }}"
+                  sizes="(min-width: 990px) 25vw, (min-width: 750px) 50vw, 100vw"
+                  alt="{{ product.featured_image.alt | default: product.title }}"
+                  width="300"
+                  height="380"
+                  loading="lazy"
+                  class="bold-product-grid__image"
+                >
+              {% else %}
+                <div class="bold-product-grid__placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+              {% endif %}
+              {% if product.compare_at_price > product.price %}
+                <span class="bold-product-grid__badge bold-product-grid__badge--sale">Sale</span>
+              {% elsif product.tags contains 'new' or product.tags contains 'New' %}
+                <span class="bold-product-grid__badge bold-product-grid__badge--new">New</span>
+              {% elsif product.tags contains 'bestseller' or product.tags contains 'Bestseller' %}
+                <span class="bold-product-grid__badge bold-product-grid__badge--hot">Best Seller</span>
+              {% endif %}
+            </div>
+            <div class="bold-product-grid__content">
+              <h3 class="bold-product-grid__title">{{ product.title }}</h3>
+              <div class="bold-product-grid__price">
+                {% if product.compare_at_price > product.price %}
+                  <span class="bold-product-grid__price-compare">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+                <span class="bold-product-grid__price-current">{{ product.price | money }}</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit) %}
+          <div class="bold-product-grid__card bold-product-grid__card--placeholder" data-animate="fade-up">
+            <div class="bold-product-grid__image-wrap">
+              <div class="bold-product-grid__placeholder">{{ 'product-' | append: i | placeholder_svg_tag }}</div>
+              <span class="bold-product-grid__badge bold-product-grid__badge--new">New</span>
+            </div>
+            <div class="bold-product-grid__content">
+              <h3 class="bold-product-grid__title">Product {{ i }}</h3>
+              <div class="bold-product-grid__price">
+                <span class="bold-product-grid__price-current">$49.99</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {% if section.settings.view_all_text != blank %}
+      <div class="bold-product-grid__footer">
+        <a href="{{ section.settings.view_all_link | default: '/collections/all' }}" class="bold-btn-secondary">
+          {{ section.settings.view_all_text }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-product-grid {
+    padding: calc(72px * var(--section-spacing-scale, 1)) 24px;
+  }
+
+  .bold-product-grid__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .bold-product-grid__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
+    gap: var(--style-gap-cards, 20px);
+  }
+
+  .bold-product-grid__card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    background: var(--bold-card-bg);
+    border: 1px solid var(--bold-glass-border);
+    border-radius: var(--bold-radius-lg);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .bold-product-grid__card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--bold-shadow);
+  }
+
+  .bold-product-grid__image-wrap {
+    position: relative;
+    aspect-ratio: 0.82;
+    overflow: hidden;
+    background: rgba(10, 22, 40, 0.5);
+  }
+
+  .bold-product-grid__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .bold-product-grid__card:hover .bold-product-grid__image {
+    transform: scale(1.05);
+  }
+
+  .bold-product-grid__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+  }
+
+  .bold-product-grid__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 10px;
+    border-radius: var(--style-border-radius-pills, 50px);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--bold-font-heading);
+  }
+
+  .bold-product-grid__badge--sale {
+    background: var(--bold-accent1);
+    color: var(--color-primary-button-text);
+  }
+
+  .bold-product-grid__badge--new {
+    background: var(--bold-accent2);
+    color: var(--color-primary-button-text);
+  }
+
+  .bold-product-grid__badge--hot {
+    background: var(--bold-accent3);
+    color: var(--bold-text-dark);
+  }
+
+  .bold-product-grid__content {
+    padding: 16px 18px 20px;
+  }
+
+  .bold-product-grid__title {
+    font-family: var(--bold-font-heading);
+    font-size: 0.9rem;
+    font-weight: var(--font-h3--weight, 700);
+    text-transform: var(--font-h3--case, uppercase);
+    letter-spacing: var(--font-h3--letter-spacing, 0.3px);
+    color: var(--bold-text-light);
+    margin: 0 0 8px;
+    line-height: 1.3;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .bold-product-grid__price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+  }
+
+  .bold-product-grid__price-compare {
+    text-decoration: line-through;
+    color: var(--bold-text-muted);
+    font-size: 0.85rem;
+  }
+
+  .bold-product-grid__price-current {
+    font-weight: 700;
+    color: var(--bold-accent1);
+  }
+
+  .bold-product-grid__footer {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .bold-product-grid__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-product-grid {
+      padding: calc(48px * var(--section-spacing-scale, 1)) 16px;
+    }
+
+    .bold-product-grid__grid {
+      gap: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bold Product Grid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Section label",
+      "default": "Shop"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Gear"
+    },
+    {
+      "type": "text",
+      "id": "accent_word",
+      "label": "Accent word",
+      "default": "Gear"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Handpicked essentials for your next purchase."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Defaults to all products when empty in theme editor."
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 8,
+      "label": "Products to show"
+    },
+    {
+      "type": "select",
+      "id": "desktop_columns",
+      "label": "Desktop columns",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View all button text",
+      "default": "View All Products"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View all link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Product Grid"
+    }
+  ]
+}
+{% endschema %}

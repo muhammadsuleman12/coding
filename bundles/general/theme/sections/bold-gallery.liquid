@@ -1,0 +1,207 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign label = section.settings.label
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign image_blocks = section.blocks | where: 'type', 'image'
+%}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-gallery bold-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-gallery__inner">
+    {% if label != blank or heading != blank or subtitle != blank %}
+      <header class="bold-section-header" data-animate="fade-up">
+        {% if label != blank %}
+          <span class="bold-section-label">{{ label }}</span>
+        {% endif %}
+        {% if heading != blank %}
+          <h2 class="bold-section-title">{{ heading }}</h2>
+        {% endif %}
+        {% if subtitle != blank %}
+          <p class="bold-section-subtitle">{{ subtitle }}</p>
+        {% endif %}
+        <div class="bold-accent-line" aria-hidden="true"></div>
+      </header>
+    {% endif %}
+
+    {% if image_blocks.size > 0 %}
+      <div class="bold-gallery__grid" data-animate-group>
+        {% for block in image_blocks %}
+          <figure class="bold-gallery__item" data-animate="scale-in" {{ block.shopify_attributes }}>
+            <div class="bold-gallery__media">
+              {% if block.settings.image != blank %}
+                {% capture img_srcset_1 %}{{ block.settings.image | image_url: width: 400 }} 400w, {{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1600 }} 1600w{% endcapture %}
+                <img
+                  src="{{ block.settings.image | image_url: width: 800 }}"
+                  srcset="{{ img_srcset_1 }}"
+                  sizes="(min-width: 990px) 33vw, 50vw"
+                  alt="{{ block.settings.image.alt | default: block.settings.overlay_text }}"
+                  width="400"
+                  height="400"
+                  loading="lazy"
+                  class="bold-gallery__image"
+                >
+              {% elsif block.settings.image_url != blank %}
+                {% # theme-check-disable RemoteAsset %}
+                <img
+                  src="{{ block.settings.image_url }}"
+                  alt="{{ block.settings.overlay_text | default: 'Gallery image' }}"
+                  width="400"
+                  height="400"
+                  loading="lazy"
+                  class="bold-gallery__image"
+                >
+                {% # theme-check-enable RemoteAsset %}
+              {% else %}
+                <div class="bold-gallery__placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+              {% endif %}
+              <div class="bold-gallery__overlay">
+                {% if block.settings.overlay_text != blank %}
+                  <span class="bold-gallery__overlay-text">{{ block.settings.overlay_text }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </figure>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-gallery {
+    padding: calc(72px * var(--section-spacing-scale, 1)) 0;
+  }
+
+  .bold-gallery__inner {
+    padding: 0 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .bold-gallery__grid {
+    display: grid;
+    /* 2 columns at every breakpoint (not just mobile) so a 4-image gallery
+       always fills 2 clean rows with no orphaned card in the last row. */
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--style-gap-cards, 16px);
+  }
+
+  .bold-gallery__item {
+    margin: 0;
+    border-radius: var(--bold-radius);
+    overflow: hidden;
+  }
+
+  .bold-gallery__media {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid var(--bold-glass-border);
+    border-radius: var(--bold-radius);
+  }
+
+  .bold-gallery__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .bold-gallery__placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--bold-card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bold-gallery__placeholder svg {
+    width: 50%;
+    opacity: 0.3;
+  }
+
+  .bold-gallery__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10, 22, 40, 0.85) 0%, transparent 60%);
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .bold-gallery__item:hover .bold-gallery__overlay,
+  .bold-gallery__item:focus-within .bold-gallery__overlay {
+    opacity: 1;
+  }
+
+  .bold-gallery__item:hover .bold-gallery__image {
+    transform: scale(1.05);
+  }
+
+  .bold-gallery__overlay-text {
+    font-family: var(--bold-font-heading);
+    font-size: 0.85rem;
+    font-weight: var(--font-h3--weight, 700);
+    text-transform: var(--font-h3--case, uppercase);
+    color: #fff;
+    letter-spacing: var(--font-h3--letter-spacing, 0.5px);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-gallery {
+      padding: calc(48px * var(--section-spacing-scale, 1)) 16px;
+    }
+
+    .bold-gallery__grid {
+      gap: 12px;
+    }
+
+    .bold-gallery__overlay {
+      opacity: 1;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bold Gallery",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:forge.settings.color_scheme", "default": "scheme-1" },
+    { "type": "text", "id": "label", "label": "Section label", "default": "GALLERY" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Captured in the wild" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Moments from our community of explorers." }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_url", "label": "Image URL" },
+        { "type": "text", "id": "overlay_text", "label": "Overlay text", "default": "In the wild" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Gallery",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

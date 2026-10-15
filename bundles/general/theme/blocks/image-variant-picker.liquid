@@ -1,0 +1,718 @@
+{% liquid
+  assign product_resource = closest.product
+  if request.visual_preview_mode and product_resource == blank
+    assign product_resource = collections.all.products.first
+  endif
+
+  assign ai_gen_id = block.id | replace: '_', '' | downcase
+  assign selected_variant = product_resource.selected_or_first_available_variant
+
+  assign detected_image_option = 0
+  for option in product_resource.options_with_values
+    assign opt_pos = forloop.index
+    assign opt_key = 'option' | append: opt_pos
+    assign first_img_id = nil
+    assign imgs_differ = false
+    assign seen_check = ''
+    for variant in product_resource.variants
+      assign v_val = variant[opt_key]
+      assign v_marker = '|' | append: v_val | append: '|'
+      unless seen_check contains v_marker
+        assign seen_check = seen_check | append: v_marker
+        if variant.featured_image
+          if first_img_id == nil
+            assign first_img_id = variant.featured_image.id
+          elsif variant.featured_image.id != first_img_id
+            assign imgs_differ = true
+          endif
+        endif
+      endunless
+    endfor
+    if imgs_differ and detected_image_option == 0
+      assign detected_image_option = opt_pos
+    endif
+  endfor
+
+  if detected_image_option == 0
+    for option in product_resource.options_with_values
+      if detected_image_option == 0
+        assign opt_name_down = option.name | downcase
+        if opt_name_down == 'color' or opt_name_down == 'colour' or opt_name_down == 'style' or opt_name_down == 'fabric' or opt_name_down == 'pattern' or opt_name_down == 'design' or opt_name_down == 'print'
+          assign detected_image_option = forloop.index
+        endif
+      endif
+    endfor
+  endif
+
+  if detected_image_option == 0
+    assign detected_image_option = 1
+  endif
+
+  assign image_option_index = detected_image_option
+  if block.settings.image_option_override != 'auto'
+    assign image_option_index = block.settings.image_option_override | plus: 0
+  endif
+
+  assign color_scheme = block.settings.color_scheme | default: section.settings.color_scheme | default: 'scheme-1'
+-%}
+
+{% style %}
+  .ai-variant-picker-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+  }
+
+  .ai-variant-picker__container-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ai-variant-picker__option-group-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ai-variant-picker__label-{{ ai_gen_id }} {
+    font-size: {{ block.settings.label_font_size }}px;
+    color: {{ block.settings.label_color }};
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .ai-variant-picker__swatches-{{ ai_gen_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    gap: {{ block.settings.swatch_spacing }}px;
+  }
+
+  .ai-variant-picker__swatch-{{ ai_gen_id }} {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .ai-variant-picker__swatch-button-{{ ai_gen_id }} {
+    width: {{ block.settings.swatch_size }}px;
+    height: {{ block.settings.swatch_size }}px;
+    border-radius: var(--style-border-radius-global);
+    border: {{ block.settings.swatch_border_width }}px solid {{ block.settings.swatch_border_color }};
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.2s ease;
+    display: block;
+  }
+
+  .ai-variant-picker__swatch-button-{{ ai_gen_id }}:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--style-shadow-card);
+  }
+
+  .ai-variant-picker__swatch-button-{{ ai_gen_id }}.selected {
+    border-color: {{ block.settings.selected_border_color }};
+    border-width: {{ block.settings.selected_border_width }}px;
+    box-shadow: 0 0 0 {{ block.settings.selected_ring_width }}px {{ block.settings.selected_ring_color }};
+  }
+
+  .ai-variant-picker__swatch-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-variant-picker__swatch-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-card-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-variant-picker__swatch-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-variant-picker__tooltip-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: {{ block.settings.tooltip_bg_color }};
+    color: {{ block.settings.tooltip_text_color }};
+    padding: 6px 12px;
+    border-radius: var(--style-border-radius-global);
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: var(--style-shadow-card);
+  }
+
+  .ai-variant-picker__tooltip-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: {{ block.settings.tooltip_bg_color }};
+  }
+
+  .ai-variant-picker__swatch-{{ ai_gen_id }}:hover .ai-variant-picker__tooltip-{{ ai_gen_id }} {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .ai-variant-picker__pills-{{ ai_gen_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ai-variant-picker__pill-{{ ai_gen_id }} {
+    padding: 7px 16px;
+    border-radius: var(--variant-picker-button-radius, var(--style-border-radius-global));
+    border: 1px solid var(--color-variant-border);
+    background-color: var(--color-variant-background);
+    color: var(--color-variant-text);
+    font-size: {{ block.settings.label_font_size }}px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    line-height: 1;
+  }
+
+  .ai-variant-picker__pill-{{ ai_gen_id }}:hover {
+    background-color: var(--color-variant-hover-background);
+    border-color: var(--color-variant-hover-border);
+    color: var(--color-variant-hover-text);
+  }
+
+  .ai-variant-picker__pill-{{ ai_gen_id }}.selected {
+    background-color: var(--color-selected-variant-background);
+    color: var(--color-selected-variant-text);
+    border-color: var(--color-selected-variant-border);
+  }
+
+  .ai-variant-picker__pill-{{ ai_gen_id }}.selected:hover {
+    background-color: var(--color-selected-variant-hover-background);
+    color: var(--color-selected-variant-hover-text);
+    border-color: var(--color-selected-variant-hover-border);
+  }
+
+  .ai-variant-picker__pill-{{ ai_gen_id }}.unavailable {
+    opacity: 0.45;
+    text-decoration: line-through;
+    cursor: pointer;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-variant-picker__swatch-button-{{ ai_gen_id }} {
+      width: {{ block.settings.swatch_size | times: 0.85 }}px;
+      height: {{ block.settings.swatch_size | times: 0.85 }}px;
+    }
+
+    .ai-variant-picker__label-{{ ai_gen_id }} {
+      font-size: {{ block.settings.label_font_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<image-variant-picker-{{ ai_gen_id }}
+  class="ai-variant-picker-{{ ai_gen_id }} forge-color-{{ color_scheme }}"
+  style="
+    --color-selected-variant-background: var(--color-primary-button-background);
+    --color-selected-variant-text: var(--color-primary-button-text);
+    --color-selected-variant-border: var(--color-primary-button-border);
+    --color-selected-variant-hover-background: var(--color-primary-button-hover-background);
+    --color-selected-variant-hover-text: var(--color-primary-button-hover-text);
+    --color-selected-variant-hover-border: var(--color-primary-button-hover-border);
+    --color-variant-background: var(--color-background);
+    --color-variant-text: var(--color-foreground);
+    --color-variant-border: var(--color-foreground-subdued, var(--color-foreground));
+    --color-variant-hover-background: var(--color-background);
+    --color-variant-hover-text: var(--color-foreground);
+    --color-variant-hover-border: var(--color-foreground);
+  "
+  {{ block.shopify_attributes }}
+  data-product-id="{{ product_resource.id }}"
+  data-section-id="{{ section.id }}"
+  data-option-count="{{ product_resource.options.size }}"
+  data-image-option-index="{{ image_option_index }}"
+  data-selected-options="{{ selected_variant.option1 | escape }}|||{{ selected_variant.option2 | escape }}|||{{ selected_variant.option3 | escape }}"
+  {% if product.id == product_resource.id %}
+    data-template-product-match="true"
+  {% endif %}
+>
+  <div class="ai-variant-picker__container-{{ ai_gen_id }}">
+    {% if product_resource.options_with_values.size > 0 %}
+      {% for option in product_resource.options_with_values %}
+        {% assign opt_pos = forloop.index %}
+        {% assign opt_key = 'option' | append: opt_pos %}
+        {% assign current_val = selected_variant[opt_key] %}
+
+        <div class="ai-variant-picker__option-group-{{ ai_gen_id }}">
+          {% if block.settings.show_label %}
+            <div class="ai-variant-picker__label-{{ ai_gen_id }}">
+              {{ option.name }}:
+              <span class="ai-variant-picker__selected-name-{{ ai_gen_id }}" data-option-index="{{ opt_pos }}">
+                {{ current_val }}
+              </span>
+            </div>
+          {% endif %}
+
+          {% if opt_pos == image_option_index %}
+            <div class="ai-variant-picker__swatches-{{ ai_gen_id }}">
+              {% assign seen_img_vals = '' %}
+              {% for variant in product_resource.variants %}
+                {% assign v_val = variant[opt_key] %}
+                {% assign v_marker = '|' | append: v_val | append: '|' %}
+                {% unless seen_img_vals contains v_marker %}
+                  {% assign seen_img_vals = seen_img_vals | append: v_marker %}
+                  <div
+                    class="ai-variant-picker__swatch-{{ ai_gen_id }}"
+                    data-option-index="{{ opt_pos }}"
+                    data-option-value="{{ v_val | escape }}"
+                  >
+                    <button
+                      type="button"
+                      class="ai-variant-picker__swatch-button-{{ ai_gen_id }}{% if v_val == current_val %} selected{% endif %}"
+                      data-option-index="{{ opt_pos }}"
+                      data-option-value="{{ v_val | escape }}"
+                      aria-label="Select {{ v_val | escape }}"
+                    >
+                      {% if variant.featured_image %}
+                        <img
+                          src="{{ variant.featured_image | image_url: width: 200 }}"
+                          alt="{{ v_val | escape }}"
+                          class="ai-variant-picker__swatch-image-{{ ai_gen_id }}"
+                          loading="lazy"
+                          width="200"
+                          height="200"
+                        >
+                      {% else %}
+                        <div class="ai-variant-picker__swatch-placeholder-{{ ai_gen_id }}">
+                          {{ 'product-1' | placeholder_svg_tag }}
+                        </div>
+                      {% endif %}
+                    </button>
+                    <div class="ai-variant-picker__tooltip-{{ ai_gen_id }}">{{ v_val }}</div>
+                  </div>
+                {% endunless %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="ai-variant-picker__pills-{{ ai_gen_id }}">
+              {% for value in option.values %}
+                <button
+                  type="button"
+                  class="ai-variant-picker__pill-{{ ai_gen_id }}{% if value == current_val %} selected{% endif %}"
+                  data-option-index="{{ opt_pos }}"
+                  data-option-value="{{ value | escape }}"
+                  aria-label="Select {{ value | escape }}"
+                >
+                  {{ value }}
+                </button>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="ai-variant-picker__label-{{ ai_gen_id }}">No variants available</div>
+    {% endif %}
+  </div>
+</image-variant-picker-{{ ai_gen_id }}>
+
+<script>
+  window.forgeVariants = {{ product_resource.variants | json }};
+</script>
+
+<script>
+  (function() {
+    const aiGenId = '{{ ai_gen_id }}';
+    const tagName = 'image-variant-picker-' + aiGenId;
+
+    function getNumericId(id) {
+      if (!id) return null;
+      return String(id).split('/').pop();
+    }
+
+    function updateProductImages(variantId) {
+      if (!variantId || !window.forgeVariants) return;
+
+      const numericVariantId = getNumericId(variantId);
+      const variant = window.forgeVariants.find(function(v) {
+        return getNumericId(v.id) === numericVariantId || String(v.id) === String(variantId);
+      });
+
+      if (!variant || !variant.featured_media || !variant.featured_media.id) return;
+
+      const mediaGallery = document.querySelector('forge-media-gallery');
+      if (!mediaGallery || !mediaGallery.slideshow) return;
+
+      const mediaId = getNumericId(variant.featured_media.id);
+      const slides = mediaGallery.slideshow.slides;
+      if (!slides || slides.length === 0) return;
+
+      let slideIndex = -1;
+      for (let i = 0; i < slides.length; i++) {
+        const mediaDiv = slides[i].querySelector('[data-media-id]');
+        if (mediaDiv && getNumericId(mediaDiv.getAttribute('data-media-id')) === mediaId) {
+          slideIndex = i;
+          break;
+        }
+      }
+
+      if (slideIndex !== -1) {
+        try { mediaGallery.slideshow.select(slideIndex, undefined, { animate: true }); } catch (e) {}
+      }
+    }
+
+    class ImageVariantPicker extends HTMLElement {
+      constructor() {
+        super();
+        this.productId = this.dataset.productId;
+        this.optionCount = parseInt(this.dataset.optionCount) || 1;
+        this.imageOptionIndex = parseInt(this.dataset.imageOptionIndex) || 1;
+
+        const parts = (this.dataset.selectedOptions || '').split('|||');
+        this.selectedOptions = {};
+        for (let i = 0; i < this.optionCount; i++) {
+          this.selectedOptions[i + 1] = parts[i] || '';
+        }
+      }
+
+      connectedCallback() {
+        this.setupEventListeners();
+        this.updatePillAvailability();
+      }
+
+      setupEventListeners() {
+        this.querySelectorAll('.ai-variant-picker__swatch-button-' + aiGenId).forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const optIdx = parseInt(btn.dataset.optionIndex);
+            const optVal = btn.dataset.optionValue;
+            this.selectedOptions[optIdx] = optVal;
+            this.updateSwatchSelected(optIdx, optVal);
+            this.updateLabelText(optIdx, optVal);
+            this.updatePillAvailability();
+            this.applyVariantChange();
+          });
+        });
+
+        this.querySelectorAll('.ai-variant-picker__pill-' + aiGenId).forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const optIdx = parseInt(btn.dataset.optionIndex);
+            const optVal = btn.dataset.optionValue;
+            this.selectedOptions[optIdx] = optVal;
+            this.updatePillSelected(optIdx, optVal);
+            this.updateLabelText(optIdx, optVal);
+            this.applyVariantChange();
+          });
+        });
+      }
+
+      updateSwatchSelected(optIdx, optVal) {
+        this.querySelectorAll('.ai-variant-picker__swatch-button-' + aiGenId + '[data-option-index="' + optIdx + '"]').forEach((btn) => {
+          btn.classList.toggle('selected', btn.dataset.optionValue === optVal);
+        });
+      }
+
+      updatePillSelected(optIdx, optVal) {
+        this.querySelectorAll('.ai-variant-picker__pill-' + aiGenId + '[data-option-index="' + optIdx + '"]').forEach((btn) => {
+          btn.classList.toggle('selected', btn.dataset.optionValue === optVal);
+        });
+      }
+
+      updateLabelText(optIdx, optVal) {
+        const el = this.querySelector('.ai-variant-picker__selected-name-' + aiGenId + '[data-option-index="' + optIdx + '"]');
+        if (el) el.textContent = optVal;
+      }
+
+      // After image option changes, mark text pills unavailable for the new color selection
+      updatePillAvailability() {
+        const variants = window.forgeVariants || [];
+        const imgIdx = this.imageOptionIndex;
+        const imgSel = this.selectedOptions[imgIdx];
+
+        for (let i = 1; i <= this.optionCount; i++) {
+          if (i === imgIdx) continue;
+          this.querySelectorAll('.ai-variant-picker__pill-' + aiGenId + '[data-option-index="' + i + '"]').forEach((pill) => {
+            const value = pill.dataset.optionValue;
+            const hasAvailable = variants.some((v) =>
+              v['option' + imgIdx] === imgSel && v['option' + i] === value && v.available
+            );
+            pill.classList.toggle('unavailable', !hasAvailable);
+          });
+        }
+      }
+
+      findVariant() {
+        const variants = window.forgeVariants || [];
+        const sel = this.selectedOptions;
+        const count = this.optionCount;
+        const imgIdx = this.imageOptionIndex;
+
+        // Exact match across all options
+        const exact = variants.find((v) => {
+          for (let i = 1; i <= count; i++) {
+            if (v['option' + i] !== sel[i]) return false;
+          }
+          return true;
+        });
+        if (exact) return exact;
+
+        // Best available match keeping the image option value
+        const best = variants.find((v) => v['option' + imgIdx] === sel[imgIdx] && v.available);
+        if (best) {
+          // Sync other selectedOptions to this variant so UI reflects reality
+          for (let i = 1; i <= count; i++) {
+            if (i !== imgIdx) this.selectedOptions[i] = best['option' + i];
+          }
+          return best;
+        }
+
+        return variants.find((v) => v['option' + imgIdx] === sel[imgIdx]) || variants[0];
+      }
+
+      applyVariantChange() {
+        const variant = this.findVariant();
+        if (!variant) return;
+
+        // Sync pill selections to the resolved variant (handles fallback cases)
+        for (let i = 1; i <= this.optionCount; i++) {
+          if (i === this.imageOptionIndex) continue;
+          const val = variant['option' + i];
+          if (this.selectedOptions[i] !== val) {
+            this.selectedOptions[i] = val;
+            this.updatePillSelected(i, val);
+            this.updateLabelText(i, val);
+          }
+        }
+
+        const variantId = getNumericId(variant.id);
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('variant', variantId);
+        window.history.replaceState({}, '', url);
+
+        const section = this.closest('.shopify-section');
+        if (section) {
+          section.dispatchEvent(new CustomEvent('variant:update', {
+            bubbles: true,
+            detail: {
+              resource: {
+                id: variantId,
+                available: variant.available,
+                featured_media: variant.featured_media
+                  ? { preview_image: { src: variant.featured_media.preview_image?.src || '' } }
+                  : null
+              },
+              sourceId: variantId,
+              data: { productId: this.productId, html: null }
+            }
+          }));
+        }
+
+        updateProductImages(variantId);
+      }
+    }
+
+    if (!customElements.get(tagName)) {
+      customElements.define(tagName, ImageVariantPicker);
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Variant image swatches",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Show label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "label_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Color",
+      "default": "#0d1f36"
+    },
+    {
+      "type": "header",
+      "content": "Image swatches"
+    },
+    {
+      "type": "select",
+      "id": "image_option_override",
+      "label": "Image option",
+      "options": [
+        { "value": "auto", "label": "Auto-detect" },
+        { "value": "1", "label": "Option 1" },
+        { "value": "2", "label": "Option 2" },
+        { "value": "3", "label": "Option 3" }
+      ],
+      "default": "auto",
+      "info": "Which option to show as image swatches. Auto-detect picks the option whose values have distinct product images."
+    },
+    {
+      "type": "range",
+      "id": "swatch_size",
+      "label": "Size",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "swatch_spacing",
+      "label": "Spacing",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "swatch_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "swatch_border_width",
+      "label": "Border width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "swatch_border_color",
+      "label": "Border color",
+      "default": "#e8e2d8"
+    },
+    {
+      "type": "header",
+      "content": "Selected state"
+    },
+    {
+      "type": "range",
+      "id": "selected_border_width",
+      "label": "Border width",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "selected_border_color",
+      "label": "Border color",
+      "default": "#e29a6c"
+    },
+    {
+      "type": "range",
+      "id": "selected_ring_width",
+      "label": "Ring width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "selected_ring_color",
+      "label": "Ring color",
+      "default": "#fce8dc"
+    },
+    {
+      "type": "header",
+      "content": "Text option pills"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1",
+      "info": "Pills inherit button colors from the selected color scheme."
+    },
+    {
+      "type": "header",
+      "content": "Tooltip"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_bg_color",
+      "label": "Background",
+      "default": "#0d1f36"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Variant image swatches",
+      "category": "t:forge.categories.product"
+    }
+  ]
+}
+{% endschema %}

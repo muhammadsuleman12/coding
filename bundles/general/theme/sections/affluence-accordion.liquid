@@ -1,0 +1,330 @@
+
+{% liquid
+  assign overline = section.settings.overline | strip_html | strip
+  assign heading = section.settings.heading | strip_html | strip
+  assign alignment = section.settings.alignment | default: 'left'
+  if alignment != 'center'
+    assign alignment = 'left'
+  endif
+  assign border_style = section.settings.border_style | default: 'hairline'
+  if border_style != 'soft'
+    assign border_style = 'hairline'
+  endif
+%}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="affluence-accordion forge-spacing-style forge-color-{{ section.settings.color_scheme }} affluence-accordion--align-{{ alignment }} affluence-accordion--border-{{ border_style }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  <div class="affluence-accordion__inner">
+    {% if overline != blank or heading != blank %}
+      <header class="affluence-accordion__header" data-animate="fade-up">
+        {% if overline != blank %}
+          <p class="affluence-accordion__overline">{{ overline }}</p>
+        {% endif %}
+        {% if heading != blank %}
+          <h2 class="affluence-accordion__heading">{{ heading }}</h2>
+        {% endif %}
+      </header>
+    {% endif %}
+
+    <div class="affluence-accordion__list" role="list" data-animate-group>
+      {% for block in section.blocks %}
+        <details class="affluence-accordion__row" data-animate="fade-up" {{ block.shopify_attributes }}>
+          <summary class="affluence-accordion__summary">
+            <span class="affluence-accordion__row-heading">{{ block.settings.heading | strip_html | strip }}</span>
+            <span class="affluence-accordion__indicator" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" focusable="false"><line x1="5" y1="12" x2="19" y2="12"/><line class="affluence-accordion__indicator-vertical" x1="12" y1="5" x2="12" y2="19"/></svg>
+            </span>
+          </summary>
+          <div class="affluence-accordion__content">
+            {{ block.settings.content }}
+          </div>
+        </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .affluence-accordion {
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: clamp(20px, 5vw, 56px);
+  }
+
+  .affluence-accordion__inner {
+    box-sizing: border-box;
+    margin-inline: auto;
+    max-width: 880px;
+  }
+
+  .affluence-accordion__header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .affluence-accordion--align-left .affluence-accordion__header {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .affluence-accordion--align-center .affluence-accordion__header {
+    text-align: center;
+    align-items: center;
+  }
+
+  .affluence-accordion__overline {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.6;
+  }
+
+  .affluence-accordion__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-weight: var(--font-h2--weight, 400);
+    font-size: clamp(1.5rem, 3vw, var(--font-h2--size));
+    line-height: 1.2;
+    letter-spacing: var(--font-h2--letter-spacing, 0.005em);
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .affluence-accordion__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .affluence-accordion--border-hairline .affluence-accordion__list {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .affluence-accordion__row {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .affluence-accordion--border-soft .affluence-accordion__row {
+    border-bottom-color: var(--color-border);
+  }
+
+  .affluence-accordion--border-soft .affluence-accordion__list {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .affluence-accordion__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 0;
+    cursor: pointer;
+    list-style: none;
+    color: var(--color-foreground);
+    font-family: var(--font-heading--family, inherit);
+    font-size: 1rem;
+    font-weight: var(--font-h3--weight, 400);
+    letter-spacing: var(--font-h3--letter-spacing, 0.01em);
+    transition: color 0.2s ease;
+  }
+
+  .affluence-accordion__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .affluence-accordion__summary:hover {
+    color: var(--color-foreground);
+    opacity: 0.78;
+  }
+
+  .affluence-accordion__summary:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 4px;
+  }
+
+  .affluence-accordion__row-heading {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .affluence-accordion__indicator {
+    flex: 0 0 auto;
+    line-height: 0;
+    color: currentColor;
+    opacity: 0.7;
+  }
+
+  .affluence-accordion__indicator svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.25s ease;
+  }
+
+  .affluence-accordion__indicator-vertical {
+    transition: opacity 0.2s ease;
+  }
+
+  .affluence-accordion__row[open] .affluence-accordion__indicator-vertical {
+    opacity: 0;
+  }
+
+  .affluence-accordion__row[open] .affluence-accordion__indicator svg {
+    transform: rotate(180deg);
+  }
+
+  .affluence-accordion__content {
+    padding: 0 0 24px;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-foreground);
+    opacity: 0.82;
+    max-width: 64ch;
+  }
+
+  .affluence-accordion__content :is(p, ul, ol) {
+    margin: 0 0 1em;
+  }
+
+  .affluence-accordion__content :is(p, ul, ol):last-child {
+    margin-bottom: 0;
+  }
+
+  .affluence-accordion__content a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .affluence-accordion__indicator svg {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Affluence Accordion",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 6,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline",
+      "info": "Small uppercase eyebrow text. Optional."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Details"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Header alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "Row separator",
+      "options": [
+        { "value": "hairline", "label": "Hairline" },
+        { "value": "soft", "label": "Soft" }
+      ],
+      "default": "hairline"
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "accordion_item",
+      "name": "Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Row heading",
+          "default": "Composition & Care"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<p>Crafted in small batches with carefully sourced materials. Gentle care recommended.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence Accordion",
+      "blocks": [
+        { "type": "accordion_item" },
+        { "type": "accordion_item" },
+        { "type": "accordion_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

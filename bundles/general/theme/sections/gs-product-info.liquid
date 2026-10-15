@@ -1,0 +1,57 @@
+{%- liquid
+  assign p = product
+  assign mf = p.metafields.custom
+  assign care = mf.care.value | default: section.settings.care_text
+-%}
+<section class="gs-section gs-pinfo forge-color-{{ section.settings.color_scheme }}">
+  <div class="gs-wrap">
+    <h2 class="gs-title">{{ section.settings.heading | escape }}</h2>
+    <div class="gs-pinfo__box">
+      <div class="gs-pinfo__tabs" role="tablist" data-gs-tabs aria-label="{{ section.settings.heading | escape }}">
+        <button type="button" role="tab" class="gs-pinfo__tab" id="GsPiT1-{{ section.id }}" aria-controls="GsPiP1-{{ section.id }}" aria-selected="true">Description</button>
+        <button type="button" role="tab" class="gs-pinfo__tab" id="GsPiT2-{{ section.id }}" aria-controls="GsPiP2-{{ section.id }}" aria-selected="false" tabindex="-1">Details &amp; specifications</button>
+        {%- if care != blank -%}<button type="button" role="tab" class="gs-pinfo__tab" id="GsPiT3-{{ section.id }}" aria-controls="GsPiP3-{{ section.id }}" aria-selected="false" tabindex="-1">Care &amp; use</button>{%- endif -%}
+      </div>
+      <div class="gs-pinfo__panels">
+        <div class="gs-pinfo__panel" id="GsPiP1-{{ section.id }}" role="tabpanel" aria-labelledby="GsPiT1-{{ section.id }}">
+          <h3 class="gs-pinfo__h">Description</h3>
+          <div class="gs-rte">{{ p.description | default: '<p>No description yet.</p>' }}</div>
+        </div>
+        <div class="gs-pinfo__panel" id="GsPiP2-{{ section.id }}" role="tabpanel" aria-labelledby="GsPiT2-{{ section.id }}" hidden>
+          <h3 class="gs-pinfo__h">Details &amp; specifications</h3>
+          <table class="gs-spec">
+            <tbody>
+              {%- if p.vendor != blank -%}<tr><th scope="row">Brand</th><td>{{ p.vendor | escape }}</td></tr>{%- endif -%}
+              {%- if mf.material != blank -%}<tr><th scope="row">Material</th><td>{{ mf.material.value }}</td></tr>{%- endif -%}
+              {%- if mf.dimensions != blank -%}<tr><th scope="row">Dimensions</th><td>{{ mf.dimensions.value }}</td></tr>{%- endif -%}
+              {%- if mf.included != blank -%}<tr><th scope="row">What's included</th><td>{{ mf.included.value }}</td></tr>{%- endif -%}
+              {%- for option in p.options_with_values -%}<tr><th scope="row">{{ option.name | escape }}</th><td>{{ option.values | join: ', ' }}</td></tr>{%- endfor -%}
+              {%- if p.selected_or_first_available_variant.sku != blank -%}<tr><th scope="row">SKU</th><td>{{ p.selected_or_first_available_variant.sku }}</td></tr>{%- endif -%}
+            </tbody>
+          </table>
+        </div>
+        {%- if care != blank -%}
+          <div class="gs-pinfo__panel" id="GsPiP3-{{ section.id }}" role="tabpanel" aria-labelledby="GsPiT3-{{ section.id }}" hidden>
+            <h3 class="gs-pinfo__h">Care &amp; use</h3>
+            <div class="gs-rte">{{ care }}</div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product information tabs",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-4" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Product information" },
+    { "type": "richtext", "id": "care_text", "label": "Default care & use text", "default": "<p>Follow the care label on the item. Wipe clean or wash gently, and store in a cool, dry place.</p>", "info": "Products can override this with a custom.care metafield. Specs read custom.material, custom.dimensions and custom.included metafields when set." }
+  ],
+  "enabled_on": { "templates": ["product"] },
+  "presets": [{ "name": "Product information tabs" }]
+}
+{% endschema %}

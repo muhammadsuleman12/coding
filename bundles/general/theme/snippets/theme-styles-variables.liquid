@@ -1,0 +1,313 @@
+{% style %}
+  {%- liquid
+    assign font_weight_choice = settings.font_weight | default: 'regular'
+
+    assign forge_weight_override = blank
+    if font_weight_choice == 'light'
+      assign forge_weight_override = 400
+    elsif font_weight_choice == 'bold'
+      assign forge_weight_override = 700
+    endif
+    assign body_font = settings.type_body_font
+    assign subheading_font = settings.type_subheading_font
+    assign heading_font = settings.type_heading_font
+    assign accent_font = settings.type_accent_font
+    if font_weight_choice == 'light'
+      assign body_font = body_font | font_modify: 'weight', 400
+      assign subheading_font = subheading_font | font_modify: 'weight', 400
+      assign heading_font = heading_font | font_modify: 'weight', 400
+      assign accent_font = accent_font | font_modify: 'weight', 400
+    elsif font_weight_choice == 'bold'
+      assign body_font = body_font | font_modify: 'weight', 700
+      assign subheading_font = subheading_font | font_modify: 'weight', 700
+      assign heading_font = heading_font | font_modify: 'weight', 700
+      assign accent_font = accent_font | font_modify: 'weight', 700
+    endif
+
+    assign primary_font_bold = body_font | font_modify: 'weight', 'bold'
+    assign primary_font_italic = body_font | font_modify: 'style', 'italic'
+    assign primary_font_bold_italic = primary_font_bold | font_modify: 'style', 'italic'
+  %}
+
+  {{ body_font | font_face: font_display: 'swap' }}
+  {{ primary_font_bold | font_face: font_display: 'swap' }}
+  {{ primary_font_italic | font_face: font_display: 'swap' }}
+  {{ primary_font_bold_italic | font_face: font_display: 'swap' }}
+
+  {% if subheading_font != body_font %}
+    {%- liquid
+      assign secondary_font_bold = subheading_font | font_modify: 'weight', 'bold'
+      assign secondary_font_italic = subheading_font | font_modify: 'style', 'italic'
+      assign secondary_font_bold_italic = secondary_font_bold | font_modify: 'style', 'italic'
+    %}
+
+    {{ subheading_font | font_face: font_display: 'swap' }}
+    {{ secondary_font_bold | font_face: font_display: 'swap' }}
+    {{ secondary_font_italic | font_face: font_display: 'swap' }}
+    {{ secondary_font_bold_italic | font_face: font_display: 'swap' }}
+  {% endif %}
+
+  {% if heading_font != body_font and heading_font != subheading_font %}
+    {%- liquid
+      assign tertiary_font_bold = heading_font | font_modify: 'weight', 'bold'
+      assign tertiary_font_italic = heading_font | font_modify: 'style', 'italic'
+      assign tertiary_font_bold_italic = tertiary_font_bold | font_modify: 'style', 'italic'
+    %}
+
+    {{ heading_font | font_face: font_display: 'swap' }}
+    {{ tertiary_font_bold | font_face: font_display: 'swap' }}
+    {{ tertiary_font_italic | font_face: font_display: 'swap' }}
+    {{ tertiary_font_bold_italic | font_face: font_display: 'swap' }}
+  {% endif %}
+
+  {% if accent_font != body_font and accent_font != subheading_font and accent_font != heading_font %}
+    {%- liquid
+      assign accent_font_bold = accent_font | font_modify: 'weight', 'bold'
+      assign accent_font_italic = accent_font | font_modify: 'style', 'italic'
+      assign accent_font_bold_italic = accent_font_bold | font_modify: 'style', 'italic'
+    %}
+
+    {{ accent_font | font_face: font_display: 'swap' }}
+    {{ accent_font_bold | font_face: font_display: 'swap' }}
+    {{ accent_font_italic | font_face: font_display: 'swap' }}
+    {{ accent_font_bold_italic | font_face: font_display: 'swap' }}
+  {% endif %}
+
+  :root {
+
+    /* Section Heights */
+    --section-height-ultra-small: 8rem;
+    --section-height-small: 15rem;
+    --section-height-medium: 25rem;
+    --section-height-large: 35rem;
+
+    @media screen and (min-width: 40em) {
+      --section-height-ultra-small: 20svh;
+      --section-height-small: 40svh;
+      --section-height-medium: 55svh;
+      --section-height-large: 70svh;
+    }
+
+    @media screen and (min-width: 60em) {
+      --section-height-ultra-small: 25svh;
+      --section-height-small: 50svh;
+      --section-height-medium: 65svh;
+      --section-height-large: 80svh;
+    }
+
+    /* Letter spacing */
+    --letter-spacing-sm: 0.06em;
+    --letter-spacing-md: 0.13em;
+
+
+    {% render 'forge-base-tokens' %}
+
+
+
+
+
+
+    /* Lever style vars (radius, button shape, card gap/shadow, heading scale,
+       section spacing, heading tracking/case, animation intensity) - shared with
+       the per-page override block below via theme-style-lever-vars.liquid, so a
+       page override resolves each value identically to this global default.
+       --heading-scale / --section-spacing-scale also have a per-section override
+       escape hatch (set the var directly on #shopify-section-{{ section.id }} to
+       beat this :root value via cascade). */
+    {%- render 'theme-style-lever-vars',
+      global_border_radius: settings.global_border_radius,
+      inputs_border_radius: settings.inputs_border_radius,
+      variant_swatch_radius: settings.variant_swatch_radius,
+      variant_button_radius: settings.variant_button_radius,
+      button_shape: settings.button_shape,
+      button_radius_custom: settings.button_radius_custom,
+      card_gap: settings.card_gap,
+      card_shadow: settings.card_shadow,
+      heading_scale: settings.heading_scale,
+      section_spacing: settings.section_spacing,
+      animation_intensity: settings.animation_intensity,
+      animation_speed_custom: settings.animation_speed_custom,
+      animation_distance_custom: settings.animation_distance_custom,
+      heading_tracking: settings.heading_tracking,
+      heading_case: settings.heading_case
+    -%}
+
+    /* Typography presets - THE definition lives in forge-typography-vars, shared with
+       forge-style-vars so a pushed page cannot drift from the theme. */
+    {%- render 'forge-typography-vars',
+      weight_override: forge_weight_override,
+      body_font: body_font,
+      heading_font: heading_font,
+      subheading_font: subheading_font,
+      accent_font: accent_font,
+      size_paragraph: settings.type_size_paragraph,
+      size_h1: settings.type_size_h1,
+      size_h2: settings.type_size_h2,
+      size_h3: settings.type_size_h3,
+      size_h4: settings.type_size_h4,
+      size_h5: settings.type_size_h5,
+      size_h6: settings.type_size_h6,
+      role_h1: settings.type_font_h1,
+      role_h2: settings.type_font_h2,
+      role_h3: settings.type_font_h3,
+      role_h4: settings.type_font_h4,
+      role_h5: settings.type_font_h5,
+      role_h6: settings.type_font_h6,
+      lh_paragraph: settings.type_line_height_paragraph,
+      lh_h1: settings.type_line_height_h1,
+      lh_h2: settings.type_line_height_h2,
+      lh_h3: settings.type_line_height_h3,
+      lh_h4: settings.type_line_height_h4,
+      lh_h5: settings.type_line_height_h5,
+      lh_h6: settings.type_line_height_h6,
+      heading_tracking: settings.heading_tracking,
+      heading_case: settings.heading_case
+    -%}
+
+
+
+
+
+    /* Borders */
+    --style-border-width: 1px;
+    --style-border-radius-xs: 0.2rem;
+    --style-border-radius-sm: 0.6rem;
+    --style-border-radius-md: 0.8rem;
+    --style-border-radius-50: 50%;
+    --style-border-radius-lg: 1rem;
+    --style-border-radius-pills: {{ settings.pills_border_radius }}px;
+    --style-border-width-primary: {{ settings.primary_button_border_width }}px;
+    --style-border-width-secondary: {{ settings.secondary_button_border_width }}px;
+    --style-border-width-inputs: {{ settings.input_border_width }}px;
+    --style-border-radius-popover: {{ settings.popover_border_radius }}px;
+    --style-border-popover: {{ settings.popover_border_width }}px {{ settings.popover_border }} rgb(var(--color-border-rgb) / {{ settings.popover_border_opacity }}%);
+    --style-border-drawer: {{ settings.drawer_border_width }}px {{ settings.drawer_border }} rgb(var(--color-border-rgb) / {{ settings.drawer_border_opacity }}%);
+    --style-border-swatch-opacity: {{ settings.variant_swatch_border_opacity }}%;
+    --style-border-swatch-width: {{ settings.variant_swatch_border_width }}px;
+    --style-border-swatch-style: {{ settings.variant_swatch_border_style }};
+
+
+
+
+
+    --icon-stroke-width: {% if settings.icon_stroke == 'thin' %}1px{% elsif settings.icon_stroke == 'heavy' %}2px{% else %}1.5px{% endif %};
+
+    /* Input */
+    --input-email-min-width: 200px;
+    --input-search-max-width: 650px;
+    --input-padding-y: 0.8rem;
+    --input-padding-x: 0.8rem;
+    --input-padding: var(--input-padding-y) var(--input-padding-x);
+    --input-box-shadow-width: var(--style-border-width-inputs);
+    --input-box-shadow: 0 0 0 var(--input-box-shadow-width) var(--color-input-border);
+    --input-box-shadow-focus: 0 0 0 calc(var(--input-box-shadow-width) + 0.5px) var(--color-input-border);
+    --input-disabled-background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    --input-disabled-border-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+    --input-disabled-text-color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    --input-textarea-min-height: 55px;
+
+    /* Button size */
+    --button-size-sm: 30px;
+    --button-size-md: 36px;
+    --button-size: var(--minimum-touch-target);
+    --button-padding-inline: 24px;
+    --button-padding-block: 16px;
+
+    /* Button font-family */
+    --button-font-family-primary: var(--font-{{ settings.type_font_button_primary }}--family);
+    --button-font-family-secondary: var(--font-{{ settings.type_font_button_secondary }}--family);
+
+    /* Button font-weight - tracks whichever role (body/accent) the merchant picked above,
+       so it inherits the global Font Weight lever the same way heading/body text does. */
+    --button-font-weight-primary: var(--font-{{ settings.type_font_button_primary }}--weight);
+    --button-font-weight-secondary: var(--font-{{ settings.type_font_button_secondary }}--weight);
+
+    /* Button text case */
+    --button-text-case: {{ settings.button_text_case }};
+    --button-text-case-primary: {{ settings.button_text_case_primary }};
+    --button-text-case-secondary: {{ settings.button_text_case_secondary }};
+
+    /* Borders */
+    --border-color: rgb(var(--color-border-rgb) / var(--opacity-50));
+    --border-width-sm: 1px;
+    --border-width-md: 2px;
+    --border-width-lg: 5px;
+
+    /* Drawers */
+    --drawer-inline-padding: 25px;
+    --drawer-menu-inline-padding: 2.5rem;
+    --drawer-header-block-padding: 20px;
+    --drawer-content-block-padding: 10px;
+    --drawer-header-desktop-top: 0rem;
+    --drawer-padding: calc(var(--padding-sm) + 7px);
+    --drawer-height: 100dvh;
+    --drawer-width: 95vw;
+    --drawer-max-width: 500px;
+
+    /* Variant Picker Swatches */
+    --variant-picker-swatch-width-unitless: {{ settings.variant_swatch_width }};
+    --variant-picker-swatch-height-unitless: {{ settings.variant_swatch_height }};
+    --variant-picker-swatch-width: {{ settings.variant_swatch_width | append: 'px' }};
+    --variant-picker-swatch-height: {{ settings.variant_swatch_height | append: 'px' }};
+    --variant-picker-border-width: {{ settings.variant_swatch_border_width | append: 'px' }};
+    --variant-picker-border-style: {{ settings.variant_swatch_border_style }};
+    --variant-picker-border-opacity: {{ settings.variant_swatch_border_opacity | append: '%' }};
+
+    /* Variant Picker Buttons */
+    --variant-picker-button-border-width: {{ settings.variant_button_border_width | append: 'px' }};
+
+    /* Slideshow */
+    --slideshow-controls-size: 3.5rem;
+    --slideshow-controls-icon: 2rem;
+    --peek-next-slide-size: 3rem;
+
+
+    /* Shapes */
+    --shape--circle: circle(50% at center);
+    --shape--sunburst: polygon(100% 50%,94.62% 55.87%,98.3% 62.94%,91.57% 67.22%,93.3% 75%,85.7% 77.39%,85.36% 85.36%,77.39% 85.7%,75% 93.3%,67.22% 91.57%,62.94% 98.3%,55.87% 94.62%,50% 100%,44.13% 94.62%,37.06% 98.3%,32.78% 91.57%,25% 93.3%,22.61% 85.7%,14.64% 85.36%,14.3% 77.39%,6.7% 75%,8.43% 67.22%,1.7% 62.94%,5.38% 55.87%,0% 50%,5.38% 44.13%,1.7% 37.06%,8.43% 32.78%,6.7% 25%,14.3% 22.61%,14.64% 14.64%,22.61% 14.3%,25% 6.7%,32.78% 8.43%,37.06% 1.7%,44.13% 5.38%,50% 0%,55.87% 5.38%,62.94% 1.7%,67.22% 8.43%,75% 6.7%,77.39% 14.3%,85.36% 14.64%,85.7% 22.61%,93.3% 25%,91.57% 32.78%,98.3% 37.06%,94.62% 44.13%);
+    --shape--diamond: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    --shape--blob: polygon(85.349% 11.712%, 87.382% 13.587%, 89.228% 15.647%, 90.886% 17.862%, 92.359% 20.204%, 93.657% 22.647%, 94.795% 25.169%, 95.786% 27.752%, 96.645% 30.382%, 97.387% 33.048%, 98.025% 35.740%, 98.564% 38.454%, 99.007% 41.186%, 99.358% 43.931%, 99.622% 46.685%, 99.808% 49.446%, 99.926% 52.210%, 99.986% 54.977%, 99.999% 57.744%, 99.975% 60.511%, 99.923% 63.278%, 99.821% 66.043%, 99.671% 68.806%, 99.453% 71.565%, 99.145% 74.314%, 98.724% 77.049%, 98.164% 79.759%, 97.433% 82.427%, 96.495% 85.030%, 95.311% 87.529%, 93.841% 89.872%, 92.062% 91.988%, 89.972% 93.796%, 87.635% 95.273%, 85.135% 96.456%, 82.532% 97.393%, 79.864% 98.127%, 77.156% 98.695%, 74.424% 99.129%, 71.676% 99.452%, 68.918% 99.685%, 66.156% 99.844%, 63.390% 99.942%, 60.624% 99.990%, 57.856% 99.999%, 55.089% 99.978%, 52.323% 99.929%, 49.557% 99.847%, 46.792% 99.723%, 44.031% 99.549%, 41.273% 99.317%, 38.522% 99.017%, 35.781% 98.639%, 33.054% 98.170%, 30.347% 97.599%, 27.667% 96.911%, 25.024% 96.091%, 22.432% 95.123%, 19.907% 93.994%, 17.466% 92.690%, 15.126% 91.216%, 12.902% 89.569%, 10.808% 87.761%, 8.854% 85.803%, 7.053% 83.703%, 5.418% 81.471%, 3.962% 79.119%, 2.702% 76.656%, 1.656% 74.095%, 0.846% 71.450%, 0.294% 68.740%, 0.024% 65.987%, 0.050% 63.221%, 0.343% 60.471%, 0.858% 57.752%, 1.548% 55.073%, 2.370% 52.431%, 3.283% 49.819%, 4.253% 47.227%, 5.249% 44.646%, 6.244% 42.063%, 7.211% 39.471%, 8.124% 36.858%, 8.958% 34.220%, 9.711% 31.558%, 10.409% 28.880%, 11.083% 26.196%, 11.760% 23.513%, 12.474% 20.839%, 13.259% 18.186%, 14.156% 15.569%, 15.214% 13.012%, 16.485% 10.556%, 18.028% 8.261%, 19.883% 6.211%, 22.041% 4.484%, 24.440% 3.110%, 26.998% 2.057%, 29.651% 1.275%, 32.360% 0.714%, 35.101% 0.337%, 37.859% 0.110%, 40.624% 0.009%, 43.391% 0.016%, 46.156% 0.113%, 48.918% 0.289%, 51.674% 0.533%, 54.425% 0.837%, 57.166% 1.215%, 59.898% 1.654%, 62.618% 2.163%, 65.322% 2.750%, 68.006% 3.424%, 70.662% 4.197%, 73.284% 5.081%, 75.860% 6.091%, 78.376% 7.242%, 80.813% 8.551%, 83.148% 10.036%, 85.349% 11.712%);
+
+    /* Buy buttons */
+    --height-buy-buttons: calc(var(--padding-lg) * 2 + var(--icon-size-sm));
+
+    /* Card image width and height variables */
+    --card-width-small: 10rem;
+
+    --height-small: 10rem;
+    --height-medium: 11.5rem;
+    --height-large: 13rem;
+    --height-full: 100vh;
+
+    @media screen and (min-width: 750px) {
+      --height-small: 17.5rem;
+      --height-medium: 21.25rem;
+      --height-large: 25rem;
+    }
+
+    /* Modal */
+    --modal-max-height: 65dvh;
+
+    /* Card styles for search */
+    --card-bg-hover: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+    --card-border-hover: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+    --card-border-focus: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+
+    /* Cart */
+    --cart-primary-font-family: var(--font-body--family);
+    --cart-primary-font-style: var(--font-body--style);
+    --cart-primary-font-weight: var(--font-body--weight);
+    --cart-secondary-font-family: var(--font-{{ settings.cart_price_font }}--family);
+    --cart-secondary-font-style: var(--font-{{ settings.cart_price_font }}--style);
+    --cart-secondary-font-weight: var(--font-{{ settings.cart_price_font }}--weight);
+
+  }
+
+  {%- comment -%}
+  AUTO-GENERATED by generatePageStyleOverrideLiquid() - do not edit manually,
+  regenerated on every style save.
+{%- endcomment -%}
+
+
+  {% render 'scroll-reveal-css' %}
+{% endstyle %}

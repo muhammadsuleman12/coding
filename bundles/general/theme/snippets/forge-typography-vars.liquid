@@ -1,0 +1,102 @@
+--font-body--family: {{ body_font.family }}, {{ body_font.fallback_families }};
+--font-body--style: {{ body_font.style }};
+--font-body--weight: {{ weight_override | default: body_font.weight }};
+--font-subheading--family: {{ subheading_font.family }}, {{ subheading_font.fallback_families }};
+--font-subheading--style: {{ subheading_font.style }};
+--font-subheading--weight: {{ weight_override | default: subheading_font.weight }};
+--font-heading--family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+--font-heading--style: {{ heading_font.style }};
+--font-heading--weight: {{ weight_override | default: heading_font.weight }};
+--font-accent--family: {{ accent_font.family }}, {{ accent_font.fallback_families }};
+--font-accent--style: {{ accent_font.style }};
+--font-accent--weight: {{ weight_override | default: accent_font.weight }};
+
+{%- liquid
+  assign type_presets = 'paragraph,h1,h2,h3,h4,h5,h6' | split: ','
+
+  assign sizes = ''
+  assign sizes = sizes | append: size_paragraph | default: 14
+  assign sizes = sizes | append: ',' | append: size_h1 | append: ',' | append: size_h2 | append: ',' | append: size_h3 | append: ',' | append: size_h4 | append: ',' | append: size_h5 | append: ',' | append: size_h6
+  assign sizes = sizes | split: ','
+
+  assign roles = 'body' | append: ',' | append: role_h1 | append: ',' | append: role_h2 | append: ',' | append: role_h3 | append: ',' | append: role_h4 | append: ',' | append: role_h5 | append: ',' | append: role_h6
+  assign roles = roles | split: ','
+
+  assign line_heights = lh_paragraph | append: ',' | append: lh_h1 | append: ',' | append: lh_h2 | append: ',' | append: lh_h3 | append: ',' | append: lh_h4 | append: ',' | append: lh_h5 | append: ',' | append: lh_h6
+  assign line_heights = line_heights | split: ','
+
+  assign fluid_size_cutoff = 48
+  assign absolute_font_size_min = 10
+
+  assign sorted_sizes = ''
+  for s in sizes
+    assign v = s | times: 1
+    if v < 100
+      assign v = '0[v]' | replace: '[v]', v
+    endif
+    assign sorted_sizes = sorted_sizes | append: '[v],' | replace: '[v]', v
+  endfor
+  assign sorted_sizes = sorted_sizes | split: ',' | uniq | sort_natural
+
+  for preset_name in type_presets
+    assign font_size_value = sizes[forloop.index0] | times: 1
+    assign font_size_string = '[v]' | replace: '[v]', font_size_value
+    assign index = sorted_sizes | find_index: font_size_string
+
+    if font_size_value >= fluid_size_cutoff
+      if index == 0
+        assign fluid_font_size_min = absolute_font_size_min
+      else
+        assign next_index = index | minus: 1
+        assign next_value = sorted_sizes[next_index] | times: 1
+        if next_value < fluid_size_cutoff
+          assign fluid_font_size_min = next_value | plus: 4
+          if font_size_value < fluid_font_size_min
+            assign fluid_font_size_min = font_size_value
+          endif
+        else
+          assign fluid_font_size_min = next_value
+        endif
+      endif
+      assign fluid_size_min_rem = fluid_font_size_min | divided_by: 16.0
+      assign fluid_size = font_size_value | times: 0.1
+      assign fluid_size_max_rem = font_size_value | divided_by: 16.0
+      echo '--font-size--[n]: clamp(calc([min] * var(--forge-rem, 16px)), [v]vw, calc([max] * var(--forge-rem, 16px)));' | replace: '[n]', preset_name | replace: '[min]', fluid_size_min_rem | replace: '[v]', fluid_size | replace: '[max]', fluid_size_max_rem
+    else
+      assign size_rem = font_size_value | divided_by: 16.0
+      echo '--font-size--[n]: calc([v] * var(--forge-rem, 16px));' | replace: '[n]', preset_name | replace: '[v]', size_rem
+    endif
+  endfor
+
+  assign heading_letter_spacing_value = 'heading-normal'
+  case heading_tracking
+    when 'tight'
+      assign heading_letter_spacing_value = 'heading-tight'
+    when 'loose'
+      assign heading_letter_spacing_value = 'heading-loose'
+  endcase
+  assign heading_case_value = heading_case | default: 'none'
+
+  for preset_name in type_presets
+    assign preset_role = roles[forloop.index0]
+    assign preset_line_height = line_heights[forloop.index0]
+
+    if preset_name == 'paragraph'
+      assign preset_case = 'none'
+      assign preset_letter_spacing = 'body-normal'
+      echo '--font-[n]--weight: var(--font-body--weight);' | replace: '[n]', preset_name
+      echo '--font-[n]--size: var(--font-size--[n]);' | replace: '[n]', preset_name
+    else
+      assign preset_case = heading_case_value
+      assign preset_letter_spacing = heading_letter_spacing_value
+      echo '--font-[n]--weight: var(--font-[r]--weight);' | replace: '[n]', preset_name | replace: '[r]', preset_role
+      echo '--font-[n]--size: calc(var(--font-size--[n]) * var(--heading-scale, 1));' | replace: '[n]', preset_name
+    endif
+
+    echo '--font-[n]--family: var(--font-[r]--family);' | replace: '[n]', preset_name | replace: '[r]', preset_role
+    echo '--font-[n]--style: var(--font-[r]--style);' | replace: '[n]', preset_name | replace: '[r]', preset_role
+    echo '--font-[n]--letter-spacing: var(--letter-spacing--[ls]);' | replace: '[n]', preset_name | replace: '[ls]', preset_letter_spacing
+    echo '--font-[n]--case: [c];' | replace: '[n]', preset_name | replace: '[c]', preset_case
+    echo '--font-[n]--line-height: var(--line-height--[lh]);' | replace: '[n]', preset_name | replace: '[lh]', preset_line_height
+  endfor
+-%}

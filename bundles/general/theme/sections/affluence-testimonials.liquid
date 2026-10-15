@@ -1,0 +1,353 @@
+
+{% liquid
+  assign overline = section.settings.overline | strip_html | strip
+  assign heading = section.settings.heading | strip_html | strip
+  assign subheading = section.settings.subheading | strip_html | strip
+  assign show_stars = section.settings.show_stars
+  assign alignment = section.settings.alignment | default: 'center'
+  if alignment != 'left'
+    assign alignment = 'center'
+  endif
+  assign block_count = section.blocks.size
+  if block_count == 0
+    assign block_count = 1
+  endif
+  assign desktop_columns = block_count
+  if desktop_columns > 4
+    assign desktop_columns = 4
+  endif
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --aft-desktop-columns: {{ desktop_columns }};
+  }
+{% endstyle %}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="affluence-testimonials forge-spacing-style forge-color-{{ section.settings.color_scheme }} affluence-testimonials--align-{{ alignment }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  {% if overline != blank or heading != blank or subheading != blank %}
+    <header class="affluence-testimonials__header" data-animate="fade-up">
+      {% if overline != blank %}
+        <p class="affluence-testimonials__overline">{{ overline }}</p>
+      {% endif %}
+      {% if heading != blank %}
+        <h2 class="affluence-testimonials__heading">{{ heading }}</h2>
+      {% endif %}
+      {% if subheading != blank %}
+        <p class="affluence-testimonials__subheading">{{ subheading }}</p>
+      {% endif %}
+    </header>
+  {% endif %}
+
+  <ul class="affluence-testimonials__grid" role="list" data-animate-group>
+    {% for block in section.blocks %}
+      <li class="affluence-testimonials__item" data-animate="fade-up" {{ block.shopify_attributes }}>
+        <figure class="affluence-testimonials__figure">
+          {% if show_stars %}
+            <div class="affluence-testimonials__stars" aria-label="5 out of 5 stars">
+              {% for i in (1..5) %}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+                  <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.77l-5.2 2.74.99-5.79L1.58 7.62l5.82-.85L10 1.5z"/>
+                </svg>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <blockquote class="affluence-testimonials__quote">
+            {{ block.settings.quote | strip_html | strip }}
+          </blockquote>
+          <figcaption class="affluence-testimonials__caption">
+            {% if block.settings.author != blank %}
+              <span class="affluence-testimonials__author">{{ block.settings.author | strip_html | strip }}</span>
+            {% endif %}
+            {% if block.settings.caption != blank %}
+              <span class="affluence-testimonials__meta">{{ block.settings.caption | strip_html | strip }}</span>
+            {% endif %}
+          </figcaption>
+        </figure>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% stylesheet %}
+  .affluence-testimonials {
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: clamp(20px, 5vw, 56px);
+  }
+
+  .affluence-testimonials__header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 auto 48px;
+    max-width: 720px;
+  }
+
+  .affluence-testimonials--align-center .affluence-testimonials__header {
+    text-align: center;
+    align-items: center;
+  }
+
+  .affluence-testimonials--align-left .affluence-testimonials__header {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .affluence-testimonials__overline {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.6;
+  }
+
+  .affluence-testimonials__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-weight: var(--font-h2--weight, 400);
+    font-size: clamp(1.5rem, 3.2vw, var(--font-h2--size));
+    line-height: 1.15;
+    letter-spacing: var(--font-h2--letter-spacing, 0.005em);
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .affluence-testimonials__subheading {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--color-foreground);
+    opacity: 0.78;
+  }
+
+  .affluence-testimonials__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--style-gap-cards, 28px);
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+
+  @media screen and (min-width: 750px) {
+    .affluence-testimonials__grid {
+      grid-template-columns: repeat(var(--aft-desktop-columns, 3), minmax(0, 1fr));
+    }
+  }
+
+  .affluence-testimonials__item {
+    display: flex;
+  }
+
+  .affluence-testimonials__figure {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin: 0;
+    width: 100%;
+  }
+
+  .affluence-testimonials--align-center .affluence-testimonials__figure {
+    align-items: center;
+    text-align: center;
+  }
+
+  .affluence-testimonials--align-left .affluence-testimonials__figure {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .affluence-testimonials__stars {
+    display: inline-flex;
+    gap: 4px;
+    color: var(--color-foreground);
+    opacity: 0.85;
+  }
+
+  .affluence-testimonials__stars svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .affluence-testimonials__quote {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    line-height: 1.55;
+    font-weight: var(--font-h3--weight, 400);
+    color: var(--color-foreground);
+    letter-spacing: var(--font-h3--letter-spacing, 0.005em);
+    quotes: '\201C' '\201D';
+  }
+
+  .affluence-testimonials__quote::before {
+    content: open-quote;
+    margin-right: 0.1em;
+  }
+
+  .affluence-testimonials__quote::after {
+    content: close-quote;
+    margin-left: 0.05em;
+  }
+
+  .affluence-testimonials__caption {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+  }
+
+  .affluence-testimonials__author {
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--color-foreground);
+  }
+
+  .affluence-testimonials__meta {
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.55;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Affluence Testimonials",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 4,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline",
+      "info": "Small uppercase eyebrow text. Optional."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What our customers say"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stars",
+      "label": "Show 5-star rating",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Quote",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "A short, refined quote from a customer."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "First L."
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption",
+          "info": "Verified buyer label or product name. Optional."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence Testimonials",
+      "blocks": [
+        { "type": "quote" },
+        { "type": "quote" },
+        { "type": "quote" }
+      ]
+    }
+  ]
+}
+{% endschema %}

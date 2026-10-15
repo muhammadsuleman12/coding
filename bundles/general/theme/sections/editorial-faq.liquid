@@ -1,0 +1,297 @@
+{% liquid
+  if section.settings.use_custom_colors
+    assign ef_text_color = section.settings.text_color
+    assign ef_bg = section.settings.bg_color
+    assign ef_border = section.settings.border_color
+  else
+    assign ef_text_color = section.settings.color_scheme.settings.foreground
+    assign ef_bg = section.settings.color_scheme.settings.background
+    assign ef_border = section.settings.color_scheme.settings.border
+  endif
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --ef-text-color: {{ ef_text_color }};
+    --ef-bg: {{ ef_bg }};
+    --ef-border: {{ ef_border }};
+  }
+{% endstyle %}
+
+<div class="editorial-faq forge-spacing-style forge-color-{{ section.settings.color_scheme }}" style="{% render 'spacing-style', settings: section.settings %}">
+  <div class="editorial-faq__container">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="editorial-faq__header" data-animate="fade-up">
+        {% if section.settings.heading != blank %}
+          <h2 class="editorial-faq__main-heading">{{ section.settings.heading }}</h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <div class="editorial-faq__subheading">{{ section.settings.subheading }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="editorial-faq__list" data-animate-group>
+      {% for block in section.blocks %}
+        {% if block.type == 'faq_item' %}
+          <details class="editorial-faq__item" data-animate="fade-up" {{ block.shopify_attributes }}>
+            <summary class="editorial-faq__summary">
+              <span class="editorial-faq__question">{{ block.settings.question }}</span>
+              <span class="editorial-faq__icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 1v12m-6-6h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </summary>
+            <div class="editorial-faq__answer">
+              <div class="editorial-faq__answer-inner">
+                {{ block.settings.answer }}
+              </div>
+            </div>
+          </details>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{%- capture ef_faq_ld -%}
+{%- assign ef_first = true -%}
+{%- for block in section.blocks -%}
+{%- if block.type == 'faq_item' and block.settings.question != blank and block.settings.answer != blank -%}
+{%- unless ef_first -%},{%- endunless -%}
+{"@type":"Question","name":{{ block.settings.question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ block.settings.answer | strip_html | json }}}}
+{%- assign ef_first = false -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endcapture -%}
+{%- assign ef_faq_ld_s = ef_faq_ld | strip -%}
+{%- if ef_faq_ld_s != '' -%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{{ ef_faq_ld_s }}]}
+</script>
+{%- endif -%}
+
+{% stylesheet %}
+  .editorial-faq {
+    width: 100%;
+    background: var(--ef-bg);
+    color: var(--ef-text-color);
+  }
+
+  .editorial-faq__container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--page-margin, 24px);
+  }
+
+  .editorial-faq__header {
+    margin: 0 0 32px 0;
+    text-align: center;
+  }
+
+  .editorial-faq__main-heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: 1.5rem;
+    font-weight: var(--font-h2--weight, 700);
+    letter-spacing: var(--font-h2--letter-spacing, 0.05em);
+    text-transform: var(--font-h2--case, uppercase);
+    color: var(--ef-text-color);
+  }
+
+  .editorial-faq__subheading {
+    margin: 12px 0 0 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--ef-text-color);
+    opacity: 0.7;
+  }
+
+  .editorial-faq__list {
+    border-top: 1px solid var(--ef-border);
+  }
+
+  .editorial-faq__item {
+    border-bottom: 1px solid var(--ef-border);
+  }
+
+  .editorial-faq__summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+    cursor: pointer;
+    list-style: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .editorial-faq__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .editorial-faq__summary:hover {
+    opacity: 0.7;
+  }
+
+  .editorial-faq__question {
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.875rem;
+    font-weight: var(--font-h3--weight, 600);
+    letter-spacing: var(--font-h3--letter-spacing, 0.08em);
+    text-transform: var(--font-h3--case, uppercase);
+  }
+
+  .editorial-faq__icon {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    transition: transform 0.3s ease;
+  }
+
+  details[open] > .editorial-faq__summary .editorial-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .editorial-faq__answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease-out;
+  }
+
+  details[open] > .editorial-faq__answer {
+    grid-template-rows: 1fr;
+  }
+
+  .editorial-faq__answer-inner {
+    overflow: hidden;
+    padding-bottom: 24px;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+
+  .editorial-faq__answer-inner p:first-child { margin-top: 0; }
+  .editorial-faq__answer-inner p:last-child { margin-bottom: 0; }
+
+  @media screen and (max-width: 749px) {
+    .editorial-faq__container {
+      padding: 0 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Editorial FAQ",
+  "tag": "section",
+  "class": "section-wrapper",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "<p>Everything you need to know before you order.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_custom_colors",
+      "label": "Use custom colors",
+      "info": "Override the color scheme for this section.",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top margin",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom margin",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "What is your shipping policy?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>We offer free shipping on all orders over $100.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial FAQ",
+      "blocks": [
+        { "type": "faq_item", "settings": { "question": "What is your shipping policy?" } },
+        { "type": "faq_item", "settings": { "question": "What is your return policy?" } },
+        { "type": "faq_item", "settings": { "question": "How do I find my size?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,48 @@
+{% style %}
+  {% for scheme in settings.color_schemes -%}
+    {% assign scheme_classes = scheme_classes | append: ', .forge-color-' | append: scheme.id %}
+    {% if forloop.index == 1 %}
+      :root,
+    {% endif %}
+    .forge-color-{{ scheme.id }} {
+      {%- render 'forge-color-scheme-vars', scheme: scheme, style_mode: settings.style_mode, drawer_drop_shadow: settings.drawer_drop_shadow, popover_drop_shadow: settings.popover_drop_shadow -%}
+    }
+
+    {% if settings.style_mode == 'gradient' %}
+      .forge-color-{{ scheme.id }} .forge-button:not(.forge-button-secondary, .forge-button-unstyled):hover,
+      .forge-color-{{ scheme.id }}.forge-button:not(.forge-button-secondary, .forge-button-unstyled):hover,
+      .forge-color-{{ scheme.id }} button.shopify-payment-button__button--unbranded:hover:not([disabled]) {
+        opacity: 0.9;
+      }
+    {% endif %}
+  {% endfor %}
+
+  {%- render 'page-color-scheme-scope' -%}
+
+  {{ scheme_classes | prepend: 'body' }} {
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+  }
+
+  {% if settings.style_mode == 'gradient' %}
+    /* Ensure gradient vars propagate to blocks/sections without an explicit .color-* ancestor */
+    :root {
+      --color-primary: var(--color-gradient-1);
+      --color-primary-hover: var(--color-gradient-2);
+      --color-primary-button-background: var(--color-card-gradient);
+      --color-primary-button-text: var(--color-gradient-text);
+      --color-primary-button-border: transparent;
+    }
+  {% else %}
+    /* In flat mode: remap gradient vars to flat equivalents on :root too (covers ai-gen blocks
+       that have no .color-* ancestor but may still reference gradient vars) */
+    :root {
+      --color-gradient-1: var(--color-primary);
+      --color-gradient-2: var(--color-primary);
+      --color-gradient-3: var(--color-primary);
+      --color-gradient-text: var(--color-foreground);
+      --color-card-gradient: var(--color-card-background);
+    }
+  {% endif %}
+
+{% endstyle %}

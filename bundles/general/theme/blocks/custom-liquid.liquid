@@ -1,0 +1,26 @@
+
+
+<div>
+  {{ block.settings.custom_liquid }}
+</div>
+
+{% schema %}
+{
+  "name": "t:forge.names.custom_liquid",
+  "tag": null,
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:forge.settings.custom_liquid",
+      "info": "t:forge.info.custom_liquid"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.custom_liquid",
+      "category": "t:forge.categories.custom"
+    }
+  ]
+}
+{% endschema %}

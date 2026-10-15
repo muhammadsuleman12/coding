@@ -1,0 +1,239 @@
+{% liquid
+  assign heading = section.settings.heading | strip_html | strip
+%}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="edna-category-tiles forge-spacing-style forge-color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  {% if heading != blank %}
+    <header class="edna-category-tiles__header" data-animate="fade-up">
+      <h2 class="edna-category-tiles__heading">{{ heading }}</h2>
+    </header>
+  {% endif %}
+
+  <ul class="edna-category-tiles__grid" role="list" data-animate-group>
+    {% for block in section.blocks %}
+      {% liquid
+        assign tile_title = block.settings.title | strip_html | strip
+        assign tile_link = block.settings.link
+        if tile_link == blank
+          assign tile_link = '/collections/all'
+        endif
+      %}
+      <li class="edna-category-tiles__item" data-animate="fade-up" {{ block.shopify_attributes }}>
+        <a href="{{ tile_link }}" class="edna-category-tiles__link">
+          <div
+            class="edna-category-tiles__media"
+            data-forge-slot-id="{{ block.id }}"
+            data-forge-aspect-ratio="3:4"
+            data-forge-slot-label="{{ tile_title | default: 'Category' | escape }}"
+            {% if block.settings.image == blank %}data-forge-slot-blank="true"{% endif %}
+          >
+            {% if block.settings.image != blank %}
+              {{
+                block.settings.image
+                | image_url: width: 1200
+                | image_tag:
+                  class: 'edna-category-tiles__img',
+                  loading: 'lazy',
+                  widths: '400, 600, 800, 1200',
+                  sizes: '(min-width: 750px) 32vw, 100vw',
+                  alt: tile_title
+              }}
+            {% else %}
+              {{ 'collection-apparel-1' | placeholder_svg_tag: 'edna-category-tiles__img edna-category-tiles__img--placeholder' }}
+            {% endif %}
+            <div class="edna-category-tiles__overlay"></div>
+          </div>
+          {% if tile_title != blank %}
+            <span class="edna-category-tiles__title">{{ tile_title }}</span>
+          {% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% stylesheet %}
+  .edna-category-tiles {
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .edna-category-tiles__header {
+    margin-block-end: 1.5rem;
+    text-align: center;
+  }
+
+  .edna-category-tiles__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1.25rem, 2.5vw, var(--font-h3--size, 1.5rem));
+    font-weight: var(--font-h3--weight, 500);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .edna-category-tiles__grid {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    max-width: 80rem;
+  }
+
+  .edna-category-tiles__link {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+  }
+
+  .edna-category-tiles__media {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--color-background);
+  }
+
+  .edna-category-tiles__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .edna-category-tiles__link:hover .edna-category-tiles__img {
+    transform: scale(1.04);
+  }
+
+  .edna-category-tiles__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.45), transparent 42%);
+    pointer-events: none;
+  }
+
+  .edna-category-tiles__title {
+    position: absolute;
+    inset-inline: 1rem;
+    inset-block-end: 1.25rem;
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fff;
+    z-index: 1;
+  }
+
+  @media screen and (min-width: 750px) {
+    .edna-category-tiles__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .edna-category-tiles__img {
+      transition: none;
+    }
+
+    .edna-category-tiles__link:hover .edna-category-tiles__img {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Edna Category Tiles",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 3,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category tile",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Edna Category Tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "Editor's Pick" } },
+        { "type": "tile", "settings": { "title": "Shoes" } },
+        { "type": "tile", "settings": { "title": "Accessories" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

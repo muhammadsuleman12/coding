@@ -1,0 +1,419 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "gs-hero-banner",
+      "blocks": {
+        "p1": {
+          "type": "pill",
+          "settings": {
+            "label": "All",
+            "tag": "",
+            "link": "",
+            "icon": "grid"
+          }
+        },
+        "p2": {
+          "type": "pill",
+          "settings": {
+            "label": "Home",
+            "tag": "furniture",
+            "link": "",
+            "icon": "home"
+          }
+        },
+        "p3": {
+          "type": "pill",
+          "settings": {
+            "label": "Tech",
+            "tag": "electronics",
+            "link": "",
+            "icon": "laptop"
+          }
+        },
+        "p4": {
+          "type": "pill",
+          "settings": {
+            "label": "Pets",
+            "tag": "pets",
+            "link": "",
+            "icon": "paw"
+          }
+        },
+        "p5": {
+          "type": "pill",
+          "settings": {
+            "label": "Apparel",
+            "tag": "apparel",
+            "link": "",
+            "icon": "shirt"
+          }
+        },
+        "p6": {
+          "type": "pill",
+          "settings": {
+            "label": "Gifts",
+            "tag": "gifts",
+            "link": "",
+            "icon": "gift"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "height": "medium",
+        "show_breadcrumb": true,
+        "kicker": "",
+        "heading": "Find your next everyday favorite.",
+        "text": "<p>Thoughtfully selected products for a more comfortable, organized and joyful everyday life.</p>",
+        "button_label": "",
+        "button_link": "",
+        "image": "shopify://shop_images/Premium_General_Store_Essentials.png",
+        "image_mobile": "shopify://shop_images/Curated_general_store_essentials_still_life.png"
+      }
+    },
+    "main": {
+      "type": "main-collection",
+      "blocks": {
+        "filters": {
+          "type": "filters",
+          "static": true,
+          "settings": {
+            "enable_filtering": true,
+            "filter_style": "vertical",
+            "filter_width": "centered",
+            "text_label_case": "default",
+            "show_swatch_label": false,
+            "show_filter_label": false,
+            "enable_sorting": true,
+            "enable_grid_density": true,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "padding-block-start": 8,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "facets_margin_bottom": 8,
+            "facets_margin_right": 20
+          },
+          "blocks": {}
+        },
+        "product-card": {
+          "type": "_product-card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 8,
+            "quick_add_always_visible": true,
+            "quick_add_button_background": "#ffffff",
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "card-gallery": {
+              "type": "_product-card-gallery",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 6,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "group": {
+              "type": "_product-card-group",
+              "settings": {
+                "content_direction": "column",
+                "vertical_on_mobile": true,
+                "horizontal_alignment": "flex-start",
+                "vertical_alignment": "center",
+                "align_baseline": false,
+                "horizontal_alignment_flex_direction_column": "flex-start",
+                "vertical_alignment_flex_direction_column": "center",
+                "gap": 4,
+                "width": "fill",
+                "custom_width": 100,
+                "width_mobile": "fill",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "custom_height": 100,
+                "inherit_color_scheme": true,
+                "color_scheme": "",
+                "background_media": "none",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "toggle_overlay": false,
+                "overlay_color": "#00000026",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "link": "",
+                "open_in_new_tab": false,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "product_title_anJjPJ": {
+                  "type": "product-title",
+                  "name": "t:forge.names.product_title",
+                  "settings": {
+                    "width": "fit-content",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "character_limit": 35,
+                    "type_preset": "h5",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": false,
+                    "background_color": "#00000026",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                },
+                "price": {
+                  "type": "price",
+                  "settings": {
+                    "show_sale_price_first": true,
+                    "show_installments": false,
+                    "show_tax_info": false,
+                    "hide_cents": false,
+                    "currency_symbol_after": false,
+                    "price_color": "",
+                    "compare_at_price_color": "",
+                    "show_badges": true,
+                    "badge_border_radius": 12,
+                    "badge_show_chevron": false,
+                    "save_badge_text": "SAVE",
+                    "badge_color": "",
+                    "type_preset": "h6",
+                    "width": "100%",
+                    "alignment": "left",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "color": "var(--color-foreground)",
+                    "accent_color_scheme": "",
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                },
+                "swatches": {
+                  "type": "swatches",
+                  "disabled": true,
+                  "settings": {
+                    "product_swatches_alignment": "flex-start",
+                    "product_swatches_alignment_mobile": "flex-start",
+                    "hide_padding": false,
+                    "product_swatches_padding_top": 4,
+                    "product_swatches_padding_bottom": 0,
+                    "product_swatches_padding_left": 0,
+                    "product_swatches_padding_right": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "product_title_anJjPJ",
+                "price",
+                "swatches"
+              ]
+            }
+          },
+          "block_order": [
+            "card-gallery",
+            "group"
+          ]
+        }
+      },
+      "settings": {
+        "layout_type": "grid",
+        "product_card_size": "medium",
+        "mobile_product_card_size": "small",
+        "enable_infinite_scroll": true,
+        "products_per_page": 24,
+        "product_grid_width": "centered",
+        "full_width_on_mobile": true,
+        "columns_gap_horizontal": 16,
+        "columns_gap_vertical": 16,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "split": {
+      "type": "gs-split-banner",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "style": "light",
+        "contained": false,
+        "kicker": "",
+        "heading": "Something for every part of your day.",
+        "text": "<p>Home, tech, pets, fashion and more. Thoughtfully selected essentials to help you live a little better every day.</p>",
+        "button_label": "Explore all products",
+        "button_link": "",
+        "image": "shopify://shop_images/A_calm_corner_of_everyday_essentials.png"
+      }
+    },
+    "faq": {
+      "type": "gs-faq",
+      "blocks": {
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>Available shipping destinations are shown at checkout once you enter your address.</p>"
+          }
+        },
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Delivery options and estimated times are shown at checkout before you pay. You'll receive a tracking link by email once your order ships.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>If something isn't right, contact us and we'll help with a return. You can find all the details in our Refund Policy.</p>"
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "How can I contact customer support?",
+            "answer": "<p>Send us a message through our contact page and we'll get back to you as soon as we can.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q3",
+        "q1",
+        "q2",
+        "q4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Shopping FAQs",
+        "subheading": "",
+        "contact_label": "Contact us",
+        "contact_link": "shopify://pages/contact",
+        "open_first": false
+      }
+    },
+    "trust": {
+      "type": "gs-trust-strip",
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Tracked delivery",
+            "text": "On every order"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "box",
+            "title": "Easy returns",
+            "text": "See our Refund Policy"
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Secure payments",
+            "text": "Shop with confidence"
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "headset",
+            "title": "Helpful support",
+            "text": "We're here to help"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "layout": "inline"
+      }
+    },
+    "news": {
+      "type": "gs-newsletter",
+      "settings": {
+        "color_scheme": "scheme-4",
+        "heading": "Good finds, straight to your inbox",
+        "text": "Be the first to know about new arrivals, exclusive offers and everyday inspiration.",
+        "button_label": "Subscribe",
+        "success": "Thanks for subscribing. Look out for our next email."
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "main",
+    "split",
+    "faq",
+    "trust",
+    "news"
+  ]
+}

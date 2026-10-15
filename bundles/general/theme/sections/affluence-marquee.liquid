@@ -1,0 +1,278 @@
+
+{% liquid
+  assign anim_speed = section.settings.speed | default: 28
+  if anim_speed < 8
+    assign anim_speed = 8
+  endif
+
+  assign vertical_padding = section.settings.vertical_padding | default: 18
+  assign font_size = section.settings.font_size | default: 'medium'
+  assign show_separator = section.settings.show_separator
+  assign block_count = section.blocks.size
+  assign repeat_count = 4
+  if block_count <= 2
+    assign repeat_count = 5
+  endif
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --afm-anim-speed: {{ anim_speed }}s;
+    --afm-padding-y: {{ vertical_padding }}px;
+  }
+{% endstyle %}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="affluence-marquee forge-spacing-style forge-color-{{ section.settings.color_scheme }} affluence-marquee--{{ font_size }}{% if section.settings.top_border %} affluence-marquee--top-border{% endif %}{% if section.settings.bottom_border %} affluence-marquee--bottom-border{% endif %}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  role="marquee"
+  aria-label="Announcements"
+  {{ section.shopify_attributes }}
+>
+  <div class="affluence-marquee__viewport" data-animate="fade-in">
+    {% for i in (1..repeat_count) %}
+      <ul class="affluence-marquee__track" aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}">
+        {% for block in section.blocks %}
+          <li class="affluence-marquee__item" {{ block.shopify_attributes }}>
+            <span class="affluence-marquee__text">{{ block.settings.text | strip_html | strip }}</span>
+            {% if show_separator %}
+              <span class="affluence-marquee__sep" aria-hidden="true">&#9670;</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .affluence-marquee {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding-block: var(--afm-padding-y, 18px);
+  }
+
+  .affluence-marquee--top-border {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .affluence-marquee--bottom-border {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .affluence-marquee__viewport {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: max-content;
+    will-change: transform;
+    animation: afm-scroll var(--afm-anim-speed, 28s) linear infinite;
+  }
+
+  .affluence-marquee:hover .affluence-marquee__viewport {
+    animation-play-state: paused;
+  }
+
+  .affluence-marquee__track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .affluence-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(20px, 3vw, 48px);
+    padding-inline: clamp(20px, 3vw, 48px);
+    font-family: var(--font-body--family, inherit);
+    color: var(--color-foreground);
+    text-transform: none;
+    letter-spacing: var(--font-h3--letter-spacing, 0.06em);
+    font-weight: var(--font-h3--weight, 400);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .affluence-marquee__sep {
+    font-size: 0.5em;
+    opacity: 0.55;
+    transform: translateY(-1px);
+  }
+
+  .affluence-marquee--small .affluence-marquee__item {
+    font-size: 0.75rem;
+  }
+
+  .affluence-marquee--medium .affluence-marquee__item {
+    font-size: 0.9rem;
+  }
+
+  .affluence-marquee--large .affluence-marquee__item {
+    font-size: 1.125rem;
+  }
+
+  .affluence-marquee--xlarge .affluence-marquee__item {
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  @media screen and (min-width: 750px) {
+    .affluence-marquee__viewport {
+      animation-duration: calc(var(--afm-anim-speed, 28s) * 1.25);
+    }
+  }
+
+  @media screen and (min-width: 1200px) {
+    .affluence-marquee__viewport {
+      animation-duration: calc(var(--afm-anim-speed, 28s) * 1.5);
+    }
+  }
+
+  @keyframes afm-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-20%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .affluence-marquee__viewport {
+      animation: none;
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Affluence Marquee",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 4,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "Font size",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "xlarge", "label": "Extra large" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Animation duration",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "unit": "s",
+      "default": 28,
+      "info": "Higher = slower scroll."
+    },
+    {
+      "type": "range",
+      "id": "vertical_padding",
+      "label": "Vertical padding",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separator",
+      "label": "Show diamond separator",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "top_border",
+      "label": "Show top border",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "bottom_border",
+      "label": "Show bottom border",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Phrase",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Free shipping over €120"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence Marquee",
+      "blocks": [
+        { "type": "text" },
+        { "type": "text" },
+        { "type": "text" }
+      ]
+    }
+  ]
+}
+{% endschema %}

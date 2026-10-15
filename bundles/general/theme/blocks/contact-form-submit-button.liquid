@@ -1,0 +1,106 @@
+
+{%- assign block_settings = block.settings -%}
+<button
+  type="submit"
+  class="forge-button submit-button forge-size-style {{ block_settings.style_class }}"
+  style="{% render 'size-style', settings: block_settings %}"
+  {{ block.shopify_attributes }}
+>
+  {{ block_settings.label }}
+</button>
+
+{% stylesheet %}
+  .submit-button {
+    min-width: max-content;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.submit_button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:forge.settings.label",
+      "default": "t:forge.text_defaults.contact_form_button_label"
+    },
+    {
+      "type": "select",
+      "id": "style_class",
+      "label": "t:forge.settings.style",
+      "options": [
+        {
+          "value": "button",
+          "label": "t:forge.options.primary"
+        },
+        {
+          "value": "button-secondary",
+          "label": "t:forge.options.secondary"
+        }
+      ],
+      "default": "button"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:forge.settings.width_desktop",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fit-content"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:forge.settings.width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:forge.settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fit-content"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:forge.settings.width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    }
+  ],
+  "presets": []
+}
+{% endschema %}

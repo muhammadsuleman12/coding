@@ -1,0 +1,326 @@
+{%- liquid
+  assign body_font = section.settings.body_font
+  assign heading_font = section.settings.heading_font
+  assign subheading_font = section.settings.subheading_font
+  assign accent_font = section.settings.accent_font
+
+  assign font_weight_choice = section.settings.font_weight | default: 'regular'
+  assign forge_weight_override = blank
+  if font_weight_choice == 'light'
+    assign forge_weight_override = 400
+  elsif font_weight_choice == 'bold'
+    assign forge_weight_override = 700
+  endif
+  if font_weight_choice == 'light'
+    assign body_font = body_font | font_modify: 'weight', 400
+    assign subheading_font = subheading_font | font_modify: 'weight', 400
+    assign heading_font = heading_font | font_modify: 'weight', 400
+    assign accent_font = accent_font | font_modify: 'weight', 400
+  elsif font_weight_choice == 'bold'
+    assign body_font = body_font | font_modify: 'weight', 700
+    assign subheading_font = subheading_font | font_modify: 'weight', 700
+    assign heading_font = heading_font | font_modify: 'weight', 700
+    assign accent_font = accent_font | font_modify: 'weight', 700
+  endif
+-%}
+{% style %}
+{%- liquid
+  assign body_bold = body_font | font_modify: 'weight', 'bold'
+  assign body_italic = body_font | font_modify: 'style', 'italic'
+  assign body_bold_italic = body_bold | font_modify: 'style', 'italic'
+-%}
+{{ body_font | font_face: font_display: 'swap' }}
+{{ body_bold | font_face: font_display: 'swap' }}
+{{ body_italic | font_face: font_display: 'swap' }}
+{{ body_bold_italic | font_face: font_display: 'swap' }}
+{% if heading_font != body_font %}
+  {%- liquid
+    assign heading_bold = heading_font | font_modify: 'weight', 'bold'
+    assign heading_italic = heading_font | font_modify: 'style', 'italic'
+    assign heading_bold_italic = heading_bold | font_modify: 'style', 'italic'
+  -%}
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {{ heading_bold | font_face: font_display: 'swap' }}
+  {{ heading_italic | font_face: font_display: 'swap' }}
+  {{ heading_bold_italic | font_face: font_display: 'swap' }}
+{% endif %}
+{% if subheading_font != body_font and subheading_font != heading_font %}
+  {%- liquid
+    assign subheading_bold = subheading_font | font_modify: 'weight', 'bold'
+    assign subheading_italic = subheading_font | font_modify: 'style', 'italic'
+    assign subheading_bold_italic = subheading_bold | font_modify: 'style', 'italic'
+  -%}
+  {{ subheading_font | font_face: font_display: 'swap' }}
+  {{ subheading_bold | font_face: font_display: 'swap' }}
+  {{ subheading_italic | font_face: font_display: 'swap' }}
+  {{ subheading_bold_italic | font_face: font_display: 'swap' }}
+{% endif %}
+{% if accent_font != body_font and accent_font != heading_font and accent_font != subheading_font %}
+  {%- liquid
+    assign accent_bold = accent_font | font_modify: 'weight', 'bold'
+    assign accent_italic = accent_font | font_modify: 'style', 'italic'
+    assign accent_bold_italic = accent_bold | font_modify: 'style', 'italic'
+  -%}
+  {{ accent_font | font_face: font_display: 'swap' }}
+  {{ accent_bold | font_face: font_display: 'swap' }}
+  {{ accent_italic | font_face: font_display: 'swap' }}
+  {{ accent_bold_italic | font_face: font_display: 'swap' }}
+{% endif %}
+:root {
+  --variant-picker-button-border-width: 1px;
+}
+{%- assign forge_page_scheme = section.settings.color_scheme -%}
+#MainContent,
+.forge-sticky-atc,
+[class^='forge-recent-purchases-'],
+forge-fly-to-cart,
+[class^='recent-purchases-'],
+.sticky-atc{% if forge_page_scheme != blank %},
+#MainContent .forge-color-{{ forge_page_scheme }}{% endif %} {
+  --forge-rem: 16px;
+  {% render 'forge-color-scheme-vars',
+    scheme: section,
+    style_mode: section.settings.style_mode,
+    drawer_drop_shadow: section.settings.drawer_drop_shadow,
+    popover_drop_shadow: section.settings.popover_drop_shadow
+  %}
+  {% render 'theme-style-lever-vars',
+    global_border_radius: section.settings.global_border_radius,
+    inputs_border_radius: section.settings.inputs_border_radius,
+    variant_swatch_radius: section.settings.variant_swatch_radius,
+    variant_button_radius: section.settings.variant_button_radius,
+    button_shape: section.settings.button_shape,
+    button_radius_custom: section.settings.button_radius_custom,
+    card_gap: section.settings.card_gap,
+    card_shadow: section.settings.card_shadow,
+    heading_scale: section.settings.heading_scale,
+    section_spacing: section.settings.section_spacing,
+    animation_intensity: section.settings.animation_intensity,
+    animation_speed_custom: section.settings.animation_speed_custom,
+    animation_distance_custom: section.settings.animation_distance_custom,
+    heading_tracking: section.settings.heading_tracking,
+    heading_case: section.settings.heading_case
+  %}
+  {% render 'forge-base-tokens' %}
+  --style-border-width: 1px;
+  --style-border-width-inputs: 1px;
+  --style-border-radius-pills: 40px;
+  --style-border-radius-popover: 8px;
+  --button-size-sm: 30px;
+  --button-size-md: 36px;
+  --button-size: var(--minimum-touch-target);
+  --button-padding-inline: 24px;
+  --button-padding-block: 16px;
+  --button-font-family-primary: var(--font-paragraph--family);
+  --button-font-family-secondary: var(--font-paragraph--family);
+  --button-font-weight-primary: var(--font-paragraph--weight);
+  --button-font-weight-secondary: var(--font-paragraph--weight);
+  --input-padding-y: 0.8rem;
+  --input-padding-x: 0.8rem;
+  --input-padding: var(--input-padding-y) var(--input-padding-x);
+  --input-box-shadow-width: var(--style-border-width-inputs);
+  --input-box-shadow: 0 0 0 var(--input-box-shadow-width) var(--color-input-border);
+  --input-box-shadow-focus: 0 0 0 calc(var(--input-box-shadow-width) + 0.5px) var(--color-input-border);
+  --input-textarea-min-height: 55px;
+  {% render 'forge-typography-vars',
+      weight_override: forge_weight_override,
+    body_font: body_font,
+    heading_font: heading_font,
+    subheading_font: subheading_font,
+    accent_font: accent_font,
+    size_paragraph: section.settings.type_size_paragraph,
+    size_h1: section.settings.type_size_h1,
+    size_h2: section.settings.type_size_h2,
+    size_h3: section.settings.type_size_h3,
+    size_h4: section.settings.type_size_h4,
+    size_h5: section.settings.type_size_h5,
+    size_h6: section.settings.type_size_h6,
+    role_h1: section.settings.type_font_h1,
+    role_h2: section.settings.type_font_h2,
+    role_h3: section.settings.type_font_h3,
+    role_h4: section.settings.type_font_h4,
+    role_h5: section.settings.type_font_h5,
+    role_h6: section.settings.type_font_h6,
+    lh_paragraph: section.settings.type_line_height_paragraph,
+    lh_h1: section.settings.type_line_height_h1,
+    lh_h2: section.settings.type_line_height_h2,
+    lh_h3: section.settings.type_line_height_h3,
+    lh_h4: section.settings.type_line_height_h4,
+    lh_h5: section.settings.type_line_height_h5,
+    lh_h6: section.settings.type_line_height_h6,
+    heading_tracking: section.settings.heading_tracking,
+    heading_case: section.settings.heading_case
+  %}
+}
+#MainContent {
+  background: var(--color-background) !important;
+  color: var(--color-foreground) !important;
+}
+.variant-option__button-label {
+  background-color: var(--forge-variant-background) !important;
+  color: var(--forge-variant-text) !important;
+}
+.variant-option__button-label:hover {
+  background-color: var(--forge-variant-hover-background) !important;
+  color: var(--forge-variant-hover-text) !important;
+}
+.variant-option__button-label__pill {
+  background: var(--forge-selected-variant-background) !important;
+}
+.variant-option__button-label:has(:checked) {
+  background-color: transparent !important;
+  color: var(--forge-selected-variant-text) !important;
+}
+.variant-option__button-label:has(:checked):hover {
+  color: var(--forge-selected-variant-hover-text) !important;
+}
+.variant-option__button-label:has(:checked):hover .variant-option__button-label__pill {
+  background-color: var(--forge-selected-variant-hover-background) !important;
+}
+.forge-button::after,
+.forge-button-unstyled::after,
+.shopify-payment-button__button--unbranded::after {
+  box-shadow: none !important;
+}
+{% render 'scroll-reveal-css' %}
+{% render 'forge-spacing-css' %}
+{% endstyle %}
+{{ 'forge-base.css' | asset_url | stylesheet_tag }}
+{% render 'forge-scripts' %}
+{% if section.settings.animation_intensity != 'none' %}
+  <script
+    src="{{ 'scroll-animations.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
+{% render 'cart-drawer-mini-2' %}
+{% schema %}
+{
+  "name": "Forge style variables",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Page color scheme", "default": "scheme-1" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "background_secondary", "label": "Background secondary", "default": "#f8f9fa" },
+    { "type": "color", "id": "foreground", "label": "Foreground", "default": "#141414" },
+    { "type": "color", "id": "foreground_heading", "label": "Foreground heading", "default": "#141414" },
+    { "type": "color", "id": "primary", "label": "Primary", "default": "#2e8b57" },
+    { "type": "color", "id": "border", "label": "Border", "default": "#eae8e6" },
+    { "type": "color", "id": "shadow", "label": "Shadow", "default": "#000000" },
+    { "type": "color", "id": "primary_button_background", "label": "Primary button background", "default": "#2e8b57" },
+    { "type": "color", "id": "primary_button_border", "label": "Primary button border", "default": "#2e8b57" },
+    { "type": "color", "id": "primary_button_text", "label": "Primary button text", "default": "#ffffff" },
+    { "type": "color", "id": "secondary_button_background", "label": "Secondary button background", "default": "#e6e6e6" },
+    { "type": "color", "id": "secondary_button_border", "label": "Secondary button border", "default": "#e6e6e6" },
+    { "type": "color", "id": "secondary_button_text", "label": "Secondary button text", "default": "#2e8b57" },
+    { "type": "color", "id": "input_background", "label": "Input background", "default": "#ffffff" },
+    { "type": "color", "id": "input_text_color", "label": "Input text", "default": "#141414" },
+    { "type": "color", "id": "input_border_color", "label": "Input border", "default": "#eae8e6" },
+    { "type": "color", "id": "variant_background_color", "label": "Variant background", "default": "#ffffff" },
+    { "type": "color", "id": "variant_border_color", "label": "Variant border", "default": "#eae8e6" },
+    { "type": "color", "id": "variant_text_color", "label": "Variant text", "default": "#141414" },
+    { "type": "color", "id": "selected_variant_background_color", "label": "Selected variant background", "default": "#2e8b57" },
+    { "type": "color", "id": "selected_variant_border_color", "label": "Selected variant border", "default": "#2e8b57" },
+    { "type": "color", "id": "selected_variant_text_color", "label": "Selected variant text", "default": "#ffffff" },
+    { "type": "color", "id": "gradient_1", "label": "Gradient 1", "default": "#2e8b57" },
+    { "type": "color", "id": "gradient_2", "label": "Gradient 2", "default": "#2e8b57" },
+    { "type": "color", "id": "gradient_3", "label": "Gradient 3", "default": "#2e8b57" },
+    { "type": "color", "id": "gradient_text_color", "label": "Gradient text", "default": "#ffffff" },
+    { "type": "color", "id": "wave_color", "label": "Wave", "default": "#ffffff" },
+    { "type": "font_picker", "id": "body_font", "label": "Body font", "default": "assistant_n4" },
+    { "type": "number", "id": "type_size_paragraph", "label": "paragraph size", "default": 14 },
+    { "type": "number", "id": "type_size_h1", "label": "h1 size", "default": 40 },
+    { "type": "number", "id": "type_size_h2", "label": "h2 size", "default": 36 },
+    { "type": "number", "id": "type_size_h3", "label": "h3 size", "default": 32 },
+    { "type": "number", "id": "type_size_h4", "label": "h4 size", "default": 24 },
+    { "type": "number", "id": "type_size_h5", "label": "h5 size", "default": 18 },
+    { "type": "number", "id": "type_size_h6", "label": "h6 size", "default": 16 },
+    { "type": "text", "id": "type_font_h1", "label": "h1 font", "default": "heading" },
+    { "type": "text", "id": "type_font_h2", "label": "h2 font", "default": "heading" },
+    { "type": "text", "id": "type_font_h3", "label": "h3 font", "default": "subheading" },
+    { "type": "text", "id": "type_font_h4", "label": "h4 font", "default": "subheading" },
+    { "type": "text", "id": "type_font_h5", "label": "h5 font", "default": "subheading" },
+    { "type": "text", "id": "type_font_h6", "label": "h6 font", "default": "subheading" },
+    { "type": "text", "id": "type_line_height_paragraph", "label": "paragraph line_height", "default": "body-normal" },
+    { "type": "text", "id": "type_line_height_h1", "label": "h1 line_height", "default": "display-normal" },
+    { "type": "text", "id": "type_line_height_h2", "label": "h2 line_height", "default": "display-normal" },
+    { "type": "text", "id": "type_line_height_h3", "label": "h3 line_height", "default": "display-normal" },
+    { "type": "text", "id": "type_line_height_h4", "label": "h4 line_height", "default": "display-normal" },
+    { "type": "text", "id": "type_line_height_h5", "label": "h5 line_height", "default": "display-normal" },
+    { "type": "text", "id": "type_line_height_h6", "label": "h6 line_height", "default": "display-normal" },
+    { "type": "font_picker", "id": "heading_font", "label": "Heading font", "default": "assistant_n4" },
+    { "type": "font_picker", "id": "subheading_font", "label": "Subheading font", "default": "assistant_n4" },
+    { "type": "font_picker", "id": "accent_font", "label": "Accent font", "default": "assistant_n4" },
+    { "type": "text", "id": "style_mode", "label": "Style mode", "default": "flat" },
+    { "type": "checkbox", "id": "drawer_drop_shadow", "label": "Drawer drop shadow", "default": false },
+    { "type": "checkbox", "id": "popover_drop_shadow", "label": "Popover drop shadow", "default": false },
+    { "type": "range", "id": "global_border_radius", "min": 0, "max": 32, "step": 2, "unit": "px", "label": "Card border radius", "default": 8 },
+    { "type": "range", "id": "inputs_border_radius", "min": 0, "max": 32, "step": 1, "unit": "px", "label": "Input border radius", "default": 8 },
+    { "type": "range", "id": "variant_swatch_radius", "min": 0, "max": 100, "step": 1, "unit": "px", "label": "Variant swatch radius", "default": 100 },
+    { "type": "range", "id": "variant_button_radius", "min": 0, "max": 100, "step": 1, "unit": "px", "label": "Variant button radius", "default": 8 },
+    {
+      "type": "select",
+      "id": "button_shape",
+      "label": "Button shape",
+      "options": [
+        { "value": "square", "label": "Square" },
+        { "value": "soft", "label": "Rounded" },
+        { "value": "pill", "label": "Pill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "soft"
+    },
+    { "type": "range", "id": "button_radius_custom", "min": 0, "max": 24, "step": 1, "unit": "px", "label": "Button border radius (custom)", "default": 4 },
+    { "type": "range", "id": "card_gap", "min": 0, "max": 48, "step": 4, "unit": "px", "label": "Card gap", "default": 20 },
+    { "type": "range", "id": "card_shadow", "min": 0, "max": 100, "step": 1, "unit": "%", "label": "Card shadow", "default": 33 },
+    { "type": "range", "id": "heading_scale", "min": 70, "max": 140, "step": 1, "unit": "%", "label": "Heading size", "default": 100 },
+    { "type": "range", "id": "section_spacing", "min": 50, "max": 120, "step": 1, "unit": "%", "label": "Section spacing", "default": 80 },
+    {
+      "type": "select",
+      "id": "animation_intensity",
+      "label": "Scroll animation intensity",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "mild", "label": "Mild" },
+        { "value": "lots", "label": "Lots" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "mild"
+    },
+    { "type": "range", "id": "animation_speed_custom", "min": 100, "max": 1500, "step": 50, "unit": "ms", "label": "Custom animation speed", "default": 550 },
+    { "type": "range", "id": "animation_distance_custom", "min": 0, "max": 80, "step": 4, "unit": "px", "label": "Custom animation distance", "default": 24 },
+    {
+      "type": "select",
+      "id": "heading_tracking",
+      "label": "Letter spacing",
+      "options": [
+        { "value": "tight", "label": "Tight" },
+        { "value": "normal", "label": "Normal" },
+        { "value": "loose", "label": "Loose" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "regular", "label": "Regular" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "regular"
+    },
+    {
+      "type": "select",
+      "id": "heading_case",
+      "label": "Heading case",
+      "options": [
+        { "value": "none", "label": "As written" },
+        { "value": "uppercase", "label": "Uppercase" }
+      ],
+      "default": "none"
+    }
+  ]
+}
+{% endschema %}

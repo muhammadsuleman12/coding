@@ -1,0 +1,349 @@
+
+
+{%- assign block_settings = block.settings -%}
+{%- assign plain_text = block_settings.text | strip_newlines | strip_html | strip -%}
+{%- assign block_index = section.blocks | find_index: 'id', block.id -%}
+
+{%- unless plain_text == '' -%}
+  <forge-slideshow-slide
+    ref="slides[]"
+    class="
+      announcement-bar__slide
+      forge-text-block
+      text-block--{{ block.id }}
+      text-block--align-center
+      text-block--full-width
+      forge-custom-typography
+      {% if block_settings.font_size != "" %}custom-font-size{% endif %}
+      {% if block_settings.weight != "" %}custom-font-weight{% endif %}
+    "
+    style="
+      {% render 'typography-style', settings: block_settings, preset: 'custom' %}
+      --width: 100%;
+      --text-align: center;
+      --line-height: 1;
+    "
+    {{ block.shopify_attributes }}
+    aria-hidden="{% if block_index == 0 %}false{% else %}true{% endif %}"
+  >
+    {% if section.settings.enable_scrolling_text %}
+      <div class="announcement-bar__marquee">
+        <div class="announcement-bar__marquee-track">
+          <p class="announcement-bar__text announcement-bar__marquee-text">
+            {{ block.settings.text }}
+          </p>
+        </div>
+      </div>
+    {% else %}
+      <p class="announcement-bar__text">
+        {{ block.settings.text }}
+      </p>
+    {% endif %}
+
+    {% if block_settings.link != blank %}
+      <a
+        class="announcement-bar__link"
+        href="{{ block_settings.link }}"
+      >
+        <span class="forge-visually-hidden">
+          {{ block_settings.text | strip_html }}
+        </span>
+      </a>
+    {% endif %}
+  </forge-slideshow-slide>
+{%- endunless -%}
+
+{% stylesheet %}
+  .forge-text-block {
+    width: var(--width);
+    max-width: 100%;
+  }
+
+  .forge-text-block > * {
+    width: var(--width);
+    max-width: var(--max-width, 100%);
+    text-align: var(--text-align);
+  }
+
+  .forge-text-block:not(.text-block--full-width).forge-rte,
+  .forge-text-block:not(.text-block--full-width).forge-paragraph {
+    /* Safari doesn't support pretty, so fallback to balance */
+    text-wrap: balance;
+    text-wrap: pretty;
+  }
+
+  .forge-text-block:not(.text-block--full-width).h1,
+  .forge-text-block:not(.text-block--full-width).forge-h2,
+  .forge-text-block:not(.text-block--full-width).forge-h3,
+  .forge-text-block:not(.text-block--full-width).forge-h4,
+  .forge-text-block:not(.text-block--full-width).forge-h5,
+  .forge-text-block:not(.text-block--full-width).forge-h6 {
+    text-wrap: balance;
+  }
+
+  /* Hide underline unless text is using paragraph styles. */
+  .forge-text-block:is(.h1, .forge-h2, .forge-h3, .forge-h4, .forge-h5, .forge-h6) a {
+    text-decoration-color: transparent;
+  }
+
+  .forge-text-block h1,
+  .forge-text-block.h1 > * {
+    margin-block: var(--font-h1--spacing);
+  }
+
+  .forge-text-block h2,
+  .forge-text-block.forge-h2 > * {
+    margin-block: var(--font-h2--spacing);
+  }
+
+  .forge-text-block h3,
+  .forge-text-block.forge-h3 > * {
+    margin-block: var(--font-h3--spacing);
+  }
+
+  .forge-text-block h4,
+  .forge-text-block.forge-h4 > * {
+    margin-block: var(--font-h4--spacing);
+  }
+
+  .forge-text-block h5,
+  .forge-text-block.forge-h5 > * {
+    margin-block: var(--font-h5--spacing);
+  }
+
+  .forge-text-block h6,
+  .forge-text-block.forge-h6 > * {
+    margin-block: var(--font-h6--spacing);
+  }
+
+  .forge-text-block > *:first-child {
+    margin-block-start: 0;
+  }
+
+  .forge-text-block > *:last-child {
+    margin-block-end: 0;
+  }
+
+  .text-block--align-center,
+  .text-block--align-center > * {
+    margin-inline: auto;
+  }
+
+  .text-block--align-right,
+  .text-block--align-right > * {
+    margin-inline-start: auto;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.announcement",
+  "tag": null,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "t:forge.settings.text",
+      "default": "t:forge.text_defaults.shop_our_latest_arrivals"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:forge.settings.link"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.typography"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:forge.settings.font",
+      "options": [
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:forge.options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:forge.options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:forge.options.heading"
+        },
+        {
+          "value": "var(--font-accent--family)",
+          "label": "t:forge.options.accent"
+        }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:forge.settings.size",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "0.625rem",
+          "label": "10px"
+        },
+        {
+          "value": "0.75rem",
+          "label": "12px"
+        },
+        {
+          "value": "0.875rem",
+          "label": "14px"
+        },
+        {
+          "value": "1rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.125rem",
+          "label": "18px"
+        },
+        {
+          "value": "1.25rem",
+          "label": "20px"
+        },
+        {
+          "value": "1.5rem",
+          "label": "24px"
+        },
+        {
+          "value": "2rem",
+          "label": "32px"
+        },
+        {
+          "value": "2.5rem",
+          "label": "40px"
+        },
+        {
+          "value": "3rem",
+          "label": "48px"
+        },
+        {
+          "value": "3.5rem",
+          "label": "56px"
+        },
+        {
+          "value": "4.5rem",
+          "label": "72px"
+        },
+        {
+          "value": "5.5rem",
+          "label": "88px"
+        },
+        {
+          "value": "7.5rem",
+          "label": "120px"
+        },
+        {
+          "value": "9.5rem",
+          "label": "152px"
+        },
+        {
+          "value": "11.5rem",
+          "label": "184px"
+        }
+      ],
+      "default": "1rem"
+    },
+    {
+      "type": "select",
+      "id": "weight",
+      "label": "t:forge.settings.weight",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "100",
+          "label": "t:forge.options.thin"
+        },
+        {
+          "value": "300",
+          "label": "t:forge.options.light"
+        },
+        {
+          "value": "400",
+          "label": "t:forge.options.regular"
+        },
+        {
+          "value": "500",
+          "label": "t:forge.options.medium"
+        },
+        {
+          "value": "600",
+          "label": "t:forge.options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:forge.options.bold"
+        },
+        {
+          "value": "900",
+          "label": "t:forge.options.black"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:forge.settings.letter_spacing",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:forge.options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:forge.options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:forge.options.loose"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "t:forge.settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:forge.options.uppercase"
+        }
+      ],
+      "default": "none"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.announcement",
+      "settings": {
+        "text": "t:forge.text_defaults.shop_our_latest_arrivals",
+        "font": "var(--font-body--family)",
+        "font_size": "1rem",
+        "weight": "",
+        "letter_spacing": "normal",
+        "case": "none"
+      }
+    }
+  ]
+}
+{% endschema %}

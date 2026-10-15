@@ -1,0 +1,277 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign label = section.settings.label
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign row_blocks = section.blocks | where: 'type', 'row'
+%}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-lifestyle bold-section forge-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-lifestyle__inner">
+    {% if label != blank or heading != blank or subtitle != blank %}
+      <header class="bold-section-header" data-animate="fade-up">
+        {% if label != blank %}
+          <span class="bold-section-label">{{ label }}</span>
+        {% endif %}
+        {% if heading != blank %}
+          <h2 class="bold-section-title">{{ heading }}</h2>
+        {% endif %}
+        {% if subtitle != blank %}
+          <p class="bold-section-subtitle">{{ subtitle }}</p>
+        {% endif %}
+        <div class="bold-accent-line" aria-hidden="true"></div>
+      </header>
+    {% endif %}
+
+    {% if row_blocks.size > 0 %}
+      <div class="bold-lifestyle__rows">
+        {% for block in row_blocks %}
+          {% assign is_reversed = forloop.index | modulo: 2 %}
+          <article class="bold-lifestyle__row{% if is_reversed == 0 %} bold-lifestyle__row--reverse{% endif %}" {{ block.shopify_attributes }}>
+            <div class="bold-lifestyle__media" data-animate="scale-in">
+              {% if block.settings.image != blank %}
+                {% capture img_srcset_1 %}{{ block.settings.image | image_url: width: 600 }} 600w, {{ block.settings.image | image_url: width: 1200 }} 1200w, {{ block.settings.image | image_url: width: 2400 }} 2400w{% endcapture %}
+                <img
+                  src="{{ block.settings.image | image_url: width: 1200 }}"
+                  srcset="{{ img_srcset_1 }}"
+                  sizes="(min-width: 990px) 50vw, 100vw"
+                  alt="{{ block.settings.image.alt | default: block.settings.title }}"
+                  width="600"
+                  height="450"
+                  loading="lazy"
+                  class="bold-lifestyle__image"
+                >
+              {% elsif block.settings.image_url != blank %}
+                {% # theme-check-disable RemoteAsset %}
+                <img
+                  src="{{ block.settings.image_url }}"
+                  alt="{{ block.settings.title | default: 'Lifestyle' }}"
+                  width="600"
+                  height="450"
+                  loading="lazy"
+                  class="bold-lifestyle__image"
+                >
+                {% # theme-check-enable RemoteAsset %}
+              {% else %}
+                <div class="bold-lifestyle__placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+              {% endif %}
+            </div>
+            <div class="bold-lifestyle__content" data-animate="fade-up">
+              {% if block.settings.label != blank %}
+                <span class="bold-section-label">{{ block.settings.label }}</span>
+              {% endif %}
+              {% if block.settings.title != blank %}
+                <h3 class="bold-lifestyle__title">{{ block.settings.title }}</h3>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <div class="bold-lifestyle__description forge-rte">{{ block.settings.description }}</div>
+              {% endif %}
+              {% if block.settings.bullet_list != blank %}
+                <ul class="bold-lifestyle__bullets">
+                  {% assign bullets = block.settings.bullet_list | newline_to_br | split: '<br />' %}
+                  {% for bullet in bullets %}
+                    {% assign bullet_text = bullet | strip %}
+                    {% if bullet_text != blank %}
+                      <li>{{ bullet_text }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {% if block.settings.cta_label != blank %}
+                <a href="{{ block.settings.cta_link | default: '#' }}" class="bold-btn-primary">
+                  {{ block.settings.cta_label }}
+                </a>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-lifestyle {
+    padding: calc(72px * var(--section-spacing-scale, 1)) 24px;
+  }
+
+  .bold-lifestyle__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .bold-lifestyle__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .bold-lifestyle__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .bold-lifestyle__row--reverse .bold-lifestyle__media {
+    order: 2;
+  }
+
+  .bold-lifestyle__row--reverse .bold-lifestyle__content {
+    order: 1;
+  }
+
+  .bold-lifestyle__media {
+    border-radius: var(--bold-radius-lg, 20px);
+    overflow: hidden;
+    box-shadow: var(--bold-shadow);
+    border: 1px solid var(--bold-glass-border);
+  }
+
+  .bold-lifestyle__image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+
+  .bold-lifestyle__placeholder {
+    aspect-ratio: 4 / 3;
+    background: var(--bold-card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bold-lifestyle__placeholder svg {
+    width: 50%;
+    opacity: 0.3;
+  }
+
+  .bold-lifestyle__title {
+    font-family: var(--bold-font-heading);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: var(--font-h3--weight, 800);
+    text-transform: var(--font-h3--case, uppercase);
+    letter-spacing: var(--font-h3--letter-spacing, normal);
+    margin: 0 0 16px;
+    color: var(--bold-text-light);
+  }
+
+  .bold-lifestyle__description {
+    color: var(--bold-text-muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .bold-lifestyle__bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bold-lifestyle__bullets li {
+    position: relative;
+    padding-left: 24px;
+    color: var(--bold-text-light);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .bold-lifestyle__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bold-accent1);
+  }
+
+  @media screen and (max-width: 989px) {
+    .bold-lifestyle__row,
+    .bold-lifestyle__row--reverse {
+      grid-template-columns: 1fr;
+    }
+
+    .bold-lifestyle__row--reverse .bold-lifestyle__media,
+    .bold-lifestyle__row--reverse .bold-lifestyle__content {
+      order: unset;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-lifestyle {
+      padding: calc(48px * var(--section-spacing-scale, 1)) 16px;
+    }
+
+    .bold-lifestyle__rows {
+      gap: 40px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bold Lifestyle",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Section label",
+      "default": "EXPLORE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Built for the journey"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Gear up for everyday use with performance you can trust."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_url", "label": "Image URL" },
+        { "type": "text", "id": "label", "label": "Label", "default": "FEATURE" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Everyday performance" },
+        { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Engineered for everyday use and all-day comfort.</p>" },
+        { "type": "textarea", "id": "bullet_list", "label": "Bullet list (one per line)", "default": "Water-resistant design\nLightweight materials\nAll-day comfort" },
+        { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Shop now" },
+        { "type": "url", "id": "cta_link", "label": "CTA link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Lifestyle",
+      "blocks": [
+        { "type": "row" },
+        { "type": "row" }
+      ]
+    }
+  ]
+}
+{% endschema %}

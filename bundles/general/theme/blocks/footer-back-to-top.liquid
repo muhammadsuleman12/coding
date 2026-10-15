@@ -1,0 +1,87 @@
+{%- doc -%}
+  Circular back-to-top button for the footer utilities bar.
+  Scrolls the page to the top when activated.
+{%- enddoc -%}
+
+<button
+  type="button"
+  class="footer-back-to-top footer-utilities__back-to-top"
+  aria-label="{% render 'forge-t', key: 'accessibility.back_to_top', fallback: 'Back to top' %}"
+  data-footer-back-to-top
+  {{ block.shopify_attributes }}
+>
+  <svg
+    class="footer-back-to-top__icon"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M12 19V5" />
+    <path d="M5 12l7-7 7 7" />
+  </svg>
+</button>
+
+<script>
+  (function () {
+    if (window.__forgeFooterBackToTopBound) return;
+    window.__forgeFooterBackToTopBound = true;
+
+    document.addEventListener('click', function (event) {
+      const button = event.target.closest('[data-footer-back-to-top]');
+      if (!button) return;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .footer-back-to-top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: var(--color-primary-button-background);
+    color: var(--color-primary-button-text);
+    transition: opacity 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .footer-back-to-top:hover {
+    opacity: 0.85;
+  }
+
+  .footer-back-to-top:focus-visible {
+    outline: 2px solid var(--color-primary-button-background);
+    outline-offset: 2px;
+  }
+
+  .footer-back-to-top__icon {
+    width: 20px;
+    height: 20px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Back to top",
+  "tag": "div",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Back to top",
+      "category": "t:forge.categories.footer"
+    }
+  ]
+}
+{% endschema %}

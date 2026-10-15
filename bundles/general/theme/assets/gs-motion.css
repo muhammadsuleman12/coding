@@ -1,0 +1,21 @@
+/* EPH General Store motion v2 — "unveil". Swap this file to change the store's motion style. */
+@keyframes gs-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes gs-unveil { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes gs-settle { from { transform: scale(1.08); } to { transform: scale(1); } }
+@keyframes gs-pop { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+.gs-js .gs-motion [data-gs-reveal] { opacity: 0; }
+.gs-js .gs-motion [data-gs-reveal].is-in { animation: gs-rise .7s var(--gs-ease) both; animation-delay: calc(var(--i, 0) * 70ms); }
+/* Images inside revealed items wipe in from the top, then settle */
+.gs-js .gs-motion [data-gs-reveal].is-in .gs-unveil,
+.gs-js .gs-motion .gs-unveil[data-gs-reveal].is-in { animation: gs-unveil .9s var(--gs-ease) both; animation-delay: calc(var(--i, 0) * 70ms + 80ms); opacity: 1; }
+.gs-js .gs-motion [data-gs-reveal].is-in .gs-unveil img,
+.gs-js .gs-motion .gs-unveil[data-gs-reveal].is-in img { animation: gs-settle 1.2s var(--gs-ease) both; }
+.gs-iconbtn.is-added { animation: gs-pop .4s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gs-js .gs-motion [data-gs-reveal] { opacity: 1 !important; animation: none !important; }
+  .gs-js .gs-motion .gs-unveil, .gs-js .gs-motion .gs-unveil img, .gs-iconbtn.is-added { animation: none !important; }
+  .gs-card__img, .gs-tile__media img, .gs-promo__media img, .gs-tab::after, .gs-faq__sign { transition: none !important; }
+}
+.gs-motion-off [data-gs-reveal] { opacity: 1 !important; animation: none !important; }

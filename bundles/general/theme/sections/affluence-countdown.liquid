@@ -1,0 +1,296 @@
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<forge-affluence-countdown
+  class="affluence-countdown forge-spacing-style forge-section forge-section--page-width forge-color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-padding', settings: section.settings %}"
+  data-countdown-end="{{ section.settings.countdown_end_date }}"
+>
+  <div class="affluence-countdown__content" data-animate="fade-up">
+    {% if section.settings.eyebrow != blank %}
+      <p class="affluence-countdown__eyebrow">{{ section.settings.eyebrow }}</p>
+    {% endif %}
+
+    {% if section.settings.heading != blank %}
+      <h2 class="affluence-countdown__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="affluence-countdown__timer" data-countdown aria-live="polite">
+      <div class="affluence-countdown__unit">
+        <span class="affluence-countdown__number" data-hours>00</span>
+        <span class="affluence-countdown__label">Hours</span>
+      </div>
+      <span class="affluence-countdown__divider">:</span>
+      <div class="affluence-countdown__unit">
+        <span class="affluence-countdown__number" data-minutes>00</span>
+        <span class="affluence-countdown__label">Minutes</span>
+      </div>
+      <span class="affluence-countdown__divider">:</span>
+      <div class="affluence-countdown__unit">
+        <span class="affluence-countdown__number" data-seconds>00</span>
+        <span class="affluence-countdown__label">Seconds</span>
+      </div>
+    </div>
+
+    {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+      <a href="{{ section.settings.button_link }}" class="affluence-countdown__button">
+        {{ section.settings.button_label }}
+      </a>
+    {% endif %}
+  </div>
+</forge-affluence-countdown>
+
+{% stylesheet %}
+  .affluence-countdown {
+    position: relative;
+  }
+
+  .affluence-countdown__content {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .affluence-countdown__eyebrow {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.65;
+  }
+
+  .affluence-countdown__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1.75rem, 5vw, var(--font-h2--size));
+    font-weight: var(--font-h2--weight, 500);
+    line-height: 1.25;
+    color: var(--color-foreground);
+  }
+
+  .affluence-countdown__timer {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 16px;
+    padding-block: 12px;
+    padding-inline: 24px;
+    border-block: 1px solid var(--color-border);
+    border-radius: var(--style-border-radius-global, 0px);
+  }
+
+  @media screen and (max-width: 749px) {
+    .affluence-countdown__timer {
+      gap: 10px;
+      padding-inline: 12px;
+    }
+  }
+
+  .affluence-countdown__unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 48px;
+  }
+
+  .affluence-countdown__divider {
+    font-family: var(--font-heading--family, inherit);
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--color-foreground);
+    opacity: 0.35;
+    align-self: center;
+  }
+
+  .affluence-countdown__number {
+    font-family: var(--font-heading--family, inherit);
+    font-size: 1.75rem;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-foreground);
+  }
+
+  @media screen and (min-width: 750px) {
+    .affluence-countdown__number {
+      font-size: 2.25rem;
+    }
+  }
+
+  .affluence-countdown__label {
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.55;
+  }
+
+  .affluence-countdown__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 32px;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.8125rem;
+    font-weight: var(--font-body--weight, 500);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-foreground);
+    background: transparent;
+    border: 1px solid var(--color-foreground);
+    border-radius: var(--style-border-radius-buttons-secondary, 0px);
+    transition: opacity 0.2s ease;
+  }
+
+  .affluence-countdown__button:hover {
+    opacity: 0.65;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class AffluenceCountdown extends HTMLElement {
+    constructor() {
+      super();
+      this.hoursEl = this.querySelector('[data-hours]');
+      this.minutesEl = this.querySelector('[data-minutes]');
+      this.secondsEl = this.querySelector('[data-seconds]');
+      this.timerEl = this.querySelector('[data-countdown]');
+    }
+
+    connectedCallback() {
+      this.endTime = this.getEndTime();
+      if (!this.timerEl) return;
+      this.updateCountdown();
+      this.interval = setInterval(() => this.updateCountdown(), 1000);
+    }
+
+    disconnectedCallback() {
+      if (this.interval) {
+        clearInterval(this.interval);
+      }
+    }
+
+    getEndTime() {
+      const configured = this.dataset.countdownEnd;
+      if (configured) {
+        const parsed = new Date(String(configured).replace(' ', 'T'));
+        if (!isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
+          return parsed.getTime();
+        }
+      }
+      // Fallback: 48 hours from first render, so the timer never shows a stale/expired state.
+      return Date.now() + 48 * 60 * 60 * 1000;
+    }
+
+    updateCountdown() {
+      const distance = Math.max(0, this.endTime - Date.now());
+      const hours = Math.floor(distance / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      if (this.hoursEl) this.hoursEl.textContent = String(hours).padStart(2, '0');
+      if (this.minutesEl) this.minutesEl.textContent = String(minutes).padStart(2, '0');
+      if (this.secondsEl) this.secondsEl.textContent = String(seconds).padStart(2, '0');
+    }
+  }
+
+  customElements.define('forge-affluence-countdown', AffluenceCountdown);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Affluence countdown",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "For a Limited Time"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The Winter Edit Closes Soon"
+    },
+    {
+      "type": "header",
+      "content": "Countdown timer"
+    },
+    {
+      "type": "text",
+      "id": "countdown_end_date",
+      "label": "Countdown end date",
+      "info": "Format: YYYY-MM-DD HH:MM:SS",
+      "default": "2025-12-25 23:59:59"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Affluence countdown"
+    }
+  ]
+}
+{% endschema %}

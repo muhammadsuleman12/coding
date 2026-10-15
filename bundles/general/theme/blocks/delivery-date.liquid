@@ -1,0 +1,265 @@
+
+{%- liquid
+  assign shipping_days = block.settings.shipping_days | default: 3
+  assign count_mode = block.settings.count_mode | default: 'working_days'
+  assign date_format = block.settings.date_format | default: '%B %-d'
+  assign text_before = block.settings.text_before
+
+  assign now_ts = 'now' | date: '%s' | times: 1
+  assign day_seconds = 86400
+
+  if count_mode == 'all_days'
+    assign day_offset = shipping_days
+  else
+    assign day_offset = 0
+    assign added = 0
+    for i in (1..60)
+      if added >= shipping_days
+        break
+      endif
+      assign day_offset = day_offset | plus: 1
+      assign elapsed = day_offset | times: day_seconds
+      assign check_ts = now_ts | plus: elapsed
+      assign weekday = check_ts | date: '%w' | times: 1
+      if weekday != 0 and weekday != 6
+        assign added = added | plus: 1
+      endif
+    endfor
+  endif
+
+  assign delivery_offset = day_offset | times: day_seconds
+  assign delivery_ts = now_ts | plus: delivery_offset
+  assign delivery_label = delivery_ts | date: date_format
+-%}
+
+<div
+  class="delivery-date delivery-date--align-{{ block.settings.alignment | default: 'left' }}"
+  style="
+    {% if block.settings.background_color != blank %}--dd-bg: {{ block.settings.background_color }};{% endif %}
+    {% if block.settings.border_color != blank %}--dd-border: {{ block.settings.border_color }};{% endif %}
+    {% if block.settings.text_color != blank %}--dd-text: {{ block.settings.text_color }};{% endif %}
+    {% if block.settings.dot_color != blank %}--dd-dot: {{ block.settings.dot_color }};{% endif %}
+    --dd-padding-y: {{ block.settings.padding_y | default: 10 }}px;
+    --dd-padding-x: {{ block.settings.padding_x | default: 18 }}px;
+    --dd-block-padding-top: {{ block.settings.padding_top | default: 12 }}px;
+    --dd-block-padding-bottom: {{ block.settings.padding_bottom | default: 12 }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  <span class="delivery-date__pill">
+    {% if block.settings.show_dot %}
+      <span class="delivery-date__dot" aria-hidden="true">
+        <span class="delivery-date__dot-core"></span>
+      </span>
+    {% endif %}
+    <span class="delivery-date__text">
+      {% if text_before != blank %}{{ text_before }} {% endif %}<strong class="delivery-date__date">{{ delivery_label }}</strong>
+    </span>
+  </span>
+</div>
+
+{% stylesheet %}
+  .delivery-date {
+    width: 100%;
+    padding-top: var(--dd-block-padding-top, 12px);
+    padding-bottom: var(--dd-block-padding-bottom, 12px);
+    display: flex;
+  }
+
+  .delivery-date--align-left   { justify-content: flex-start; }
+  .delivery-date--align-center { justify-content: center; }
+  .delivery-date--align-right  { justify-content: flex-end; }
+
+  .delivery-date__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: var(--dd-padding-y, 10px) var(--dd-padding-x, 18px);
+    background: var(--dd-bg, var(--color-background, transparent));
+    border: 1px solid var(--dd-border, var(--color-border, rgba(0, 0, 0, 0.12)));
+    border-radius: var(--style-border-radius-pills, 999px);
+    color: var(--dd-text, var(--color-foreground, #1a1a1a));
+    max-width: 100%;
+  }
+
+  .delivery-date__dot {
+    position: relative;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--dd-dot, #4caf50) 22%, transparent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Fallback for browsers that don't support color-mix — solid translucent halo. */
+  @supports not (background: color-mix(in srgb, red, blue)) {
+    .delivery-date__dot {
+      background: rgba(76, 175, 80, 0.22);
+    }
+  }
+
+  .delivery-date__dot-core {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--dd-dot, #4caf50);
+    display: block;
+  }
+
+  .delivery-date__text {
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    color: inherit;
+  }
+
+  .delivery-date__date {
+    font-weight: 600;
+  }
+
+  @media (max-width: 480px) {
+    .delivery-date__text {
+      font-size: 0.875rem;
+    }
+    .delivery-date__pill {
+      padding: 8px 14px;
+      gap: 10px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Delivery Date",
+  "tag": "div",
+  "settings": [
+    { "type": "header", "content": "Delivery estimate" },
+    {
+      "type": "range",
+      "id": "shipping_days",
+      "label": "Shipping time (days)",
+      "info": "How long the order takes to reach the customer.",
+      "min": 1,
+      "max": 21,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "count_mode",
+      "label": "How to count days",
+      "options": [
+        { "value": "working_days", "label": "Working days only (Mon–Fri)" },
+        { "value": "all_days", "label": "All days (including weekends)" }
+      ],
+      "default": "working_days"
+    },
+    {
+      "type": "text",
+      "id": "text_before",
+      "label": "Lead-in text",
+      "info": "Text before the calculated date. Leave blank to show only the date.",
+      "default": "Order today, receive it by"
+    },
+    {
+      "type": "text",
+      "id": "date_format",
+      "label": "Date format",
+      "info": "Ruby strftime format (e.g. %B %-d for 'June 17', %A %B %-d for 'Tuesday June 17').",
+      "default": "%B %-d"
+    },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dot",
+      "label": "Show status dot",
+      "default": true
+    },
+    { "type": "header", "content": "Colors" },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Status dot color",
+      "default": "#4caf50"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "info": "Leave blank to inherit from the section color scheme."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "info": "Leave blank to inherit from the section color scheme."
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "info": "Leave blank to inherit from the section color scheme."
+    },
+    { "type": "header", "content": "Spacing" },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "label": "Pill padding (vertical)",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Pill padding (horizontal)",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Block padding top",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Block padding bottom",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Delivery Date"
+    }
+  ]
+}
+{% endschema %}

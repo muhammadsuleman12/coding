@@ -1,0 +1,539 @@
+
+
+{% liquid
+  assign block_settings = block.settings
+  assign ratio = 1
+
+  case block_settings.image_ratio
+    when 'landscape'
+      assign ratio = '16 / 9'
+    when 'portrait'
+      assign ratio = '4 / 5'
+    when 'adapt'
+      assign ratio = block_settings.image.aspect_ratio
+  endcase
+
+  if ratio == 0 or ratio == null
+    assign ratio = 1
+  endif
+%}
+
+{% capture class %}
+  forge-image-block image-block--{{ block.id }} image-block--height-{{ block_settings.height }} spacing-style size-style{% if block_settings.auto_bounce_interval != 'off' %} image-block--bounce{% endif %}
+{% endcapture %}
+
+{% capture style %}
+  --ratio: {{ ratio }};
+  {% render 'size-style', settings: block_settings %}
+  {% render 'spacing-style', settings: block_settings %}
+{% endcapture %}
+
+{% liquid
+  assign effective_radius = block_settings.border_radius | plus: 0
+  if effective_radius == 0 and settings.global_border_radius > 0
+    assign effective_radius = settings.global_border_radius
+  endif
+%}
+
+{% capture image_border_style %}
+  --ratio: {{ ratio }};
+  --border-width: {{ block_settings.border_width }}px;
+  --border-style: {{ block_settings.border }};
+  --border-color: rgb(var(--color-border-rgb) / {{ block_settings.border_opacity | divided_by: 100.0 }});
+  --border-radius: {{ effective_radius }}px;
+  {% if effective_radius > 0 %}overflow: hidden;{% endif %}
+{% endcapture %}
+
+{% liquid
+  assign media_width_desktop = '100vw'
+  assign media_width_mobile = '100vw'
+  assign sizes = 'auto, (min-width: 750px) ' | append: media_width_desktop | append: ', ' | append: media_width_mobile
+  assign widths = '240, 352, 832, 1200, 1600, 1920, 2560, 3840'
+%}
+
+{% capture image %}
+  {%- if block_settings.image -%}
+    {{
+      block_settings.image
+      | image_url: width: 3840
+      | image_tag:
+        width: block_settings.image.width,
+        widths: widths,
+        height: block_settings.image.height,
+        class: 'forge-image-block__image border-style',
+        style: image_border_style,
+        sizes: sizes
+    }}
+  {%- else -%}
+    <div class="placeholder-image forge-border-style forge-size-style" style="{{ image_border_style }}">
+      {{ 'detailed-apparel-1' | placeholder_svg_tag: 'hero__image' }}
+    </div>
+  {%- endif -%}
+{% endcapture %}
+
+{% if block_settings.link == blank %}
+  <forge-image-bounce-block
+    class="{{ class }}"
+    style="{{ style }}"
+    data-auto-bounce-interval="{{ block_settings.auto_bounce_interval }}"
+    data-bounce-intensity="{{ block_settings.bounce_intensity }}"
+    data-bounce-speed="{{ block_settings.bounce_speed }}"
+    {{ block.shopify_attributes }}
+  >
+    {{ image }}
+  </forge-image-bounce-block>
+{% else %}
+  <a
+    href="{{ block_settings.link }}"
+    class="{{ class }}"
+    style="{{ style }}"
+    {{ block.shopify_attributes }}
+  >
+    <forge-image-bounce-block
+      data-auto-bounce-interval="{{ block_settings.auto_bounce_interval }}"
+      data-bounce-intensity="{{ block_settings.bounce_intensity }}"
+      data-bounce-speed="{{ block_settings.bounce_speed }}"
+      style="display: block; width: 100%; height: 100%;"
+    >
+      {{ image }}
+    </forge-image-bounce-block>
+  </a>
+{% endif %}
+
+{% stylesheet %}
+  .placeholder-image {
+    position: relative;
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+  }
+
+  placeholder-image img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: var(--ratio);
+  }
+
+  .forge-image-block {
+    display: flex;
+
+    /* When the image is nested in a group, section, etc, respect the parent's horizontal alignment */
+    justify-content: var(--horizontal-alignment, 'inline-start');
+  }
+
+  .image-block--height-fill .image-block__image {
+    height: 100%;
+  }
+
+  .image-block__image {
+    width: 100%;
+    object-fit: cover;
+    aspect-ratio: var(--ratio);
+  }
+
+  /* Bounce animation styles */
+  forge-image-bounce-block {
+    display: block;
+  }
+
+  /* Subtle bounce - up and down motion */
+  @keyframes gentle-bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    20% { transform: translateY(-4px); }
+    40% { transform: translateY(2px); }
+    60% { transform: translateY(-2px); }
+    80% { transform: translateY(1px); }
+  }
+
+  /* Normal bounce - up and down motion */
+  @keyframes gentle-bounce-normal {
+    0%, 100% { transform: translateY(0); }
+    20% { transform: translateY(-8px); }
+    40% { transform: translateY(4px); }
+    60% { transform: translateY(-4px); }
+    80% { transform: translateY(2px); }
+  }
+
+  /* Pronounced bounce - up and down motion */
+  @keyframes gentle-bounce-pronounced {
+    0%, 100% { transform: translateY(0); }
+    20% { transform: translateY(-12px); }
+    40% { transform: translateY(6px); }
+    60% { transform: translateY(-6px); }
+    80% { transform: translateY(3px); }
+  }
+
+  /* Slow speed - 0.6s */
+  forge-image-bounce-block.bouncing[data-bounce-speed="slow"][data-bounce-intensity="subtle"] {
+    animation: gentle-bounce-subtle 0.6s ease-out;
+  }
+  forge-image-bounce-block.bouncing[data-bounce-speed="slow"][data-bounce-intensity="normal"] {
+    animation: gentle-bounce-normal 0.6s ease-out;
+  }
+  forge-image-bounce-block.bouncing[data-bounce-speed="slow"][data-bounce-intensity="pronounced"] {
+    animation: gentle-bounce-pronounced 0.6s ease-out;
+  }
+
+  /* Normal speed - 0.4s */
+  forge-image-bounce-block.bouncing[data-bounce-speed="normal"][data-bounce-intensity="subtle"] {
+    animation: gentle-bounce-subtle 0.4s ease-out;
+  }
+  forge-image-bounce-block.bouncing[data-bounce-speed="normal"][data-bounce-intensity="normal"] {
+    animation: gentle-bounce-normal 0.4s ease-out;
+  }
+  forge-image-bounce-block.bouncing[data-bounce-speed="normal"][data-bounce-intensity="pronounced"] {
+    animation: gentle-bounce-pronounced 0.4s ease-out;
+  }
+
+  /* Fast speed - 0.25s */
+  forge-image-bounce-block.bouncing[data-bounce-speed="fast"][data-bounce-intensity="subtle"] {
+    animation: gentle-bounce-subtle 0.25s ease-out;
+  }
+  forge-image-bounce-block.bouncing[data-bounce-speed="fast"][data-bounce-intensity="normal"] {
+    animation: gentle-bounce-normal 0.25s ease-out;
+  }
+  forge-image-bounce-block.bouncing[data-bounce-speed="fast"][data-bounce-intensity="pronounced"] {
+    animation: gentle-bounce-pronounced 0.25s ease-out;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class ImageBounceBlock extends HTMLElement {
+    connectedCallback() {
+      this.setupAutoBounce();
+    }
+
+    disconnectedCallback() {
+      if (this.bounceInterval) {
+        clearInterval(this.bounceInterval);
+      }
+    }
+
+    setupAutoBounce() {
+      const autoBounceInterval = this.getAttribute('data-auto-bounce-interval');
+      
+      if (!autoBounceInterval || autoBounceInterval === 'off') return;
+
+      const intervalSeconds = parseInt(autoBounceInterval);
+      const speed = this.getAttribute('data-bounce-speed') || 'normal';
+      
+      // Get animation duration based on speed (faster overall)
+      const durations = { slow: 600, normal: 400, fast: 250 };
+      const animationDuration = durations[speed] || 400;
+      
+      // Start the auto-bounce interval
+      this.bounceInterval = setInterval(() => {
+        this.classList.add('bouncing');
+        
+        // Remove the class after animation completes
+        setTimeout(() => {
+          this.classList.remove('bouncing');
+        }, animationDuration);
+      }, intervalSeconds * 1000);
+    }
+  }
+
+  if (!customElements.get('forge-image-bounce-block')) {
+    customElements.define('forge-image-bounce-block', ImageBounceBlock);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:forge.names.image",
+  "tag": null,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:forge.settings.image"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:forge.settings.link"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.size"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:forge.options.auto"
+        },
+        {
+          "value": "portrait",
+          "label": "t:forge.options.portrait"
+        },
+        {
+          "value": "square",
+          "label": "t:forge.options.square"
+        },
+        {
+          "value": "landscape",
+          "label": "t:forge.options.landscape"
+        }
+      ],
+      "default": "adapt",
+      "label": "t:forge.settings.aspect_ratio"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:forge.settings.width_desktop",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:forge.options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:forge.settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:forge.settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:forge.options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:forge.options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:forge.settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:forge.settings.height",
+      "options": [
+        {
+          "value": "fit",
+          "label": "t:forge.options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:forge.options.fill"
+        }
+      ],
+      "default": "fit",
+      "visible_if": "{{ block.settings.image_ratio == 'adapt' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.borders"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:forge.settings.style",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:forge.options.solid"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:forge.settings.thickness",
+      "default": 1,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:forge.settings.opacity",
+      "default": 100,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:forge.settings.border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "select",
+      "id": "auto_bounce_interval",
+      "label": "Auto bounce interval",
+      "options": [
+        {
+          "value": "off",
+          "label": "Off"
+        },
+        {
+          "value": "3",
+          "label": "Every 3 seconds"
+        },
+        {
+          "value": "5",
+          "label": "Every 5 seconds"
+        },
+        {
+          "value": "10",
+          "label": "Every 10 seconds"
+        }
+      ],
+      "default": "off",
+      "info": "Automatically bounce the image up and down at regular intervals to grab attention"
+    },
+    {
+      "type": "select",
+      "id": "bounce_intensity",
+      "label": "Bounce intensity",
+      "options": [
+        {
+          "value": "subtle",
+          "label": "Subtle (4px)"
+        },
+        {
+          "value": "normal",
+          "label": "Normal (8px)"
+        },
+        {
+          "value": "pronounced",
+          "label": "Pronounced (12px)"
+        }
+      ],
+      "default": "normal",
+      "info": "Controls how much the image moves during bounce animation",
+      "visible_if": "{{ block.settings.auto_bounce_interval != 'off' }}"
+    },
+    {
+      "type": "select",
+      "id": "bounce_speed",
+      "label": "Bounce speed",
+      "options": [
+        {
+          "value": "slow",
+          "label": "Slow"
+        },
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "fast",
+          "label": "Fast"
+        }
+      ],
+      "default": "normal",
+      "info": "Controls how fast the bounce animation plays",
+      "visible_if": "{{ block.settings.auto_bounce_interval != 'off' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.image",
+      "category": "t:forge.categories.basic"
+    }
+  ]
+}
+{% endschema %}

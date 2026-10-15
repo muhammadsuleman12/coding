@@ -1,0 +1,496 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "product-main_v00ivq": {
+      "type": "product-information",
+      "blocks": {
+        "media-gallery": {
+          "type": "_product-media-gallery",
+          "static": true,
+          "settings": {
+            "media_presentation": "carousel",
+            "media_columns": "two",
+            "image_gap": 4,
+            "large_first_image": false,
+            "icons_style": "arrow",
+            "icons_shape": "none",
+            "slideshow_controls_style": "thumbnails",
+            "slideshow_mobile_controls_style": "dots",
+            "thumbnail_position": "bottom",
+            "thumbnail_width": 72,
+            "show_thumbnails_mobile": false,
+            "aspect_ratio": "1",
+            "constrain_to_viewport": false,
+            "media_fit": "cover",
+            "media_radius": 6,
+            "extend_media": false,
+            "zoom": true,
+            "video_loop": false,
+            "hide_variants": false,
+            "hide_variant_images_until_selected": false,
+            "padding-block-start": 0,
+            "padding-block-end": 12,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "show_testimonial": false,
+            "hide_testimonial_mobile": true,
+            "testimonial_quote": "<p>\"Exactly as described and nicely packed. Really happy with my order.\"</p>",
+            "testimonial_name": "Sarah L.",
+            "testimonial_color_scheme": "scheme-1",
+            "testimonial_border_style": "dashed",
+            "testimonial_border_width": 1,
+            "testimonial_border_radius": 8,
+            "testimonial_photo_size": 80,
+            "testimonial_quote_size": 12,
+            "testimonial_name_size": 16
+          },
+          "blocks": {}
+        },
+        "product-details": {
+          "type": "_product-details",
+          "static": true,
+          "settings": {
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "details_position": "flex-start",
+            "gap": 12,
+            "sticky_details_desktop": true,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "override_child_border_radius": true,
+            "block_border_radius": "0",
+            "padding-block-start": 0,
+            "padding-block-end": 10,
+            "padding-inline-start": 12,
+            "padding-inline-end": 12
+          },
+          "blocks": {
+            "text_WE3K4w": {
+              "type": "text",
+              "name": "t:forge.names.title",
+              "settings": {
+                "text": "<h1><strong>{{ closest.product.title }}</strong></h1>",
+                "character_limit": 0,
+                "width": "fit-content",
+                "max_width": "narrow",
+                "alignment": "left",
+                "width_mobile": "fit-content",
+                "max_width_mobile": "normal",
+                "alignment_mobile": "left",
+                "letter_spacing": "normal",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_a7krng": {
+              "type": "price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "hide_cents": false,
+                "currency_symbol_after": false,
+                "price_color": "",
+                "compare_at_price_color": "",
+                "show_badges": true,
+                "badge_border_radius": 4,
+                "badge_show_chevron": false,
+                "save_badge_text": "SAVE",
+                "badge_color": "",
+                "type_preset": "h2",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "color": "var(--color-foreground)",
+                "accent_color_scheme": "",
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "variant_picker_R3rGDr": {
+              "type": "variant-picker",
+              "settings": {
+                "variant_style": "buttons",
+                "show_swatches": true,
+                "alignment": "left",
+                "color_scheme": "",
+                "show_variant_title": false,
+                "selected_option_background": "",
+                "selected_option_text": "",
+                "selected_option_border": "",
+                "unselected_option_background": "",
+                "unselected_option_text": "",
+                "unselected_option_border": "",
+                "selected_option_hover_background": "",
+                "selected_option_hover_text": "",
+                "selected_option_hover_border": "",
+                "unselected_option_hover_background": "",
+                "unselected_option_hover_text": "",
+                "unselected_option_hover_border": "",
+                "option_border_radius": 0,
+                "swatch_border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 18,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "buy_buttons_eYQEYi": {
+              "type": "buy-buttons",
+              "settings": {
+                "stacking": false,
+                "show_pickup_availability": false,
+                "gift_card_form": true,
+                "show_buy_now": false,
+                "buy_now_text": "Buy it now",
+                "mobile_font_size": 16,
+                "mobile_padding_block": 16,
+                "mobile_padding_inline": 32,
+                "desktop_font_size": 16,
+                "desktop_padding_block": 16,
+                "desktop_padding_inline": 32,
+                "quantity_picker_corner_radius": 8,
+                "buy_buttons_cta_corner_radius": 8,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "quantity": {
+                  "type": "quantity",
+                  "static": true,
+                  "settings": {
+                    "show_label": false,
+                    "label_text": "Quantity",
+                    "label_font_size": 16,
+                    "label_text_align": "left",
+                    "full_width": false,
+                    "border_color": "",
+                    "border_thickness": 1,
+                    "border_radius": 8
+                  },
+                  "blocks": {}
+                },
+                "add-to-cart": {
+                  "type": "add-to-cart",
+                  "static": true,
+                  "settings": {
+                    "button_label": "",
+                    "style_class": "button",
+                    "button_background_color": "",
+                    "button_text_color": "",
+                    "enable_hover_wiggle": false,
+                    "auto_wiggle_interval": "off",
+                    "wiggle_intensity": "normal"
+                  },
+                  "blocks": {}
+                },
+                "accelerated-checkout": {
+                  "type": "accelerated-checkout",
+                  "static": true,
+                  "settings": {
+                    "button_label": "",
+                    "button_background_color": "",
+                    "button_text_color": "",
+                    "enable_hover_wiggle": false,
+                    "auto_wiggle_interval": "off",
+                    "wiggle_intensity": "normal"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": []
+            }
+          },
+          "block_order": [
+            "text_WE3K4w",
+            "price_a7krng",
+            "variant_picker_R3rGDr",
+            "buy_buttons_eYQEYi"
+          ]
+        },
+        "sticky_atc_block": {
+          "type": "sticky_atc",
+          "static": true,
+          "settings": {
+            "button_action": "add_to_cart",
+            "button_label": "",
+            "buy_now_label": "",
+            "show_price_badge": true,
+            "show_variant_selector": true,
+            "enable_variant_dropdown_animated_border": true,
+            "show_price": true,
+            "show_compare_at_price": true,
+            "show_quantity_badge": true,
+            "trigger_mode": "button_position",
+            "scroll_offset": 300,
+            "scroll_percentage": 50,
+            "price_size": 24,
+            "price_color": "",
+            "comp_price_size": 18,
+            "compare_price_color": "",
+            "title_size": 16,
+            "product_title_color": "",
+            "option_size": 14,
+            "product_option_color": "",
+            "use_theme_shape_settings": true,
+            "variant_selector_border_radius": 8,
+            "image_border_radius": 8,
+            "use_scheme_colors": true,
+            "bar_width_mode": "full_width",
+            "compact_width": 560,
+            "container_alignment": "center",
+            "bar_max_width": 1280,
+            "bar_vertical_padding": 12,
+            "container_background_color": "",
+            "accent_color": "",
+            "container_border_radius": 10,
+            "container_shadow": true,
+            "enable_bg_gradient": true,
+            "enable_accent_line": true,
+            "enable_backdrop_blur": true,
+            "button_size": "medium",
+            "button_text_color": "",
+            "button_background_color": "",
+            "button_border_radius": 8,
+            "enable_hover_wiggle": false,
+            "auto_wiggle_interval": "off",
+            "wiggle_intensity": "normal",
+            "badge_bg_color": "",
+            "badge_text_color": "",
+            "badge_border_radius": 4,
+            "badge_font_size": 12,
+            "badge_padding": 4
+          },
+          "blocks": {}
+        }
+      },
+      "settings": {
+        "content_width": "content-center-aligned",
+        "desktop_media_position": "left",
+        "equal_columns": true,
+        "limit_details_width": false,
+        "gap": 48,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 48,
+        "padding-block-start-mobile": 0,
+        "padding-block-end": 48,
+        "padding-block-end-mobile": 0
+      }
+    },
+    "info": {
+      "type": "gs-product-info",
+      "settings": {
+        "color_scheme": "scheme-4",
+        "heading": "Product information",
+        "care_text": "<p>Follow the care label on the item. Wipe clean or wash gently, and store in a cool, dry place.</p>"
+      }
+    },
+    "ship": {
+      "type": "gs-product-assurance",
+      "blocks": {
+        "a1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Delivery options",
+            "text": "Shipping options and costs are shown at checkout.",
+            "link": ""
+          }
+        },
+        "a2": {
+          "type": "item",
+          "settings": {
+            "icon": "box",
+            "title": "Order tracking",
+            "text": "Track your order with a tracking number once it ships.",
+            "link": ""
+          }
+        },
+        "a3": {
+          "type": "item",
+          "settings": {
+            "icon": "refresh",
+            "title": "Returns",
+            "text": "View our return policy for eligibility and details.",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "a1",
+        "a2",
+        "a3"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Shipping & returns",
+        "size_guide_page": "",
+        "size_guide_label": "Size guide",
+        "guide_option": "Size"
+      }
+    },
+    "gs_reviews_Bfjq3q": {
+      "type": "gs-reviews",
+      "blocks": {
+        "review_Rf6Rzd": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>The item looks just like the photos and is easy to use. Great value for the price.</p>",
+            "name": "Lara B.",
+            "item": ""
+          }
+        },
+        "review_QRHpgj": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Ordering was simple, and everything arrived in great condition. I’d happily shop here again.</p>",
+            "name": "James L.",
+            "item": ""
+          }
+        },
+        "review_4fk46F": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>It’s been a useful addition to my daily routine. Very pleased with it so far!</p>",
+            "name": "Wendel M.",
+            "item": ""
+          }
+        },
+        "review_CVKcT6": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Really happy with my purchase. Good quality and exactly what I was looking for.</p>",
+            "name": "Christopher N.",
+            "item": ""
+          }
+        }
+      },
+      "block_order": [
+        "review_Rf6Rzd",
+        "review_QRHpgj",
+        "review_4fk46F",
+        "review_CVKcT6"
+      ],
+      "name": "Customer reviews",
+      "settings": {
+        "color_scheme": "",
+        "heading": "Customer reviews",
+        "subheading": "",
+        "link_label": "See all reviews",
+        "link": ""
+      }
+    },
+    "faq": {
+      "type": "gs-faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Delivery options and estimated times are shown at checkout before you pay. You'll receive a tracking link by email once your order ships.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>If something isn't right, contact us and we'll help with a return. You can find all the details in our Refund Policy.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>Available shipping destinations are shown at checkout once you enter your address.</p>"
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "How can I contact customer support?",
+            "answer": "<p>Send us a message through our contact page and we'll get back to you as soon as we can.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Frequently asked questions",
+        "subheading": "",
+        "contact_label": "Contact us",
+        "contact_link": "shopify://pages/contact-us",
+        "open_first": false
+      }
+    },
+    "related": {
+      "type": "gs-related",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "You may also like",
+        "intent": "related",
+        "limit": 4
+      }
+    },
+    "news": {
+      "type": "gs-newsletter",
+      "settings": {
+        "color_scheme": "scheme-4",
+        "heading": "Good finds, straight to your inbox",
+        "text": "Be the first to know about new arrivals, exclusive offers and everyday inspiration.",
+        "button_label": "Subscribe",
+        "success": "Thanks for subscribing. Look out for our next email."
+      }
+    }
+  },
+  "order": [
+    "product-main_v00ivq",
+    "info",
+    "ship",
+    "gs_reviews_Bfjq3q",
+    "faq",
+    "related",
+    "news"
+  ]
+}

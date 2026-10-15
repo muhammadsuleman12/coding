@@ -1,0 +1,355 @@
+
+{% assign block_settings = block.settings %}
+
+<forge-accordion-custom
+  {% if block_settings.open_by_default %}
+    open-by-default-on-desktop
+    open-by-default-on-mobile
+  {% endif %}
+>
+  <details
+    class="details"
+    data-testid="accordion-details"
+    {{ block.shopify_attributes }}
+  >
+    <summary class="details__header">
+      {% render 'icon-or-image',
+        icon: block_settings.icon,
+        svg_icon: block_settings.svg_icon,
+        image_upload: block_settings.image_upload,
+        width: block_settings.width,
+        class_name: 'details__icon'
+      %}
+      {{ block_settings.heading }}
+      <span class="forge-svg-wrapper forge-icon-caret forge-icon-animated">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+      <span class="forge-svg-wrapper forge-icon-plus">
+        {{- 'icon-plus.svg' | inline_asset_content -}}
+      </span>
+    </summary>
+
+    <div class="forge-details-content">
+      {% content_for 'blocks' %}
+    </div>
+  </details>
+</forge-accordion-custom>
+
+{% stylesheet %}
+  .details__icon {
+    height: auto;
+    margin-inline-end: var(--margin-xs);
+    fill: currentColor;
+    stroke: currentColor;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.accordion_row",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "t:forge.settings.heading",
+      "default": "t:forge.text_defaults.accordion_heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "t:forge.settings.open_row_by_default",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.icon"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:forge.settings.icon",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.none"
+        },
+        {
+          "value": "apple",
+          "label": "t:forge.options.apple"
+        },
+        {
+          "value": "arrow",
+          "label": "t:forge.options.arrow"
+        },
+        {
+          "value": "banana",
+          "label": "t:forge.options.banana"
+        },
+        {
+          "value": "bottle",
+          "label": "t:forge.options.bottle"
+        },
+        {
+          "value": "box",
+          "label": "t:forge.options.box"
+        },
+        {
+          "value": "carrot",
+          "label": "t:forge.options.carrot"
+        },
+        {
+          "value": "chat_bubble",
+          "label": "t:forge.options.chat_bubble"
+        },
+        {
+          "value": "check_box",
+          "label": "t:forge.options.check_box"
+        },
+        {
+          "value": "clipboard",
+          "label": "t:forge.options.clipboard"
+        },
+        {
+          "value": "dairy",
+          "label": "t:forge.options.dairy"
+        },
+        {
+          "value": "dairy_free",
+          "label": "t:forge.options.dairy_free"
+        },
+        {
+          "value": "dryer",
+          "label": "t:forge.options.dryer"
+        },
+        {
+          "value": "eye",
+          "label": "t:forge.options.eye"
+        },
+        {
+          "value": "fire",
+          "label": "t:forge.options.fire"
+        },
+        {
+          "value": "gluten_free",
+          "label": "t:forge.options.gluten_free"
+        },
+        {
+          "value": "heart",
+          "label": "t:forge.options.heart"
+        },
+        {
+          "value": "iron",
+          "label": "t:forge.options.iron"
+        },
+        {
+          "value": "leaf",
+          "label": "t:forge.options.leaf"
+        },
+        {
+          "value": "leather",
+          "label": "t:forge.options.leather"
+        },
+        {
+          "value": "lightning_bolt",
+          "label": "t:forge.options.lightning_bolt"
+        },
+        {
+          "value": "lipstick",
+          "label": "t:forge.options.lipstick"
+        },
+        {
+          "value": "lock",
+          "label": "t:forge.options.lock"
+        },
+        {
+          "value": "map_pin",
+          "label": "t:forge.options.map_pin"
+        },
+        {
+          "value": "nut_free",
+          "label": "t:forge.options.nut_free"
+        },
+        {
+          "value": "pants",
+          "label": "t:forge.options.pants"
+        },
+        {
+          "value": "paw_print",
+          "label": "t:forge.options.paw_print"
+        },
+        {
+          "value": "pepper",
+          "label": "t:forge.options.pepper"
+        },
+        {
+          "value": "perfume",
+          "label": "t:forge.options.perfume"
+        },
+        {
+          "value": "plane",
+          "label": "t:forge.options.plane"
+        },
+        {
+          "value": "plant",
+          "label": "t:forge.options.plant"
+        },
+        {
+          "value": "price_tag",
+          "label": "t:forge.options.price_tag"
+        },
+        {
+          "value": "question_mark",
+          "label": "t:forge.options.question_mark"
+        },
+        {
+          "value": "recycle",
+          "label": "t:forge.options.recycle"
+        },
+        {
+          "value": "return",
+          "label": "t:forge.options.return"
+        },
+        {
+          "value": "ruler",
+          "label": "t:forge.options.ruler"
+        },
+        {
+          "value": "serving_dish",
+          "label": "t:forge.options.serving_dish"
+        },
+        {
+          "value": "shirt",
+          "label": "t:forge.options.shirt"
+        },
+        {
+          "value": "shoe",
+          "label": "t:forge.options.shoe"
+        },
+        {
+          "value": "silhouette",
+          "label": "t:forge.options.silhouette"
+        },
+        {
+          "value": "bluesky",
+          "label": "t:forge.options.social_bluesky"
+        },
+        {
+          "value": "facebook",
+          "label": "t:forge.options.social_facebook"
+        },
+        {
+          "value": "instagram",
+          "label": "t:forge.options.social_instagram"
+        },
+        {
+          "value": "linkedin",
+          "label": "t:forge.options.social_linkedin"
+        },
+        {
+          "value": "pinterest",
+          "label": "t:forge.options.social_pinterest"
+        },
+        {
+          "value": "snapchat",
+          "label": "t:forge.options.social_snapchat"
+        },
+        {
+          "value": "spotify",
+          "label": "t:forge.options.social_spotify"
+        },
+        {
+          "value": "threads",
+          "label": "t:forge.options.social_threads"
+        },
+        {
+          "value": "tiktok",
+          "label": "t:forge.options.social_tiktok"
+        },
+        {
+          "value": "tumblr",
+          "label": "t:forge.options.social_tumblr"
+        },
+        {
+          "value": "twitter",
+          "label": "t:forge.options.social_twitter"
+        },
+        {
+          "value": "vimeo",
+          "label": "t:forge.options.social_vimeo"
+        },
+        {
+          "value": "youtube",
+          "label": "t:forge.options.social_youtube"
+        },
+        {
+          "value": "whatsapp",
+          "label": "t:forge.options.social_whatsapp"
+        },
+        {
+          "value": "snowflake",
+          "label": "t:forge.options.snowflake"
+        },
+        {
+          "value": "star",
+          "label": "t:forge.options.star"
+        },
+        {
+          "value": "stopwatch",
+          "label": "t:forge.options.stopwatch"
+        },
+        {
+          "value": "truck",
+          "label": "t:forge.options.truck"
+        },
+        {
+          "value": "washing",
+          "label": "t:forge.options.washing"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_upload",
+      "label": "t:forge.settings.image_icon"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "t:forge.settings.width",
+      "min": 12,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.accordion_row",
+      "blocks": {
+        "text-1": {
+          "type": "text",
+          "settings": {
+            "text": "t:forge.html_defaults.work_quickly_to_ship",
+            "width": "100%"
+          }
+        }
+      },
+      "block_order": ["text-1"],
+      "settings": {
+        "heading": "t:forge.text_defaults.when_will_order_arrive"
+      }
+    }
+  ]
+}
+{% endschema %}

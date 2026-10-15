@@ -1,0 +1,301 @@
+
+
+{% liquid
+  assign block_settings = block.settings
+  assign heading = block_settings.heading
+  assign color_scheme = block_settings.color_scheme
+  assign show_as_accordion = block_settings.show_as_accordion
+  if show_as_accordion == true and block_settings.accordion_dividers == true
+    assign dividers_enabled = true
+  endif
+%}
+
+<forge-accordion-custom
+  class="
+    menu
+    {% if show_as_accordion == true %} menu--accordion menu--{{ block_settings.accordion_icon }}{% endif %}
+    {% if dividers_enabled == true %} menu--dividers{% endif %}
+  "
+  data-disable-on-desktop="true"
+  open-by-default-on-desktop
+  {% if show_as_accordion == false %}
+    data-disable-on-mobile="true"
+    open-by-default-on-mobile
+  {% endif %}
+>
+  <details
+    class="
+      menu__details
+      forge-spacing-style
+      {% if block_settings.inherit_color_scheme == false %} forge-color-{{ color_scheme }}{% endif %}
+    "
+    data-testid="social-menu-details"
+    style="
+      --spacing--size: {{ block_settings.menu_spacing }}px;
+      {% render 'spacing-style', settings: block_settings %}
+    "
+    {{ block.shopify_attributes }}
+  >
+    <summary class="menu__heading{% if heading == blank %} menu__heading--empty{% endif %} {{ block_settings.heading_preset }}">
+      <span class="menu__heading__default">{{ heading }}</span>
+      <span class="menu__heading__accordion">
+        {{ heading }}
+        <span class="menu__heading__toggle forge-svg-wrapper forge-icon-caret forge-icon-animated">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+        <span class="menu__heading__toggle forge-svg-wrapper forge-icon-plus">
+          {{- 'icon-plus.svg' | inline_asset_content -}}
+        </span>
+      </span>
+    </summary>
+
+    <div class="forge-details-content">
+      <ul class="forge-list-unstyled social-menu__list">
+        {% content_for 'blocks' %}
+      </ul>
+    </div>
+  </details>
+</forge-accordion-custom>
+
+{% stylesheet %}
+  .menu {
+    width: 100%;
+  }
+
+  .menu:not(:has(.menu__heading--empty)) .forge-details-content {
+    margin-block-start: var(--spacing--size);
+  }
+
+  .social-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing--size);
+  }
+
+  .menu .menu__heading--empty {
+    display: none;
+  }
+
+  .menu__heading__default {
+    display: contents;
+  }
+
+  .menu__heading__accordion {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    /* Always show the fallback heading on mobile when accordion is enabled */
+    .menu--accordion .menu__heading--empty {
+      display: flex;
+    }
+
+    .menu--accordion .menu__heading__accordion {
+      display: contents;
+    }
+
+    .menu--accordion .menu__heading__default {
+      display: none;
+    }
+
+    .menu--accordion .forge-details-content {
+      margin-block-start: var(--spacing--size);
+    }
+
+    .menu--accordion .menu__details {
+      padding-inline: 0;
+    }
+
+    .menu--dividers .menu__details {
+      border-block-end: var(--style-border-width) solid var(--color-border);
+    }
+
+    .menu--dividers .forge-details-content {
+      padding-block-end: var(--padding-sm);
+    }
+  }
+
+  .menu--caret .forge-icon-plus,
+  .menu--plus .forge-icon-caret {
+    display: none;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:forge.names.social_menu",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_social-menu-item"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:forge.settings.heading"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.appearance"
+    },
+    {
+      "type": "range",
+      "id": "menu_spacing",
+      "label": "t:forge.settings.vertical_gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_as_accordion",
+      "label": "t:forge.settings.show_as_accordion",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "accordion_icon",
+      "label": "t:forge.settings.icon",
+      "options": [
+        {
+          "value": "caret",
+          "label": "t:forge.options.caret"
+        },
+        {
+          "value": "plus",
+          "label": "t:forge.options.plus"
+        }
+      ],
+      "default": "caret",
+      "visible_if": "{{ block.settings.show_as_accordion == true }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "accordion_dividers",
+      "label": "t:forge.settings.dividers",
+      "default": false,
+      "visible_if": "{{ block.settings.show_as_accordion == true }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:forge.settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.typography"
+    },
+    {
+      "type": "select",
+      "id": "heading_preset",
+      "label": "t:forge.settings.heading_preset",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:forge.options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:forge.options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:forge.options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:forge.options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:forge.options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:forge.options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:forge.options.h6"
+        }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:forge.settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:forge.settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.social_menu",
+      "category": "t:forge.categories.links",
+      "blocks": {
+        "social_item_1": {
+          "type": "_social-menu-item"
+        },
+        "social_item_2": {
+          "type": "_social-menu-item"
+        }
+      },
+      "block_order": ["social_item_1", "social_item_2"]
+    }
+  ]
+}
+{% endschema %}

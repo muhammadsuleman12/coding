@@ -1,0 +1,366 @@
+{% liquid
+  assign eyebrow = section.settings.eyebrow | strip_html | strip
+  assign heading = section.settings.heading | strip_html | strip
+  assign subheading = section.settings.subheading | strip_html | strip
+%}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="edna-lookbook forge-spacing-style forge-color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  <div class="edna-lookbook__layout">
+    <div class="edna-lookbook__stage">
+      <div
+        class="edna-lookbook__media"
+        data-forge-slot-id="image"
+        data-forge-aspect-ratio="4:5"
+        data-forge-slot-label="Lookbook"
+        {% if section.settings.image == blank %}data-forge-slot-blank="true"{% endif %}
+      >
+        {% if section.settings.image != blank %}
+          {{
+            section.settings.image
+            | image_url: width: 1600
+            | image_tag:
+              class: 'edna-lookbook__img',
+              loading: 'lazy',
+              widths: '600, 900, 1200, 1600',
+              sizes: '(min-width: 750px) 48vw, 100vw',
+              alt: heading
+          }}
+        {% else %}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'edna-lookbook__img edna-lookbook__img--placeholder' }}
+        {% endif %}
+
+        {% for block in section.blocks %}
+          {% liquid
+            assign pin_x = block.settings.x | default: 50
+            assign pin_y = block.settings.y | default: 50
+            assign pin_product = block.settings.product
+            assign pin_label = block.settings.label | strip_html | strip
+            if pin_product != blank
+              assign pin_href = pin_product.url
+              if pin_label == blank
+                assign pin_label = pin_product.title
+              endif
+            else
+              assign pin_href = '/collections/all'
+            endif
+          %}
+          <a
+            class="edna-lookbook__pin"
+            href="{{ pin_href }}"
+            style="--edna-pin-x: {{ pin_x }}%; --edna-pin-y: {{ pin_y }}%;"
+            aria-label="{{ pin_label | default: 'Shop this piece' | escape }}"
+            {{ block.shopify_attributes }}
+          >
+            <span class="edna-lookbook__pin-dot">{{ forloop.index }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="edna-lookbook__copy" data-animate="fade-up">
+      {% if eyebrow != blank %}
+        <p class="edna-lookbook__eyebrow">{{ eyebrow }}</p>
+      {% endif %}
+      {% if heading != blank %}
+        <h2 class="edna-lookbook__heading">{{ heading }}</h2>
+      {% endif %}
+      {% if subheading != blank %}
+        <p class="edna-lookbook__subheading">{{ subheading }}</p>
+      {% endif %}
+
+      <ol class="edna-lookbook__list">
+        {% for block in section.blocks %}
+          {% liquid
+            assign pin_product = block.settings.product
+            assign pin_label = block.settings.label | strip_html | strip
+            if pin_product != blank
+              assign pin_href = pin_product.url
+              assign pin_title = pin_product.title
+              assign pin_price = pin_product.price | money
+              if pin_label == blank
+                assign pin_label = pin_title
+              endif
+            else
+              assign pin_href = '/collections/all'
+              assign pin_title = pin_label | default: 'Featured piece'
+              assign pin_price = ''
+            endif
+          %}
+          <li class="edna-lookbook__item" {{ block.shopify_attributes }}>
+            <a href="{{ pin_href }}" class="edna-lookbook__item-link">
+              <span class="edna-lookbook__item-num">{{ forloop.index }}</span>
+              <span class="edna-lookbook__item-copy">
+                <span class="edna-lookbook__item-title">{{ pin_title }}</span>
+                {% if pin_price != blank %}
+                  <span class="edna-lookbook__item-price">{{ pin_price }}</span>
+                {% endif %}
+              </span>
+            </a>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .edna-lookbook {
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .edna-lookbook__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 80rem;
+    margin-inline: auto;
+    align-items: center;
+  }
+
+  .edna-lookbook__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--color-background);
+  }
+
+  .edna-lookbook__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .edna-lookbook__pin {
+    position: absolute;
+    inset-inline-start: var(--edna-pin-x, 50%);
+    inset-block-start: var(--edna-pin-y, 50%);
+    transform: translate(-50%, -50%);
+    text-decoration: none;
+    z-index: 1;
+  }
+
+  .edna-lookbook__pin-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    border: 1px solid var(--color-foreground);
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+
+  .edna-lookbook__copy {
+    min-width: 0;
+  }
+
+  .edna-lookbook__eyebrow {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-foreground-muted);
+  }
+
+  .edna-lookbook__heading {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1.5rem, 3vw, var(--font-h2--size, 2rem));
+    font-weight: var(--font-h2--weight, 500);
+    line-height: 1.2;
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .edna-lookbook__subheading {
+    margin: 0 0 1.5rem;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-foreground-muted);
+    max-width: 36ch;
+  }
+
+  .edna-lookbook__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .edna-lookbook__item {
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .edna-lookbook__item-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 1rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .edna-lookbook__item-num {
+    flex: 0 0 1.5rem;
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--color-foreground-muted);
+  }
+
+  .edna-lookbook__item-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .edna-lookbook__item-title {
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.9375rem;
+    color: var(--color-foreground);
+  }
+
+  .edna-lookbook__item-price {
+    font-size: 0.8125rem;
+    color: var(--color-foreground-muted);
+  }
+
+  @media screen and (min-width: 750px) {
+    .edna-lookbook__layout {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: 4rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Edna Lookbook",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 4,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Shop the Look"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Styled from the floor"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Tap a pin to shop each piece in the edit."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Lookbook image"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Hotspot",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Piece"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "range",
+          "id": "x",
+          "label": "Horizontal position",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "y",
+          "label": "Vertical position",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Edna Lookbook",
+      "blocks": [
+        { "type": "hotspot", "settings": { "label": "Blazer", "x": 32, "y": 38 } },
+        { "type": "hotspot", "settings": { "label": "Trousers", "x": 58, "y": 68 } },
+        { "type": "hotspot", "settings": { "label": "Bag", "x": 74, "y": 48 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

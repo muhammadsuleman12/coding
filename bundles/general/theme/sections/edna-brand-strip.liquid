@@ -1,0 +1,243 @@
+{% liquid
+  assign heading = section.settings.heading | strip_html | strip
+  assign speed = section.settings.speed | default: 40
+%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --edna-brand-speed: {{ speed }}s;
+  }
+{% endstyle %}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="edna-brand-strip forge-spacing-style forge-color-{{ section.settings.color_scheme }}{% if section.settings.grayscale %} edna-brand-strip--grayscale{% endif %}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  {% if heading != blank %}
+    <header class="edna-brand-strip__header" data-animate="fade-up">
+      <p class="edna-brand-strip__heading">{{ heading }}</p>
+    </header>
+  {% endif %}
+
+  <div class="edna-brand-strip__viewport" aria-label="{{ heading | default: 'Brands' | escape }}">
+    <ul class="edna-brand-strip__track" role="list">
+      {% for pass in (1..2) %}
+        {% for block in section.blocks %}
+          {% assign logo_title = block.settings.title | strip_html | strip %}
+          <li class="edna-brand-strip__item"{% if pass == 2 %} aria-hidden="true"{% endif %} {{ block.shopify_attributes }}>
+            {% if block.settings.image != blank %}
+              {{
+                block.settings.image
+                | image_url: width: 400
+                | image_tag:
+                  class: 'edna-brand-strip__img',
+                  loading: 'lazy',
+                  widths: '120, 240, 360, 400',
+                  sizes: '7.5rem',
+                  alt: logo_title
+              }}
+            {% else %}
+              <span class="edna-brand-strip__wordmark">{{ logo_title | default: 'Brand' }}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{% stylesheet %}
+  .edna-brand-strip {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .edna-brand-strip__header {
+    text-align: center;
+    margin-block-end: 1.25rem;
+    padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .edna-brand-strip__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-foreground-muted);
+  }
+
+  .edna-brand-strip__viewport {
+    overflow: hidden;
+    width: 100%;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .edna-brand-strip__track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 3.5rem;
+    width: max-content;
+    animation: edna-brand-scroll var(--edna-brand-speed, 40s) linear infinite;
+  }
+
+  .edna-brand-strip__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
+    min-width: 6.5rem;
+    flex: 0 0 auto;
+  }
+
+  .edna-brand-strip__img {
+    display: block;
+    max-width: 7.5rem;
+    max-height: 2.75rem;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .edna-brand-strip--grayscale .edna-brand-strip__img {
+    filter: grayscale(1);
+    opacity: 0.72;
+  }
+
+  .edna-brand-strip__wordmark {
+    font-family: var(--font-heading--family, inherit);
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    white-space: nowrap;
+  }
+
+  @keyframes edna-brand-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .edna-brand-strip__track {
+      animation: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 80rem;
+      margin-inline: auto;
+      padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+      gap: 2rem 2.5rem;
+    }
+
+    .edna-brand-strip__viewport {
+      mask-image: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Edna Brand Strip",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 8,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Stocked Brands"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll duration",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "s",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "grayscale",
+      "label": "Grayscale logos",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Brand",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Brand name",
+          "default": "Brand"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Edna Brand Strip",
+      "blocks": [
+        { "type": "logo", "settings": { "title": "Maison" } },
+        { "type": "logo", "settings": { "title": "Atelier" } },
+        { "type": "logo", "settings": { "title": "Nord" } },
+        { "type": "logo", "settings": { "title": "Linea" } },
+        { "type": "logo", "settings": { "title": "Forme" } },
+        { "type": "logo", "settings": { "title": "Studio" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

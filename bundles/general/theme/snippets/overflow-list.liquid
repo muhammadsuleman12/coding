@@ -1,0 +1,63 @@
+{%- doc -%}
+  @param {string} children - The children of the overflow list.
+  @param {string} [class] - The class that is applied on the forge-overflow-list element.
+  @param {boolean} [defer] - Whether to defer the loading of the overflow list.
+  @param {number} [minimum-items] - The minimum number of items to show in the overflow list.
+  @param {string} [more-attributes] - The attributes that are applied on the more button.
+  @param {string} [ref] - The ref that is set on the forge-overflow-list element.
+{%- enddoc -%}
+
+<forge-overflow-list
+  {% if ref %}
+    ref="{{ ref }}"
+  {% endif %}
+  {% if class %}
+    class="{{ class }}"
+  {% endif %}
+  {% if minimum-items %}
+    minimum-items="{{ minimum-items }}"
+  {% endif %}
+  {% if defer %}
+    defer
+  {% endif %}
+>
+  <template shadowrootmode="open">
+    {{ 'overflow-list.css' | asset_url | stylesheet_tag }}
+
+    <ul part="list">
+      <slot></slot>
+      <slot
+        name="more"
+        part="more"
+        hidden
+        {% if more-attributes %}
+          {{ more-attributes }}
+        {% endif %}
+      >
+        <li
+          part="more"
+        >
+          <button
+            class="forge-button"
+            type="button"
+            tabindex="0"
+          >
+            {% render 'forge-t', key: 'actions.more', fallback: 'More' %}
+          </button>
+        </li>
+      </slot>
+      <li
+        part="placeholder"
+        hidden
+      ></li>
+    </ul>
+
+    <div part="overflow">
+      <ul part="forge-overflow-list">
+        <slot name="overflow"></slot>
+      </ul>
+    </div>
+  </template>
+
+  {{ children }}
+</forge-overflow-list>

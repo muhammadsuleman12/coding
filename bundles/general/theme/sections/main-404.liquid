@@ -1,0 +1,188 @@
+
+
+<div class="forge-section-background no-gradient-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="
+    forge-section forge-section--{{ section.settings.section_width }} forge-color-{{ section.settings.color_scheme }}
+    {% if forge-section.settings.section_height != "" %} {{ section.settings.section_height | prepend: "forge-section--height-" }}{% endif %}
+  "
+>
+  <div>
+    <div
+      class="
+        forge-spacing-style
+        forge-layout-panel-flex
+        forge-layout-panel-flex--column
+        forge-section-content-wrapper
+        forge-mobile-column
+      "
+      style="
+        {% render 'layout-panel-style', settings: section.settings %}
+        {% render 'spacing-style', settings: section.settings %}
+      "
+    >
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:forge.names.404",
+  "class": "section-wrapper",
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "content_direction",
+      "label": "t:forge.settings.direction",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:forge.options.vertical"
+        }
+      ],
+      "default": "column",
+      "visible_if": "{{ section.settings.horizontal_alignment_flex_direction_column == 'fake-value' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:forge.settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:forge.options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:forge.options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "t:forge.settings.height",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "t:forge.options.small"
+        },
+        {
+          "value": "medium",
+          "label": "t:forge.options.medium"
+        },
+        {
+          "value": "large",
+          "label": "t:forge.options.large"
+        },
+        {
+          "value": "full-screen",
+          "label": "t:forge.options.full_screen"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment_flex_direction_column",
+      "label": "t:forge.settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment_flex_direction_column",
+      "label": "t:forge.settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:forge.settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

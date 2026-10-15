@@ -1,0 +1,93 @@
+{%- liquid
+  assign socials = 'facebook,instagram,tiktok,pinterest,youtube,x' | split: ','
+-%}
+<footer class="gs-footer forge-color-{{ section.settings.color_scheme }}">
+  <div class="gs-wrap">
+    <div class="gs-footer__top">
+      <div class="gs-footer__brand">
+        {%- if settings.logo != blank and section.settings.show_logo -%}
+          <a href="{{ routes.root_url }}" class="gs-footer__logo">{{ settings.logo | image_url: width: 360 | image_tag: loading: 'lazy', alt: shop.name, style: 'max-height: 56px; width: auto;' }}</a>
+        {%- else -%}
+          <a href="{{ routes.root_url }}" class="gs-footer__name">{{ shop.name | escape }}</a>
+        {%- endif -%}
+        {%- if section.settings.about != blank -%}<div class="gs-footer__about">{{ section.settings.about }}</div>{%- endif -%}
+        <ul class="gs-footer__social" role="list">
+          {%- for s in socials -%}
+            {%- assign key = 'gs_social_' | append: s -%}
+            {%- assign url = settings[key] -%}
+            {%- if url != blank -%}
+              <li><a href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ s | capitalize }}">{% render 'gs-social-icon', name: s %}</a></li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+      {%- for block in section.blocks -%}
+        <div class="gs-footer__col" {{ block.shopify_attributes }}>
+          {%- case block.type -%}
+            {%- when 'menu' -%}
+              <details class="gs-footer__acc" open>
+                <summary class="gs-footer__heading">{{ block.settings.heading | default: block.settings.menu.title | escape }}</summary>
+                <ul role="list">
+                  {%- for link in block.settings.menu.links -%}<li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>{%- endfor -%}
+                </ul>
+              </details>
+            {%- when 'text' -%}
+              <p class="gs-footer__heading">{{ block.settings.heading | escape }}</p>
+              <div class="gs-footer__text">{{ block.settings.text }}</div>
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+    </div>
+    <div class="gs-footer__bottom">
+      <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | escape }}. {{ section.settings.copyright | escape }}</p>
+      {%- if section.settings.show_policies -%}
+        <ul class="gs-footer__policies" role="list">
+          {%- for policy in shop.policies -%}<li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if section.settings.show_payment -%}
+        <ul class="gs-footer__pay" role="list" aria-label="Payment methods">
+          {%- for type in shop.enabled_payment_types -%}<li>{{ type | payment_type_svg_tag: class: 'gs-pay' }}</li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+<script>
+  (function () {
+    var mq = window.matchMedia('(max-width: 749px)');
+    function sync() { document.querySelectorAll('.gs-footer__acc').forEach(function (d) { d.open = !mq.matches; }); }
+    sync(); mq.addEventListener && mq.addEventListener('change', sync);
+  })();
+</script>
+
+
+{% schema %}
+{
+  "name": "Footer (store)",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-2" },
+    { "type": "checkbox", "id": "show_logo", "label": "Show logo (otherwise store name)", "default": false },
+    { "type": "richtext", "id": "about", "label": "About text", "default": "<p>Useful, good-looking things for home, tech, gifting and every day. Picked with care and priced fairly.</p>" },
+    { "type": "text", "id": "copyright", "label": "Copyright note", "default": "All rights reserved." },
+    { "type": "checkbox", "id": "show_policies", "label": "Show policy links", "default": true },
+    { "type": "checkbox", "id": "show_payment", "label": "Show payment icons", "default": true },
+    { "type": "paragraph", "content": "Social links are set in Theme settings > Social links." }
+  ],
+  "blocks": [
+    { "type": "menu", "name": "Menu", "settings": [
+      { "type": "text", "id": "heading", "label": "Heading" },
+      { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+    ] },
+    { "type": "text", "name": "Text", "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "Need a hand?" },
+      { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Message us any time. We are happy to help with orders, sizes and returns.</p>" }
+    ] }
+  ],
+  "max_blocks": 3,
+  "enabled_on": { "groups": ["footer"] },
+  "presets": [{ "name": "Footer (store)" }]
+}
+{% endschema %}

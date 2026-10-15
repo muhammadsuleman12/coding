@@ -1,0 +1,292 @@
+{% render 'bold-typography' %}
+{% liquid
+  assign label = section.settings.label
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign slider_blocks = section.blocks | where: 'type', 'slider'
+  assign slider_blocks = slider_blocks | slice: 0, 1
+%}
+
+<div class="forge-section-background bold-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<section class="bold-comparison bold-section forge-section--full-width forge-color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+  <div class="bold-comparison__inner">
+    {% if label != blank or heading != blank or subtitle != blank %}
+      <header class="bold-section-header" data-animate="fade-up">
+        {% if label != blank %}
+          <span class="bold-section-label">{{ label }}</span>
+        {% endif %}
+        {% if heading != blank %}
+          <h2 class="bold-section-title">{{ heading }}</h2>
+        {% endif %}
+        {% if subtitle != blank %}
+          <p class="bold-section-subtitle">{{ subtitle }}</p>
+        {% endif %}
+        <div class="bold-accent-line" aria-hidden="true"></div>
+      </header>
+    {% endif %}
+
+    {% if slider_blocks.size > 0 %}
+      <div class="bold-comparison__grid">
+        {% for block in slider_blocks %}
+          <div class="bold-comparison__card" data-bold-slider data-animate="fade-up" {{ block.shopify_attributes }}>
+            {% if block.settings.title != blank %}
+              <h3 class="bold-comparison__title">{{ block.settings.title }}</h3>
+            {% endif %}
+            <div class="bold-comparison__compare" data-bold-compare style="--adv-pos: {{ block.settings.start_position | default: 50 }}%;">
+              <div class="bold-comparison__img bold-comparison__img--after">
+                {% if block.settings.after_image != blank %}
+                  {% capture img_srcset_1 %}{{ block.settings.after_image | image_url: width: 450 }} 450w, {{ block.settings.after_image | image_url: width: 900 }} 900w, {{ block.settings.after_image | image_url: width: 1800 }} 1800w{% endcapture %}
+                  <img src="{{ block.settings.after_image | image_url: width: 1200 }}"
+                    srcset="{{ img_srcset_1 }}" sizes="(min-width: 900px) 900px, 100vw" alt="{{ block.settings.after_label | default: 'After' }}" loading="lazy" width="600" height="400">
+                {% else %}
+                  {{ 'lifestyle-1' | placeholder_svg_tag }}
+                {% endif %}
+              </div>
+              <div class="bold-comparison__img bold-comparison__img--before" data-bold-before>
+                {% if block.settings.before_image != blank %}
+                  {% capture img_srcset_2 %}{{ block.settings.before_image | image_url: width: 450 }} 450w, {{ block.settings.before_image | image_url: width: 900 }} 900w, {{ block.settings.before_image | image_url: width: 1800 }} 1800w{% endcapture %}
+                  <img src="{{ block.settings.before_image | image_url: width: 1200 }}"
+                    srcset="{{ img_srcset_2 }}" sizes="(min-width: 900px) 900px, 100vw" alt="{{ block.settings.before_label | default: 'Before' }}" loading="lazy" width="600" height="400">
+                {% else %}
+                  {{ 'lifestyle-2' | placeholder_svg_tag }}
+                {% endif %}
+              </div>
+              <span class="bold-comparison__badge bold-comparison__badge--before">{{ block.settings.before_label | default: 'Before' }}</span>
+              <span class="bold-comparison__badge bold-comparison__badge--after">{{ block.settings.after_label | default: 'After' }}</span>
+              <div class="bold-comparison__divider" data-bold-divider></div>
+              <div class="bold-comparison__handle" data-bold-handle aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+                  <path d="M8 7L4 12L8 17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M16 7L20 12L16 17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <input class="bold-comparison__range" type="range" min="0" max="100" value="{{ block.settings.start_position | default: 50 }}" aria-label="{{ block.settings.title | default: 'Before and after comparison' }}">
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-comparison {
+    padding: calc(72px * var(--section-spacing-scale, 1)) 0;
+  }
+
+  .bold-comparison__inner {
+    padding: 0 48px;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  .bold-comparison__grid {
+    display: flex;
+    justify-content: center;
+  }
+
+  .bold-comparison__card {
+    width: 100%;
+    max-width: 900px;
+    background: var(--bold-card-bg);
+    border: 1px solid var(--bold-glass-border);
+    border-radius: var(--bold-radius-lg);
+    padding: 20px;
+    box-shadow: var(--bold-shadow);
+  }
+
+  .bold-comparison__title {
+    font-family: var(--bold-font-heading);
+    font-size: 1rem;
+    font-weight: var(--font-h3--weight, 700);
+    text-transform: var(--font-h3--case, uppercase);
+    letter-spacing: var(--font-h3--letter-spacing, normal);
+    text-align: center;
+    margin: 0 0 16px;
+    color: var(--bold-text-light);
+  }
+
+  .bold-comparison__compare {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border-radius: var(--bold-radius);
+    background: var(--color-background);
+    user-select: none;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  .bold-comparison__img,
+  .bold-comparison__img img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bold-comparison__img img {
+    object-fit: cover;
+    display: block;
+  }
+
+  .bold-comparison__img--after { z-index: 1; }
+
+  .bold-comparison__img--before {
+    z-index: 2;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--adv-pos, 50%);
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .bold-comparison__img--before img {
+    width: var(--adv-img-width, 100%);
+    max-width: none;
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
+
+  .bold-comparison__badge {
+    position: absolute;
+    top: 12px;
+    padding: 5px 10px;
+    border-radius: var(--style-border-radius-global, 6px);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    z-index: 5;
+  }
+
+  .bold-comparison__badge--before { left: 12px; }
+  .bold-comparison__badge--after { right: 12px; }
+
+  .bold-comparison__divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 6;
+    pointer-events: none;
+  }
+
+  .bold-comparison__handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    transform: translate(-50%, -50%);
+    z-index: 7;
+    display: grid;
+    place-items: center;
+    color: var(--bold-accent2);
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .bold-comparison__range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    z-index: 10;
+    cursor: ew-resize;
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-comparison {
+      padding: calc(48px * var(--section-spacing-scale, 1)) 0;
+    }
+
+    .bold-comparison__inner {
+      padding: 0 16px;
+    }
+
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    document.querySelectorAll('[data-bold-slider]').forEach(function (root) {
+      var range = root.querySelector('.bold-comparison__range');
+      var compare = root.querySelector('[data-bold-compare]');
+      var beforeLayer = root.querySelector('[data-bold-before]');
+      var beforeImg = beforeLayer && beforeLayer.querySelector('img');
+      var divider = root.querySelector('[data-bold-divider]');
+      var handle = root.querySelector('[data-bold-handle]');
+      if (!range || !compare || !beforeLayer || !divider || !handle) return;
+
+      function syncBeforeImgWidth() {
+        if (!beforeImg) return;
+        var w = compare.getBoundingClientRect().width;
+        if (w > 0) compare.style.setProperty('--adv-img-width', w + 'px');
+      }
+
+      function setPos(val) {
+        var v = Math.max(0, Math.min(100, Number(val)));
+        compare.style.setProperty('--adv-pos', v + '%');
+        divider.style.left = v + '%';
+        handle.style.left = v + '%';
+        syncBeforeImgWidth();
+      }
+
+      setPos(range.value);
+      range.addEventListener('input', function (e) { setPos(e.target.value); });
+      range.addEventListener('change', function (e) { setPos(e.target.value); });
+
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(syncBeforeImgWidth).observe(compare);
+      } else {
+        window.addEventListener('resize', syncBeforeImgWidth);
+      }
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bold Comparison",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:forge.settings.color_scheme", "default": "scheme-1" },
+    { "type": "text", "id": "label", "label": "Section label", "default": "RESULTS" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "See the difference" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Drag to compare before and after." }
+  ],
+  "blocks": [
+    {
+      "type": "slider",
+      "name": "Before/After slider",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Durability test" },
+        { "type": "image_picker", "id": "before_image", "label": "Before image" },
+        { "type": "image_picker", "id": "after_image", "label": "After image" },
+        { "type": "text", "id": "before_label", "label": "Before label", "default": "Before" },
+        { "type": "text", "id": "after_label", "label": "After label", "default": "After" },
+        { "type": "range", "id": "start_position", "label": "Start position (%)", "min": 0, "max": 100, "step": 1, "default": 50 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Comparison",
+      "blocks": [
+        { "type": "slider" }
+      ]
+    }
+  ]
+}
+{% endschema %}

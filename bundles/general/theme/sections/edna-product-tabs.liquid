@@ -1,0 +1,423 @@
+{% liquid
+  assign heading = section.settings.heading | strip_html | strip
+  assign max_products = section.settings.max_products | default: 8
+  if max_products < 4
+    assign max_products = 4
+  endif
+  if max_products > 12
+    assign max_products = 12
+  endif
+%}
+
+<div class="forge-section-background forge-color-{{ section.settings.color_scheme }}"></div>
+<forge-edna-product-tabs
+  class="edna-product-tabs forge-spacing-style forge-color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-style', settings: section.settings %}"
+  {{ section.shopify_attributes }}
+>
+  {% if heading != blank %}
+    <header class="edna-product-tabs__header" data-animate="fade-up">
+      <h2 class="edna-product-tabs__heading">{{ heading }}</h2>
+    </header>
+  {% endif %}
+
+  <div class="edna-product-tabs__nav" role="tablist">
+    {% for block in section.blocks %}
+      {% assign tab_title = block.settings.title | strip_html | strip %}
+      <button
+        type="button"
+        class="edna-product-tabs__tab{% if forloop.first %} is-active{% endif %}"
+        role="tab"
+        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+        aria-controls="EdnaProductTab-{{ section.id }}-{{ forloop.index }}"
+        id="EdnaProductTabBtn-{{ section.id }}-{{ forloop.index }}"
+        data-edna-tab="{{ forloop.index }}"
+        {{ block.shopify_attributes }}
+      >
+        {{ tab_title | default: 'Shop' }}
+      </button>
+    {% endfor %}
+  </div>
+
+  <div class="edna-product-tabs__panels">
+    {% for block in section.blocks %}
+      {% liquid
+        assign tab_collection = block.settings.collection
+        if tab_collection != blank
+          assign products_to_show = tab_collection.products
+        else
+          assign products_to_show = collections['all'].products
+        endif
+      %}
+      <div
+        class="edna-product-tabs__panel{% if forloop.first %} is-active{% endif %}"
+        role="tabpanel"
+        id="EdnaProductTab-{{ section.id }}-{{ forloop.index }}"
+        aria-labelledby="EdnaProductTabBtn-{{ section.id }}-{{ forloop.index }}"
+        data-edna-panel="{{ forloop.index }}"
+        {% unless forloop.first %}hidden{% endunless %}
+      >
+        <ul class="edna-product-tabs__grid" role="list" data-animate-group>
+          {% if products_to_show.size > 0 %}
+            {% for product in products_to_show limit: max_products %}
+              <li class="edna-product-card" data-animate="fade-up">
+                <a href="{{ product.url }}" class="edna-product-card__link">
+                  <div class="edna-product-card__media">
+                    {% if product.featured_image %}
+                      {% assign card_alt = product.featured_image.alt | default: product.title %}
+                      {{
+                        product.featured_image
+                        | image_url: width: 900
+                        | image_tag:
+                          class: 'edna-product-card__img',
+                          loading: 'lazy',
+                          widths: '300, 450, 600, 900',
+                          sizes: '(min-width: 750px) 22vw, 70vw',
+                          alt: card_alt
+                      }}
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag: 'edna-product-card__img edna-product-card__img--placeholder' }}
+                    {% endif %}
+                    {% if product.compare_at_price > product.price %}
+                      <span class="edna-product-card__badge">Sale</span>
+                    {% endif %}
+                  </div>
+                  <div class="edna-product-card__info">
+                    {% if product.vendor != blank %}
+                      <p class="edna-product-card__vendor">{{ product.vendor }}</p>
+                    {% endif %}
+                    <p class="edna-product-card__title">{{ product.title }}</p>
+                    <div class="edna-product-card__prices">
+                      {% if product.compare_at_price > product.price %}
+                        <span class="edna-product-card__price edna-product-card__price--sale">{{ product.price | money }}</span>
+                        <span class="edna-product-card__price edna-product-card__price--compare">{{ product.compare_at_price | money }}</span>
+                      {% else %}
+                        <span class="edna-product-card__price">{{ product.price | money }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </a>
+              </li>
+            {% endfor %}
+          {% else %}
+            {% for i in (1..4) %}
+              <li class="edna-product-card" aria-hidden="true">
+                <div class="edna-product-card__link">
+                  <div class="edna-product-card__media">
+                    {{ 'product-1' | placeholder_svg_tag: 'edna-product-card__img edna-product-card__img--placeholder' }}
+                  </div>
+                  <div class="edna-product-card__info">
+                    <p class="edna-product-card__title">Product name</p>
+                    <div class="edna-product-card__prices">
+                      <span class="edna-product-card__price">$48</span>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          {% endif %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+</forge-edna-product-tabs>
+
+{% stylesheet %}
+  .edna-product-tabs {
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .edna-product-tabs__header {
+    margin-block-end: 1rem;
+    text-align: center;
+  }
+
+  .edna-product-tabs__heading {
+    margin: 0;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1.25rem, 2.5vw, var(--font-h3--size, 1.5rem));
+    font-weight: var(--font-h3--weight, 500);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .edna-product-tabs__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 1.5rem;
+    border-block-end: 1px solid var(--color-border);
+    margin-block-end: 1.75rem;
+  }
+
+  .edna-product-tabs__tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    border-block-end: 2px solid transparent;
+    margin-block-end: -1px;
+    padding: 0.75rem 0.15rem;
+    cursor: pointer;
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-foreground-muted);
+  }
+
+  .edna-product-tabs__tab.is-active {
+    color: var(--color-foreground);
+    border-block-end-color: var(--color-foreground);
+  }
+
+  .edna-product-tabs__tab:hover {
+    color: var(--color-foreground);
+  }
+
+  .edna-product-tabs__panel {
+    display: none;
+  }
+
+  .edna-product-tabs__panel.is-active {
+    display: block;
+  }
+
+  .edna-product-tabs__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .edna-product-card {
+    flex: 0 0 70%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .edna-product-card__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .edna-product-card__media {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--color-background);
+  }
+
+  .edna-product-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .edna-product-card__badge {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    padding: 0.25rem 0.45rem;
+    background: var(--color-primary);
+    color: var(--color-primary-button-text);
+    font-family: var(--font-heading--family, inherit);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .edna-product-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .edna-product-card__vendor {
+    margin: 0;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-foreground-muted);
+  }
+
+  .edna-product-card__title {
+    margin: 0;
+    font-family: var(--font-body--family, inherit);
+    font-size: 0.875rem;
+    line-height: 1.35;
+    color: var(--color-foreground);
+    overflow-wrap: break-word;
+  }
+
+  .edna-product-card__prices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: baseline;
+  }
+
+  .edna-product-card__price {
+    font-size: 0.8125rem;
+    color: var(--color-foreground);
+  }
+
+  .edna-product-card__price--sale {
+    color: var(--color-primary);
+  }
+
+  .edna-product-card__price--compare {
+    color: var(--color-foreground-muted);
+    text-decoration: line-through;
+  }
+
+  @media screen and (min-width: 750px) {
+    .edna-product-tabs__grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+
+    .edna-product-card {
+      flex: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class ForgeEdnaProductTabs extends HTMLElement {
+    connectedCallback() {
+      this.tabs = [...this.querySelectorAll("[data-edna-tab]")];
+      this.panels = [...this.querySelectorAll("[data-edna-panel]")];
+      this.onClick = this.onClick.bind(this);
+      for (const tab of this.tabs) {
+        tab.addEventListener("click", this.onClick);
+      }
+    }
+
+    disconnectedCallback() {
+      for (const tab of this.tabs ?? []) {
+        tab.removeEventListener("click", this.onClick);
+      }
+    }
+
+    onClick(event) {
+      const button = event.currentTarget;
+      const id = button.getAttribute("data-edna-tab");
+      for (const tab of this.tabs) {
+        const active = tab === button;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+      }
+      for (const panel of this.panels) {
+        const active = panel.getAttribute("data-edna-panel") === id;
+        panel.classList.toggle("is-active", active);
+        panel.hidden = !active;
+      }
+    }
+  }
+
+  customElements.define("forge-edna-product-tabs", ForgeEdnaProductTabs);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Edna Product Tabs",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 4,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Products per tab",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tab label",
+          "default": "New Arrivals"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Edna Product Tabs",
+      "blocks": [
+        { "type": "tab", "settings": { "title": "New Arrivals" } },
+        { "type": "tab", "settings": { "title": "Trending" } },
+        { "type": "tab", "settings": { "title": "Sale" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

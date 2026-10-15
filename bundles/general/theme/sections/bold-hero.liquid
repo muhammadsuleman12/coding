@@ -1,0 +1,582 @@
+{% render 'bold-typography' %}
+{% render 'heading-scale-override', section: section %}
+{% liquid
+  assign badge = section.settings.badge
+  assign headline = section.settings.headline
+  assign accent_word_1 = section.settings.accent_word_1
+  assign accent_word_2 = section.settings.accent_word_2
+  assign subtitle = section.settings.subtitle
+  assign primary_button = section.settings.primary_button
+  assign primary_link = section.settings.primary_link
+  assign secondary_button = section.settings.secondary_button
+  assign secondary_link = section.settings.secondary_link
+  assign hero_image = section.settings.hero_image
+  assign hero_image_url = section.settings.hero_image_url
+  assign content_align = section.settings.content_align | default: 'center'
+  assign overlay_opacity = section.settings.overlay_opacity | default: 70
+  assign stat_blocks = section.blocks | where: 'type', 'stat'
+  assign has_hero_image = false
+  if hero_image != blank or hero_image_url != blank
+    assign has_hero_image = true
+  endif
+
+  assign fallback_product_image = blank
+  unless has_hero_image
+    assign fallback_product_image = collections.all.products.first.featured_image
+  endunless
+  assign has_any_image = has_hero_image
+  if fallback_product_image != blank
+    assign has_any_image = true
+  endif
+
+  assign hero_tone = section.settings.hero_tone | default: 'auto'
+  if hero_tone == 'auto'
+    assign scheme_bg = section.settings.color_scheme.settings.background
+    assign scheme_brightness = scheme_bg | color_brightness
+    if scheme_brightness > 127
+      assign hero_tone = 'bright-airy'
+    else
+      assign hero_tone = 'dramatic-dark'
+    endif
+  endif
+%}
+
+<div class="forge-section-background bold-bg bold-bg--surface forge-color-{{ section.settings.color_scheme }}"></div>
+<section
+  class="bold-hero bold-section forge-section forge-section--full-width bold-hero--align-{{ content_align }} forge-color-{{ section.settings.color_scheme }}"
+  data-bold-hero-tone="{{ hero_tone }}"
+  style="--bold-hero-overlay-alpha: {{ overlay_opacity | divided_by: 100.0 }};"
+  {{ section.shopify_attributes }}
+>
+  <div
+    class="bold-hero__media{% unless has_any_image %} bold-hero__media--empty{% endunless %}"
+    data-forge-slot-id="hero_image"
+    data-forge-aspect-ratio="16:9"
+    data-forge-slot-label="Hero background"
+    {% unless has_hero_image %}data-forge-slot-blank="true"{% endunless %}
+    aria-hidden="true"
+  >
+    {% if hero_image != blank %}
+      <img
+        src="{{ hero_image | image_url: width: 2400 }}"
+        srcset="{{ hero_image | image_url: width: 800 }} 800w, {{ hero_image | image_url: width: 1400 }} 1400w, {{ hero_image | image_url: width: 2000 }} 2000w, {{ hero_image | image_url: width: 2800 }} 2800w"
+        sizes="100vw"
+        alt=""
+        width="2400"
+        height="1350"
+        loading="eager"
+        fetchpriority="high"
+        class="bold-hero__image"
+      >
+    {% elsif hero_image_url != blank %}
+      {% # theme-check-disable RemoteAsset %}
+      <img
+        src="{{ hero_image_url }}"
+        alt=""
+        width="2400"
+        height="1350"
+        loading="eager"
+        fetchpriority="high"
+        class="bold-hero__image"
+      >
+      {% # theme-check-enable RemoteAsset %}
+    {% elsif fallback_product_image != blank %}
+      <img
+        src="{{ fallback_product_image | image_url: width: 2400 }}"
+        srcset="{{ fallback_product_image | image_url: width: 800 }} 800w, {{ fallback_product_image | image_url: width: 1400 }} 1400w, {{ fallback_product_image | image_url: width: 2000 }} 2000w, {{ fallback_product_image | image_url: width: 2800 }} 2800w"
+        sizes="100vw"
+        alt=""
+        width="2400"
+        height="1350"
+        loading="eager"
+        fetchpriority="high"
+        class="bold-hero__image"
+      >
+    {% endif %}
+  </div>
+
+  <div class="bold-hero__overlay" aria-hidden="true"></div>
+
+  <div class="bold-hero__inner">
+    <div class="bold-hero__copy" data-animate="fade-up">
+      {% if badge != blank %}
+        <span class="bold-hero__badge">{{ badge }}</span>
+      {% endif %}
+
+      {% if headline != blank %}
+        <h1 class="bold-hero__headline">
+          {% assign words = headline | split: ' ' %}
+          {% for word in words %}
+            {% if accent_word_1 != blank and word == accent_word_1 %}
+              <span class="bold-hero__accent bold-hero__accent--orange">{{ word }}</span>
+            {% elsif accent_word_2 != blank and word == accent_word_2 %}
+              <span class="bold-hero__accent bold-hero__accent--blue">{{ word }}</span>
+            {% else %}
+              {{ word }}
+            {% endif %}
+            {% unless forloop.last %} {% endunless %}
+          {% endfor %}
+        </h1>
+      {% endif %}
+
+      {% if subtitle != blank %}
+        <p class="bold-hero__subtitle">{{ subtitle }}</p>
+      {% endif %}
+
+      <div class="bold-hero__buttons">
+        {% if primary_button != blank %}
+          <a href="{{ primary_link | default: '/collections/all' }}" class="bold-btn-primary bold-hero__btn">
+            {{ primary_button }}
+          </a>
+        {% endif %}
+        {% if secondary_button != blank %}
+          <a href="{{ secondary_link | default: '/collections/all' }}" class="bold-btn-secondary bold-hero__btn">
+            {{ secondary_button }}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if stat_blocks.size > 0 %}
+        <div class="bold-hero__stats">
+          {% for block in stat_blocks limit: 3 %}
+            <div class="bold-hero__stat" {{ block.shopify_attributes }}>
+              <span class="bold-hero__stat-number">{{ block.settings.number }}</span>
+              <span class="bold-hero__stat-label">{{ block.settings.label }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .bold-hero {
+    position: relative;
+    isolation: isolate;
+    min-height: min(80vh, 720px);
+    padding: calc(120px * var(--section-spacing-scale, 1)) 24px calc(80px * var(--section-spacing-scale, 1));
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+
+    /* Tone-locked tokens. Each tone overrides these so the hero stays
+       internally coherent (image mood + scrim + text color) regardless of
+       which color scheme is active on the rest of the page. */
+    --bold-hero-overlay-rgb: 0 0 0;
+    --bold-hero-text-color: #ffffff;
+    --bold-hero-subtitle-color: rgb(255 255 255 / 0.86);
+    --bold-hero-stat-label-color: rgb(255 255 255 / 0.7);
+    --bold-hero-headline-shadow: 0 2px 24px rgb(0 0 0 / 0.45);
+    --bold-hero-subtitle-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
+    --bold-hero-badge-bg: rgb(255 255 255 / 0.12);
+    --bold-hero-badge-border: rgb(255 255 255 / 0.22);
+    --bold-hero-stat-divider: rgb(255 255 255 / 0.18);
+  }
+
+  /* Dramatic / dark — moody image, dark scrim, light text. (Default tokens above.) */
+  .bold-hero[data-bold-hero-tone="dramatic-dark"] {
+    --bold-hero-overlay-rgb: 0 0 0;
+  }
+
+  /* Vibrant / mid — saturated image, mid-strength dark scrim, light text. */
+  .bold-hero[data-bold-hero-tone="vibrant-mid"] {
+    --bold-hero-overlay-rgb: 0 0 0;
+    --bold-hero-subtitle-color: rgb(255 255 255 / 0.92);
+    --bold-hero-stat-label-color: rgb(255 255 255 / 0.78);
+    --bold-hero-badge-bg: rgb(255 255 255 / 0.18);
+    --bold-hero-badge-border: rgb(255 255 255 / 0.3);
+  }
+
+  /* Bright / airy — daylight image, light scrim, dark text. */
+  .bold-hero[data-bold-hero-tone="bright-airy"] {
+    --bold-hero-overlay-rgb: 255 255 255;
+    --bold-hero-text-color: #0f172a;
+    --bold-hero-subtitle-color: rgb(15 23 42 / 0.78);
+    --bold-hero-stat-label-color: rgb(15 23 42 / 0.62);
+    /* Faint white halo helps thin dark text over remaining busy areas of
+       the photo without making it look outlined. */
+    --bold-hero-headline-shadow:
+      0 0 1px rgb(255 255 255 / 0.65),
+      0 1px 14px rgb(255 255 255 / 0.55);
+    --bold-hero-subtitle-shadow: 0 1px 10px rgb(255 255 255 / 0.5);
+    --bold-hero-badge-bg: rgb(255 255 255 / 0.55);
+    --bold-hero-badge-border: rgb(15 23 42 / 0.12);
+    --bold-hero-stat-divider: rgb(15 23 42 / 0.14);
+  }
+
+  /* Full-bleed background image */
+  .bold-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .bold-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Dark overlay sits above the image, below the copy.
+     When no image is present, the existing radial-gradient on .section-background
+     is enough — keep the overlay transparent. */
+  .bold-hero__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    /* Scrim is strongest behind the copy and feathers to the edges. The tint
+       color comes from the tone (dark scrim for dramatic/vibrant tones, light
+       wash for bright-airy) so the overlay actually contrasts the text, rather
+       than tracking the scheme background. */
+    background:
+      radial-gradient(
+        ellipse 110% 95% at 50% 48%,
+        rgb(var(--bold-hero-overlay-rgb) / calc(var(--bold-hero-overlay-alpha, 0.7) + 0.18)) 0%,
+        rgb(var(--bold-hero-overlay-rgb) / var(--bold-hero-overlay-alpha, 0.7)) 55%,
+        rgb(var(--bold-hero-overlay-rgb) / calc(var(--bold-hero-overlay-alpha, 0.7) * 0.78)) 100%
+      );
+  }
+
+  .bold-hero__media--empty + .bold-hero__overlay {
+    background: transparent;
+  }
+
+  .bold-hero__inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .bold-hero__copy {
+    max-width: 720px;
+  }
+
+  .bold-hero--align-center .bold-hero__copy {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .bold-hero--align-right .bold-hero__copy {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .bold-hero__badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: var(--style-border-radius-pills, 50px);
+    background: var(--bold-hero-badge-bg);
+    border: 1px solid var(--bold-hero-badge-border);
+    font-family: var(--bold-font-heading);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--bold-accent2);
+    margin-bottom: 24px;
+    backdrop-filter: blur(6px);
+  }
+
+  .bold-hero__headline {
+    font-family: var(--bold-font-heading);
+    font-size: clamp(2.4rem, 6vw, calc(var(--font-h1--size) * 1.8));
+    font-weight: var(--font-h1--weight, 900);
+    line-height: 1.05;
+    text-transform: var(--font-h1--case, uppercase);
+    letter-spacing: var(--font-h1--letter-spacing, -0.5px);
+    color: var(--bold-hero-text-color);
+    margin: 0 0 20px;
+    text-shadow: var(--bold-hero-headline-shadow);
+  }
+
+  .bold-hero__accent--orange {
+    color: var(--bold-accent1);
+  }
+
+  .bold-hero__accent--blue {
+    color: var(--bold-accent2);
+  }
+
+  .bold-hero__subtitle {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--bold-hero-subtitle-color);
+    max-width: 560px;
+    margin: 0 0 36px;
+    text-shadow: var(--bold-hero-subtitle-shadow);
+  }
+
+  .bold-hero--align-center .bold-hero__subtitle {
+    margin-inline: auto;
+  }
+
+  .bold-hero--align-right .bold-hero__subtitle {
+    margin-left: auto;
+  }
+
+  .bold-hero__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .bold-hero--align-center .bold-hero__buttons {
+    justify-content: center;
+  }
+
+  .bold-hero--align-right .bold-hero__buttons {
+    justify-content: flex-end;
+  }
+
+  /* The secondary (ghost) button's default color/border come from the section's
+     color scheme via .bold-btn-secondary, but this hero locks its text color to
+     the image/overlay tone (--bold-hero-text-color), not the scheme - a
+     dark-scheme border on a bright-airy photo (or vice versa) reads as
+     near-invisible. Reuse the hero's own tone tokens so it always contrasts
+     against the actual image + scrim behind it. */
+  .bold-hero__btn.bold-btn-secondary {
+    color: var(--bold-hero-text-color);
+    border-color: var(--bold-hero-badge-border);
+  }
+
+  .bold-hero__btn.bold-btn-secondary:hover {
+    border-color: var(--bold-hero-text-color);
+  }
+
+  .bold-hero__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px 48px;
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--bold-hero-stat-divider);
+  }
+
+  .bold-hero--align-center .bold-hero__stats {
+    justify-content: center;
+  }
+
+  .bold-hero--align-right .bold-hero__stats {
+    justify-content: flex-end;
+  }
+
+  .bold-hero__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bold-hero__stat-number {
+    font-family: var(--bold-font-heading);
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    font-weight: var(--font-h2--weight, 800);
+    color: var(--bold-accent2);
+    line-height: 1;
+    text-shadow: var(--bold-hero-subtitle-shadow);
+  }
+
+  .bold-hero__stat-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--bold-hero-stat-label-color);
+  }
+
+  @media screen and (max-width: 749px) {
+    .bold-hero {
+      min-height: 560px;
+      padding: calc(96px * var(--section-spacing-scale, 1)) 16px calc(64px * var(--section-spacing-scale, 1));
+    }
+
+    .bold-hero__buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .bold-hero--align-center .bold-hero__buttons {
+      align-items: center;
+    }
+
+    .bold-hero--align-right .bold-hero__buttons {
+      align-items: flex-end;
+    }
+
+    .bold-hero__stats {
+      gap: 24px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bold Hero",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero background image"
+    },
+    {
+      "type": "text",
+      "id": "hero_image_url",
+      "label": "Hero image URL (fallback)",
+      "info": "Used when no image is picked. AI-generated images are set here automatically."
+    },
+    {
+      "type": "select",
+      "id": "hero_tone",
+      "label": "Hero tone",
+      "info": "Locks the image mood, overlay color, and text color together. Auto matches the active color scheme's brightness.",
+      "options": [
+        { "value": "auto", "label": "Auto (match color scheme)" },
+        { "value": "dramatic-dark", "label": "Dramatic / dark" },
+        { "value": "bright-airy", "label": "Bright / airy" },
+        { "value": "vibrant-mid", "label": "Vibrant / mid" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay strength",
+      "info": "How strongly the tone's scrim tints the image. Higher = more legible text, less visible photo.",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "select",
+      "id": "content_align",
+      "label": "Content alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "heading_scale_override",
+      "label": "Heading size override",
+      "default": "default",
+      "options": [
+        { "value": "default", "label": "Use theme setting" },
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "xlarge", "label": "Extra large" }
+      ],
+      "info": "Overrides the theme's global Heading size setting for this section only."
+    },
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "New Collection 2026"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Built for the Everyday"
+    },
+    {
+      "type": "text",
+      "id": "accent_word_1",
+      "label": "Accent word 1",
+      "info": "Word in headline to highlight in the primary accent color",
+      "default": "Everyday"
+    },
+    {
+      "type": "text",
+      "id": "accent_word_2",
+      "label": "Accent word 2",
+      "info": "Optional second word to highlight in blue"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Premium products designed for shoppers who expect more. Free shipping on orders over $75."
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "primary_button",
+      "label": "Primary button",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "primary_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button",
+      "label": "Secondary button",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "secondary_link",
+      "label": "Secondary button link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "default": "50K+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Happy Customers"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Hero",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "50K+", "label": "Happy Customers" } },
+        { "type": "stat", "settings": { "number": "4.9★", "label": "Average Rating" } },
+        { "type": "stat", "settings": { "number": "100+", "label": "Countries Shipped" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

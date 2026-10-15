@@ -1,0 +1,134 @@
+
+
+<div class="forge-section-background no-gradient-bg forge-color-{{ section.settings.color_scheme }}"></div>
+<div class="forge-section forge-section--page-width forge-color-{{ section.settings.color_scheme }}">
+  <div
+    class="forge-spacing-style search-page__header"
+    style="
+      --horizontal-alignment: {{ section.settings.alignment }};
+      {% render 'spacing-style', settings: section.settings %}
+    "
+  >
+    {% assign heading_text = 'content.search' | t %}
+
+    {% if search.performed %}
+      {% assign heading_text = 'content.search_results' | t %}
+    {% endif %}
+
+    {% capture heading_text %}
+      <h3>{{ heading_text }}</h3>
+    {% endcapture %}
+
+    {% content_for 'block', id: 'heading', type: '_heading', text: heading_text %}
+    {% content_for 'block', id: 'search', type: '_search-input' %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:forge.names.search",
+  "settings": [
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:forge.settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:forge.options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:forge.options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:forge.options.right"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:forge.settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:forge.settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:forge.settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:forge.names.search",
+      "category": "t:forge.categories.forms",
+      "settings": {
+        "alignment": "flex-start",
+        "color_scheme": "scheme-1",
+        "padding-block-start": 40,
+        "padding-block-end": 0
+      },
+      "blocks": {
+        "heading": {
+          "type": "_heading",
+          "static": true,
+          "settings": {
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "",
+            "text": "",
+            "read_only": true,
+            "alignment": "left",
+            "show_alignment": true,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "search": {
+          "type": "_search-input",
+          "static": true,
+          "settings": {
+            "width": "fill",
+            "custom_width": 50,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "show_submit_button": true,
+            "submit_button_label": "Search",
+            "submit_button_border_radius": 8
+          },
+          "blocks": {}
+        }
+      }
+    }
+  ]
+}
+{% endschema %}

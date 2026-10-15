@@ -1,0 +1,163 @@
+
+
+{%- doc -%}
+  Renders an inline text block.
+
+  @param {string} suffix
+{%- enddoc -%}
+
+{% assign block_settings = block.settings %}
+{% assign plain_text = block_settings.text | strip_newlines | strip_html | strip %}
+
+{%- if plain_text != '' or request.design_mode -%}
+  <span
+    class="
+      forge-text-block
+      forge-custom-typography
+      {% if block_settings.weight != blank %}forge-custom-font-weight{% endif %}
+      {% if block_settings.font_size != blank %}forge-custom-font-size{% endif %}
+    "
+    style="{% render 'typography-style', preset: 'custom', settings: block_settings, type: 'heading' %}"
+    {{ block.shopify_attributes }}
+  >
+    <span>{{ block.settings.text }}</span>{{ suffix }}
+  </span>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:forge.names.text",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:forge.settings.text"
+    },
+    {
+      "type": "header",
+      "content": "t:forge.content.typography"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:forge.settings.font",
+      "options": [
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:forge.options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:forge.options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:forge.options.heading"
+        },
+        {
+          "value": "var(--font-accent--family)",
+          "label": "t:forge.options.accent"
+        }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "select",
+      "id": "weight",
+      "label": "t:forge.settings.weight",
+      "options": [
+        {
+          "value": "",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "100",
+          "label": "t:forge.options.thin"
+        },
+        {
+          "value": "300",
+          "label": "t:forge.options.light"
+        },
+        {
+          "value": "400",
+          "label": "t:forge.options.regular"
+        },
+        {
+          "value": "500",
+          "label": "t:forge.options.medium"
+        },
+        {
+          "value": "600",
+          "label": "t:forge.options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:forge.options.bold"
+        },
+        {
+          "value": "900",
+          "label": "t:forge.options.black"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "t:forge.settings.line_height",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:forge.options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:forge.options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:forge.options.loose"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:forge.settings.letter_spacing",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:forge.options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:forge.options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:forge.options.loose"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "t:forge.settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:forge.options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:forge.options.uppercase"
+        }
+      ],
+      "default": "none"
+    }
+  ]
+}
+{% endschema %}

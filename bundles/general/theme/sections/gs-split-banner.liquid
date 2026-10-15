@@ -1,0 +1,40 @@
+{%- assign img = section.settings.image -%}
+<section class="gs-split gs-split--{{ section.settings.style }} forge-color-{{ section.settings.color_scheme }}">
+  <div class="gs-split__grid{% if section.settings.contained %} gs-wrap{% endif %}">
+    <div class="gs-split__copy" data-gs-reveal>
+      {%- if section.settings.kicker != blank -%}<p class="gs-kicker">{{ section.settings.kicker | escape }}</p>{%- endif -%}
+      <h2 class="gs-split__title">{{ section.settings.heading }}</h2>
+      {%- if section.settings.text != blank -%}<div class="gs-split__text">{{ section.settings.text }}</div>{%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a class="gs-btn gs-btn--auto{% if section.settings.style == 'dark' %} gs-btn--light{% endif %}" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">{{ section.settings.button_label | escape }} {% render 'gs-icon', name: 'arrow', size: 18 %}</a>
+      {%- endif -%}
+    </div>
+    <div class="gs-split__media gs-unveil" data-gs-reveal>
+      {%- if img -%}
+        {{ img | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600,900,1200,1600', sizes: '(min-width: 750px) 55vw, 100vw', alt: '' }}
+      {%- else -%}
+        <div class="gs-banner__slot"><span>Image 1400 × 900 (mobile 900 × 600)</span></div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Split banner",
+  "tag": "div",
+  "class": "gs-shell",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "select", "id": "style", "label": "Style", "default": "dark", "options": [ { "value": "dark", "label": "Dark panel" }, { "value": "light", "label": "Light panel" } ] },
+    { "type": "checkbox", "id": "contained", "label": "Contained width", "default": false },
+    { "type": "text", "id": "kicker", "label": "Small line above heading", "default": "Everyday spaces" },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Made for your everyday." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Practical essentials, thoughtful details and timeless style for a more comfortable life at home and beyond.</p>" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Discover the collection" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "1400 × 900 px" }
+  ],
+  "presets": [{ "name": "Split banner" }]
+}
+{% endschema %}

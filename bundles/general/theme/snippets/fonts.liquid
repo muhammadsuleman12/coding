@@ -1,0 +1,49 @@
+{% # theme-check-disable %}
+{%- liquid
+  assign font_weight_choice = settings.font_weight | default: 'regular'
+  assign body_font = settings.type_body_font
+  assign subheading_font = settings.type_subheading_font
+  assign heading_font = settings.type_heading_font
+  assign accent_font = settings.type_accent_font
+  if font_weight_choice == 'light'
+    assign body_font = body_font | font_modify: 'weight', 400
+    assign subheading_font = subheading_font | font_modify: 'weight', 400
+    assign heading_font = heading_font | font_modify: 'weight', 400
+    assign accent_font = accent_font | font_modify: 'weight', 400
+  elsif font_weight_choice == 'bold'
+    assign body_font = body_font | font_modify: 'weight', 700
+    assign subheading_font = subheading_font | font_modify: 'weight', 700
+    assign heading_font = heading_font | font_modify: 'weight', 700
+    assign accent_font = accent_font | font_modify: 'weight', 700
+  endif
+
+  assign font_urls = ''
+  unless body_font.system?
+    assign body_font_url = body_font | font_url
+    assign font_urls = font_urls | append: body_font_url | append: ','
+  endunless
+  unless subheading_font.system?
+    assign subheading_font_url = subheading_font | font_url
+    assign font_urls = font_urls | append: subheading_font_url | append: ','
+  endunless
+  unless heading_font.system?
+    assign heading_font_url = heading_font | font_url
+    assign font_urls = font_urls | append: heading_font_url | append: ','
+  endunless
+  unless accent_font.system?
+    assign accent_font_url = accent_font | font_url
+    assign font_urls = font_urls | append: accent_font_url | append: ','
+  endunless
+  assign font_url_list = font_urls | split: ',' | uniq
+-%}
+{%- for font_url in font_url_list -%}
+  <link
+    rel="preload"
+    as="font"
+    href="{{ font_url }}"
+    type="font/woff2"
+    crossorigin
+    fetchpriority="low"
+  >
+{%- endfor -%}
+{% # theme-check-enable %}

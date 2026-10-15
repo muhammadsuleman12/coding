@@ -1,30 +1,44 @@
 import type { BundleProduct } from "../bundle";
 import type { StepContext } from "../context.server";
 import { publishToOnlineStore } from "../context.server";
-import { assertNoUserErrors, gql, sleep } from "../graphql.server";
+import {
+  assertNoUserErrors,
+  forEachLimit,
+  gql,
+  sleep,
+} from "../graphql.server";
+
+const CONCURRENCY = 4;
 
 // Creates each product with productSet, keyed by handle. Products whose
-// handle already exists are left untouched.
+// handle already exists are left untouched. Products are created a few at a
+// time; their images are checked once all of them exist, since Shopify
+// processes images in the background.
 export async function importProducts(ctx: StepContext) {
-  for (const product of ctx.bundle.products ?? []) {
-    const existing = await gql(
-      ctx.admin,
-      `#graphql
+  const created: { handle: string; id: string }[] = [];
+
+  await forEachLimit(
+    ctx.bundle.products ?? [],
+    CONCURRENCY,
+    async (product) => {
+      const existing = await gql(
+        ctx.admin,
+        `#graphql
         query importerFindProduct($handle: String!) {
           productByIdentifier(identifier: { handle: $handle }) {
             id
           }
         }`,
-      { handle: product.handle },
-    );
-    if (existing?.productByIdentifier) {
-      ctx.log(`Product ${product.handle} already exists`);
-      continue;
-    }
+        { handle: product.handle },
+      );
+      if (existing?.productByIdentifier) {
+        ctx.log(`Product ${product.handle} already exists`);
+        return;
+      }
 
-    const data = await gql(
-      ctx.admin,
-      `#graphql
+      const data = await gql(
+        ctx.admin,
+        `#graphql
         mutation importerSetProduct($input: ProductSetInput!) {
           productSet(input: $input, synchronous: true) {
             product {
@@ -36,22 +50,27 @@ export async function importProducts(ctx: StepContext) {
             }
           }
         }`,
-      { input: toProductSetInput(ctx, product) },
-    );
-    assertNoUserErrors(
-      `Product ${product.handle}`,
-      data?.productSet?.userErrors,
-    );
-    const id = data?.productSet?.product?.id;
-    if (!id) throw new Error(`Product ${product.handle} was not created`);
+        { input: toProductSetInput(ctx, product) },
+      );
+      assertNoUserErrors(
+        `Product ${product.handle}`,
+        data?.productSet?.userErrors,
+      );
+      const id = data?.productSet?.product?.id;
+      if (!id) throw new Error(`Product ${product.handle} was not created`);
 
-    await waitForMedia(ctx, product.handle, id);
-    await publishToOnlineStore(ctx, id);
-    ctx.log(`Created product ${product.handle}`);
-  }
+      await publishToOnlineStore(ctx, id);
+      created.push({ handle: product.handle, id });
+      ctx.log(`Created product ${product.handle}`);
+    },
+  );
+
+  await forEachLimit(created, CONCURRENCY, ({ handle, id }) =>
+    waitForMedia(ctx, handle, id),
+  );
 }
 
-const MEDIA_TIMEOUT_MS = 120_000;
+const MEDIA_TIMEOUT_MS = 300_000;
 
 // Shopify downloads product images after productSet returns. Wait until they
 // are processed so a broken image URL fails the import instead of leaving a

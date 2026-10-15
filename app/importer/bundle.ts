@@ -71,6 +71,14 @@ export interface BundleVariant {
 }
 
 // Rules mirror the smart-collection conditions in the Shopify admin.
+export type TextRelation =
+  | "EQUALS"
+  | "NOT_EQUALS"
+  | "CONTAINS"
+  | "NOT_CONTAINS"
+  | "STARTS_WITH"
+  | "ENDS_WITH";
+
 export type BundleCollectionRule =
   | {
       column: "TAG";
@@ -78,14 +86,14 @@ export type BundleCollectionRule =
       condition: string;
     }
   | {
-      column: "TITLE" | "TYPE" | "VENDOR";
-      relation:
-        | "EQUALS"
-        | "NOT_EQUALS"
-        | "CONTAINS"
-        | "NOT_CONTAINS"
-        | "STARTS_WITH"
-        | "ENDS_WITH";
+      column: "TITLE" | "TYPE" | "VENDOR" | "VARIANT_TITLE";
+      relation: TextRelation;
+      condition: string;
+    }
+  | {
+      // Amount in the store's currency, e.g. "25"
+      column: "VARIANT_PRICE" | "VARIANT_COMPARE_AT_PRICE";
+      relation: "EQUALS" | "NOT_EQUALS" | "GREATER_THAN" | "LESS_THAN";
       condition: string;
     };
 

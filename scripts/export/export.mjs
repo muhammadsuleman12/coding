@@ -112,7 +112,9 @@ function toBundleProduct(product) {
   };
 }
 
-const RULE_COLUMNS = new Set(["TAG", "TITLE", "TYPE", "VENDOR"]);
+// Smart-collection rules the importer supports (app/importer/bundle.ts).
+const TEXT_COLUMNS = new Set(["TITLE", "TYPE", "VENDOR", "VARIANT_TITLE"]);
+const PRICE_COLUMNS = new Set(["VARIANT_PRICE", "VARIANT_COMPARE_AT_PRICE"]);
 const TEXT_RELATIONS = new Set([
   "EQUALS",
   "NOT_EQUALS",
@@ -121,6 +123,21 @@ const TEXT_RELATIONS = new Set([
   "STARTS_WITH",
   "ENDS_WITH",
 ]);
+const PRICE_RELATIONS = new Set([
+  "EQUALS",
+  "NOT_EQUALS",
+  "GREATER_THAN",
+  "LESS_THAN",
+]);
+
+function isSupportedRule(rule) {
+  if (rule.column === "TAG") {
+    return rule.relation === "EQUALS" || rule.relation === "NOT_EQUALS";
+  }
+  if (TEXT_COLUMNS.has(rule.column)) return TEXT_RELATIONS.has(rule.relation);
+  if (PRICE_COLUMNS.has(rule.column)) return PRICE_RELATIONS.has(rule.relation);
+  return false;
+}
 
 function toBundleCollection(collection) {
   const base = {
@@ -155,11 +172,7 @@ function toBundleCollection(collection) {
 
   const conditions = [];
   for (const rule of collection.ruleSet.rules) {
-    const supported =
-      RULE_COLUMNS.has(rule.column) &&
-      (rule.column === "TAG"
-        ? rule.relation === "EQUALS" || rule.relation === "NOT_EQUALS"
-        : TEXT_RELATIONS.has(rule.relation));
+    const supported = isSupportedRule(rule);
     if (!supported) {
       warn(
         `Collection ${collection.handle}: unsupported rule ${rule.column} ${rule.relation} "${rule.condition}" (needs importer support)`,

@@ -1,4 +1,9 @@
-import type { BundleCollection, BundleCollectionRule } from "../bundle";
+import type {
+  BundleCollection,
+  BundleCollectionRule,
+  TextRelation,
+} from "../bundle";
+import type { CurrencyCode } from "../../types/admin.types";
 import type { StepContext } from "../context.server";
 import { publishToOnlineStore } from "../context.server";
 import { assertNoUserErrors, gql } from "../graphql.server";
@@ -88,7 +93,11 @@ async function toSources(ctx: StepContext, collection: BundleCollection) {
     selections.push({ productId });
   }
 
-  const conditions = (collection.rules?.conditions ?? []).map(toCondition);
+  const rules = collection.rules?.conditions ?? [];
+  const currencyCode = rules.some((r) => r.column.startsWith("VARIANT_"))
+    ? await shopCurrency(ctx)
+    : "USD";
+  const conditions = rules.map((rule) => toCondition(rule, currencyCode));
   if (selections.length === 0 && conditions.length === 0) return undefined;
 
   return [
@@ -108,7 +117,7 @@ async function toSources(ctx: StepContext, collection: BundleCollection) {
 }
 
 // Maps an admin-style smart collection rule to a source condition.
-function toCondition(rule: BundleCollectionRule) {
+function toCondition(rule: BundleCollectionRule, currencyCode: CurrencyCode) {
   const values = [rule.condition];
   const matchType = "ANY" as const;
   switch (rule.column) {
@@ -147,11 +156,45 @@ function toCondition(rule: BundleCollectionRule) {
           matchType,
         },
       };
+    case "VARIANT_TITLE":
+      return {
+        variantTitle: {
+          relation: textRelation(rule.relation),
+          values,
+          matchType,
+        },
+      };
+    case "VARIANT_PRICE":
+      return {
+        variantPrice: {
+          relation: rule.relation,
+          value: { amount: rule.condition, currencyCode },
+        },
+      };
+    case "VARIANT_COMPARE_AT_PRICE":
+      return {
+        variantCompareAtPrice: {
+          relation: rule.relation,
+          value: { amount: rule.condition, currencyCode },
+        },
+      };
   }
 }
 
-function textRelation(
-  relation: Exclude<BundleCollectionRule, { column: "TAG" }>["relation"],
-) {
+function textRelation(relation: TextRelation) {
   return relation === "NOT_CONTAINS" ? ("DOES_NOT_CONTAIN" as const) : relation;
+}
+
+// Price rules compare in the merchant's store currency.
+async function shopCurrency(ctx: StepContext) {
+  const data = await gql(
+    ctx.admin,
+    `#graphql
+      query importerShopCurrency {
+        shop {
+          currencyCode
+        }
+      }`,
+  );
+  return data?.shop.currencyCode ?? "USD";
 }

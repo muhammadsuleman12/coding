@@ -61,6 +61,11 @@ export type ImporterFindCollectionProductQueryVariables = AdminTypes.Exact<{
 
 export type ImporterFindCollectionProductQuery = { productByIdentifier?: AdminTypes.Maybe<Pick<AdminTypes.Product, 'id'>> };
 
+export type ImporterShopCurrencyQueryVariables = AdminTypes.Exact<{ [key: string]: never; }>;
+
+
+export type ImporterShopCurrencyQuery = { shop: Pick<AdminTypes.Shop, 'currencyCode'> };
+
 export type ImporterFindFileQueryVariables = AdminTypes.Exact<{
   query: AdminTypes.Scalars['String']['input'];
 }>;
@@ -212,6 +217,7 @@ interface GeneratedQueryTypes {
   "#graphql\n      query importerFindBlog($query: String!) {\n        blogs(first: 1, query: $query) {\n          nodes {\n            id\n            handle\n            articles(first: 250) {\n              nodes {\n                id\n                handle\n              }\n            }\n          }\n        }\n      }": {return: ImporterFindBlogQuery, variables: ImporterFindBlogQueryVariables},
   "#graphql\n        query importerFindCollection($handle: String!) {\n          collectionByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindCollectionQuery, variables: ImporterFindCollectionQueryVariables},
   "#graphql\n        query importerFindCollectionProduct($handle: String!) {\n          productByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindCollectionProductQuery, variables: ImporterFindCollectionProductQueryVariables},
+  "#graphql\n      query importerShopCurrency {\n        shop {\n          currencyCode\n        }\n      }": {return: ImporterShopCurrencyQuery, variables: ImporterShopCurrencyQueryVariables},
   "#graphql\n        query importerFindFile($query: String!) {\n          files(first: 1, query: $query) {\n            nodes {\n              id\n            }\n          }\n        }": {return: ImporterFindFileQuery, variables: ImporterFindFileQueryVariables},
   "#graphql\n        query importerFileStatus($ids: [ID!]!) {\n          nodes(ids: $ids) {\n            ... on File {\n              fileStatus\n              fileErrors {\n                message\n                details\n              }\n            }\n          }\n        }": {return: ImporterFileStatusQuery, variables: ImporterFileStatusQueryVariables},
   "#graphql\n      query importerMenus {\n        menus(first: 100) {\n          nodes {\n            id\n            handle\n            isDefault\n          }\n        }\n      }": {return: ImporterMenusQuery, variables: ImporterMenusQueryVariables},

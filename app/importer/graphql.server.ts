@@ -56,3 +56,21 @@ function isThrottled(error: unknown): boolean {
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+// Runs fn over items with at most `limit` calls in flight. Stops at the first
+// error.
+export async function forEachLimit<T>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<void>,
+) {
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () =>
+    (async () => {
+      while (next < items.length) {
+        await fn(items[next++]);
+      }
+    })(),
+  );
+  await Promise.all(workers);
+}

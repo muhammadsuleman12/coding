@@ -1,0 +1,145 @@
+{%- liquid
+  assign img = section.settings.image
+  assign img_m = section.settings.image_mobile | default: img
+-%}
+<section class="pl-hero pl-hero--bleed{% if section.settings.fade %} pl-hero--fade{% endif %}{% if img == blank %} pl-hero--noimg{% endif %}" style="--pl-hero-bg: {{ section.settings.bg }};" aria-labelledby="Hero-{{ section.id }}">
+  {%- if img != blank -%}
+    <div class="pl-hero__bg">
+      <picture>
+        <source media="(max-width: 899px)" srcset="{{ img_m | image_url: width: 750 }} 750w, {{ img_m | image_url: width: 1200 }} 1200w" sizes="100vw">
+        {{ img | image_url: width: 2400 | image_tag: class: 'pl-media', loading: 'eager', fetchpriority: 'high', widths: '1200, 1600, 2000, 2400', sizes: '100vw', alt: img.alt, style: section.settings.focal }}
+      </picture>
+    </div>
+  {%- endif -%}
+  <div class="pl-trail" aria-hidden="true">
+    {%- assign pos = '40,14,-18|43,26,12|46,12,-10' | split: '|' -%}
+    {%- for p in pos -%}
+      {%- assign xy = p | split: ',' -%}
+      <span style="position:absolute;left:{{ xy[0] }}%;top:{{ xy[1] }}%;transform:rotate({{ xy[2] }}deg);--i:{{ forloop.index0 }}">{% render 'pl-icon', name: 'paw', size: 28 %}</span>
+    {%- endfor -%}
+  </div>
+  <div class="pl-wrap pl-hero__inner">
+    <div class="pl-hero__copy">
+      {%- if section.settings.badge != blank -%}<span class="pl-pill">{% render 'pl-icon', name: 'paw', size: 16 %}{{ section.settings.badge }}</span>{%- endif -%}
+      <h1 class="pl-h1" id="Hero-{{ section.id }}">{{ section.settings.heading }}</h1>
+      {%- if section.settings.text != blank -%}<p class="pl-lead">{{ section.settings.text }}</p>{%- endif -%}
+      <div class="pl-hero__actions">
+        {%- if section.settings.btn_label != blank and section.settings.btn_link != blank -%}
+          <a class="pl-btn pl-btn--primary" href="{{ section.settings.btn_link }}">{{ section.settings.btn_label }}{% render 'pl-icon', name: 'arrow' %}</a>
+        {%- endif -%}
+        {%- if section.settings.link_label != blank and section.settings.link_url != blank -%}
+          <a class="pl-link" href="{{ section.settings.link_url }}">{{ section.settings.link_label }}{% render 'pl-icon', name: 'arrow' %}</a>
+        {%- endif -%}
+      </div>
+    </div>
+    {%- if section.settings.note != blank -%}
+      <p class="pl-hero__note">{% render 'pl-icon', name: 'heart', size: 22 %}{{ section.settings.note }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Pet hero",
+  "tag": "div",
+  "class": "pl-section-hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop, wide 12:5, 2400 \u00d7 1000)",
+      "info": "Full-width background. Keep pets in the right half; the left side sits behind the text."
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile, 4:3, 1200 \u00d7 900)",
+      "info": "Shown under the text on phones. Uses the desktop image if empty."
+    },
+    {
+      "type": "select",
+      "id": "focal",
+      "label": "Desktop image focus",
+      "default": "object-position:right center",
+      "options": [
+        {
+          "value": "object-position:right center",
+          "label": "Right"
+        },
+        {
+          "value": "object-position:center",
+          "label": "Center"
+        },
+        {
+          "value": "object-position:left center",
+          "label": "Left"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "fade",
+      "label": "Soft fade behind text (desktop)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "Everyday pet essentials"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Made for the best part of their day."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Toys, beds, walking gear and grooming tools for dogs, cats and small pets \u2014 chosen for comfort and built for daily use."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button label",
+      "default": "Shop all essentials"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Text link label",
+      "default": "See best sellers"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Text link"
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "Floating note",
+      "default": "Picked for comfy naps and busy paws"
+    },
+    {
+      "type": "color",
+      "id": "bg",
+      "label": "Background",
+      "default": "#dcebdc"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet hero"
+    }
+  ]
+}
+{% endschema %}

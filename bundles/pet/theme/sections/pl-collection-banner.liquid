@@ -1,0 +1,204 @@
+{%- assign c = collection -%}
+<section class="pl-section pl-cbanner{% if c.image == blank %} pl-cbanner--noimg{% endif %}" style="--pl-pt:{{ section.settings.pt }}px;--pl-pb:{{ section.settings.pb }}px;">
+  <div class="pl-wrap">
+    <nav aria-label="Breadcrumb"><ol class="pl-crumbs"><li><a href="{{ routes.root_url }}">Home</a></li>{% if c.handle != 'all' %}<li><a href="{{ routes.all_products_collection_url }}">Shop</a></li>{% endif %}<li aria-current="page">{{ c.title | default: 'Products' }}</li></ol></nav>
+    <div class="pl-cbanner__card">
+      <div class="pl-cbanner__body">
+        <h1 class="pl-h2" style="font-size:clamp(2rem,4.4vw,3.2rem)">{{ c.title | default: 'Products' }}</h1>
+        {%- if section.settings.show_desc and c.description != blank -%}<div class="pl-text">{{ c.description }}</div>{%- endif -%}
+        {%- if section.settings.show_count -%}<span class="pl-cbanner__count">{{ c.products_count }} {% if c.products_count == 1 %}product{% else %}products{% endif %}</span>{%- endif -%}
+      </div>
+      {%- if c.image != blank -%}
+        <div class="pl-cbanner__media">{{ c.image | image_url: width: 1200 | image_tag: class: 'pl-media', loading: 'eager', widths: '600, 900, 1200', sizes: '(min-width: 750px) 50vw, 100vw', alt: '' }}</div>
+      {%- endif -%}
+    </div>
+    {%- if section.blocks.size > 0 -%}
+      <nav class="pl-chips" aria-label="Categories">
+        {%- for block in section.blocks -%}
+          {%- assign bc = block.settings.collection -%}
+          {%- if bc != blank -%}
+            <a class="pl-chip{% if bc.handle == c.handle %} is-active{% endif %}" href="{{ bc.url }}" {{ block.shopify_attributes }}{% if bc.handle == c.handle %} aria-current="page"{% endif %}>{% render 'pl-icon', name: block.settings.icon %}{{ block.settings.label | default: bc.title }}</a>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Pet collection banner",
+  "tag": "div",
+  "enabled_on": {
+    "templates": [
+      "collection"
+    ]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_desc",
+      "label": "Show description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "Banner image comes from the collection image (16:9)."
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 8
+    }
+  ],
+  "max_blocks": 10,
+  "blocks": [
+    {
+      "type": "chip",
+      "name": "Category chip",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "paw",
+          "options": [
+            {
+              "value": "paw",
+              "label": "Paw"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "box",
+              "label": "Box"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "bone",
+              "label": "Bone"
+            },
+            {
+              "value": "bowl",
+              "label": "Bowl"
+            },
+            {
+              "value": "bed",
+              "label": "Bed"
+            },
+            {
+              "value": "leash",
+              "label": "Leash"
+            },
+            {
+              "value": "brush",
+              "label": "Brush"
+            },
+            {
+              "value": "cat",
+              "label": "Cat"
+            },
+            {
+              "value": "dog",
+              "label": "Dog"
+            },
+            {
+              "value": "bird",
+              "label": "Bird"
+            },
+            {
+              "value": "shirt",
+              "label": "Shirt"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet collection banner"
+    }
+  ]
+}
+{% endschema %}

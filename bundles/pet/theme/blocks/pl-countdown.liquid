@@ -1,0 +1,46 @@
+{%- assign end = block.settings.end_date | strip -%}
+{%- if end != blank -%}
+<div class="pl-countdown" data-pl-countdown="{{ end | replace: ' ', 'T' }}" {{ block.shopify_attributes }} hidden>
+  <p class="pl-countdown__label" style="margin:0">{% render 'pl-icon', name: 'tag', size: 20 %}{{ block.settings.label }}{% if block.settings.sub != blank %}<span>{{ block.settings.sub }}</span>{% endif %}</p>
+  <div class="pl-countdown__units" aria-live="off">
+    <span class="pl-countdown__unit"><b data-u="d">00</b>Days</span>
+    <span class="pl-countdown__unit"><b data-u="h">00</b>Hrs</span>
+    <span class="pl-countdown__unit"><b data-u="m">00</b>Min</span>
+    <span class="pl-countdown__unit"><b data-u="s">00</b>Sec</span>
+  </div>
+</div>
+{%- elsif request.design_mode -%}
+<p {{ block.shopify_attributes }} style="font-size:.85rem;opacity:.7">Offer timer is hidden: set an end date in this block.</p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Offer countdown",
+  
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Limited-time offer"
+    },
+    {
+      "type": "text",
+      "id": "sub",
+      "label": "Detail",
+      "default": "Ends soon"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End date and time",
+      "info": "Format: 2026-12-31 23:59 (store visitors' local time). Leave blank to hide. The timer hides itself when it ends."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Offer countdown"
+    }
+  ]
+}
+{% endschema %}

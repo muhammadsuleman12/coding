@@ -1,0 +1,234 @@
+<div class="pl-trust pl-trust--{{ section.settings.style }} pl-section" style="--pl-pt:{{ section.settings.pt }}px;--pl-pb:{{ section.settings.pb }}px;--pl-trust-bg:{{ section.settings.bg }};">
+  <div class="pl-wrap">
+    {%- if section.settings.heading != blank -%}<h2 class="pl-h2" style="text-align:center;margin-bottom:24px">{{ section.settings.heading }}</h2>{%- endif -%}
+    <ul class="pl-trust__list" style="--cols: {{ section.blocks.size | at_least: 1 }}">
+      {%- for block in section.blocks -%}
+        <li {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}<a class="pl-trust__item" href="{{ block.settings.link }}">{%- else -%}<div class="pl-trust__item">{%- endif -%}
+            <span class="pl-icon-badge">{% render 'pl-icon', name: block.settings.icon %}</span>
+            <div><strong>{{ block.settings.title }}</strong>{%- if block.settings.text != blank -%}<span>{{ block.settings.text }}</span>{%- endif -%}</div>
+          {%- if block.settings.link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Pet trust strip",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "default": "panel",
+      "options": [
+        {
+          "value": "panel",
+          "label": "Panel"
+        },
+        {
+          "value": "plain",
+          "label": "Plain"
+        },
+        {
+          "value": "compact",
+          "label": "Compact on mobile"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "bg",
+      "label": "Background"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "truck",
+          "options": [
+            {
+              "value": "paw",
+              "label": "Paw"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "box",
+              "label": "Box"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "bone",
+              "label": "Bone"
+            },
+            {
+              "value": "bowl",
+              "label": "Bowl"
+            },
+            {
+              "value": "bed",
+              "label": "Bed"
+            },
+            {
+              "value": "leash",
+              "label": "Leash"
+            },
+            {
+              "value": "brush",
+              "label": "Brush"
+            },
+            {
+              "value": "cat",
+              "label": "Cat"
+            },
+            {
+              "value": "dog",
+              "label": "Dog"
+            },
+            {
+              "value": "bird",
+              "label": "Bird"
+            },
+            {
+              "value": "shirt",
+              "label": "Shirt"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Tracked shipping"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet trust strip",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Tracked shipping",
+            "text": "Updates by email at every step"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "box",
+            "title": "30-day returns",
+            "text": "Easy if it isn't the right fit"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "mail",
+            "title": "Help by email",
+            "text": "Real answers from pet people"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

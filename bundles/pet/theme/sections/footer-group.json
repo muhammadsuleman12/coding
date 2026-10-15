@@ -1,0 +1,56 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "t:names.footer",
+  "sections": {
+    "pl_footer": {
+      "type": "pl-footer",
+      "blocks": {
+        "m1": {
+          "type": "menu",
+          "settings": {
+            "title": "Shop",
+            "menu": "footer-shop"
+          }
+        },
+        "m2": {
+          "type": "menu",
+          "settings": {
+            "title": "Help",
+            "menu": "footer-help"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2"
+      ],
+      "settings": {
+        "show_news": true,
+        "news_heading": "Treats for your inbox",
+        "news_text": "New arrivals, care tips and offers for pet people. No spam, unsubscribe anytime.",
+        "news_button": "Sign up",
+        "tagline": "Everyday essentials for dogs, cats and small pets — and the people who love them.",
+        "contact_heading": "We're here to help",
+        "contact_text": "<p>Questions about sizing, orders or returns? Send us a message and a real person will reply.</p>",
+        "show_payment": true,
+        "social_instagram": "",
+        "social_facebook": "",
+        "social_pinterest": "",
+        "social_tiktok": "",
+        "social_youtube": ""
+      }
+    }
+  },
+  "order": [
+    "pl_footer"
+  ]
+}

@@ -1,0 +1,313 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "banner": {
+      "type": "pl-collection-banner",
+      "blocks": {
+        "chip_1": {
+          "type": "chip",
+          "settings": {
+            "collection": "dogs",
+            "icon": "dog",
+            "label": "Dogs"
+          }
+        },
+        "chip_2": {
+          "type": "chip",
+          "settings": {
+            "collection": "cats",
+            "icon": "cat",
+            "label": "Cats"
+          }
+        },
+        "chip_3": {
+          "type": "chip",
+          "settings": {
+            "collection": "small-pets-birds",
+            "icon": "bird",
+            "label": "Small pets & birds"
+          }
+        },
+        "chip_4": {
+          "type": "chip",
+          "settings": {
+            "collection": "toys-play",
+            "icon": "bone",
+            "label": "Toys & play"
+          }
+        },
+        "chip_5": {
+          "type": "chip",
+          "settings": {
+            "collection": "beds-furniture",
+            "icon": "bed",
+            "label": "Beds"
+          }
+        },
+        "chip_6": {
+          "type": "chip",
+          "settings": {
+            "collection": "walk-travel",
+            "icon": "leash",
+            "label": "Walk & travel"
+          }
+        },
+        "chip_7": {
+          "type": "chip",
+          "settings": {
+            "collection": "grooming-hygiene",
+            "icon": "brush",
+            "label": "Grooming"
+          }
+        },
+        "chip_8": {
+          "type": "chip",
+          "settings": {
+            "collection": "feeding-water",
+            "icon": "bowl",
+            "label": "Feeding"
+          }
+        },
+        "chip_9": {
+          "type": "chip",
+          "settings": {
+            "collection": "pet-apparel",
+            "icon": "shirt",
+            "label": "Apparel"
+          }
+        },
+        "chip_10": {
+          "type": "chip",
+          "settings": {
+            "collection": "under-25",
+            "icon": "tag",
+            "label": "Under $25"
+          }
+        }
+      },
+      "block_order": [
+        "chip_1",
+        "chip_2",
+        "chip_3",
+        "chip_4",
+        "chip_5",
+        "chip_6",
+        "chip_7",
+        "chip_8",
+        "chip_9",
+        "chip_10"
+      ],
+      "settings": {
+        "show_desc": true,
+        "show_count": true,
+        "pt": 20,
+        "pb": 8
+      }
+    },
+    "main": {
+      "type": "main-collection",
+      "blocks": {
+        "filters": {
+          "type": "filters",
+          "static": true,
+          "settings": {
+            "enable_filtering": true,
+            "filter_style": "vertical",
+            "filter_width": "centered",
+            "text_label_case": "default",
+            "show_swatch_label": false,
+            "show_filter_label": false,
+            "enable_sorting": true,
+            "enable_grid_density": false,
+            "background_color": "",
+            "text_color": "",
+            "padding-block-start": 8,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "facets_margin_bottom": 8,
+            "facets_margin_right": 20
+          },
+          "blocks": {}
+        },
+        "product-card": {
+          "type": "_product-card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 6,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "card-gallery": {
+              "type": "_product-card-gallery",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_4nY4eT": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 8,
+                "padding-block-end": 0,
+                "padding-inline-start": 14,
+                "padding-inline-end": 14
+              },
+              "blocks": {}
+            },
+            "price_EzJzMm": {
+              "type": "price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h5",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 0,
+                "padding-block-end": 14,
+                "padding-inline-start": 14,
+                "padding-inline-end": 14
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "card-gallery",
+            "product_title_4nY4eT",
+            "price_EzJzMm"
+          ]
+        }
+      },
+      "settings": {
+        "layout_type": "grid",
+        "product_card_size": "medium",
+        "mobile_product_card_size": "small",
+        "enable_infinite_scroll": true,
+        "products_per_page": 24,
+        "product_grid_width": "centered",
+        "full_width_on_mobile": true,
+        "columns_gap_horizontal": 16,
+        "columns_gap_vertical": 16,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 16,
+        "padding-block-end": 32
+      }
+    },
+    "promo": {
+      "type": "pl-image-banner",
+      "settings": {
+        "image": "shopify://shop_images/Curated_pet_essentials_in_soft_hues-16.png",
+        "image_mobile": "shopify://shop_images/Curated_pet_essentials_in_soft_hues-16.png",
+        "heading": "Not sure where to start?",
+        "text": "<p>Our best sellers are the toys, beds and walking gear pet parents reorder most.</p>",
+        "btn_label": "Shop best sellers",
+        "btn_link": "shopify://collections/best-sellers",
+        "style": "navy",
+        "media_side": "right",
+        "full": false,
+        "pt": 32,
+        "pb": 24
+      }
+    },
+    "trust": {
+      "type": "pl-trust-strip",
+      "blocks": {
+        "item_1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Tracked shipping",
+            "text": "Updates by email at every step",
+            "link": "shopify://pages/shipping-returns"
+          }
+        },
+        "item_2": {
+          "type": "item",
+          "settings": {
+            "icon": "box",
+            "title": "30-day returns",
+            "text": "Easy if it isn't the right fit",
+            "link": "shopify://pages/shipping-returns"
+          }
+        },
+        "item_3": {
+          "type": "item",
+          "settings": {
+            "icon": "mail",
+            "title": "Help by email",
+            "text": "Real answers from pet people",
+            "link": "shopify://pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "item_1",
+        "item_2",
+        "item_3"
+      ],
+      "settings": {
+        "heading": "",
+        "style": "panel",
+        "bg": "",
+        "pt": 8,
+        "pb": 48
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "main",
+    "promo",
+    "trust"
+  ]
+}

@@ -1,0 +1,338 @@
+<div class="pl-trustrow" {{ block.shopify_attributes }}>
+  {%- for i in (1..3) -%}
+    {%- assign t = 'text_' | append: i -%}{%- assign ic = 'icon_' | append: i -%}
+    {%- if block.settings[t] != blank -%}<div class="pl-trustrow__item">{% render 'pl-icon', name: block.settings[ic] %}<span>{{ block.settings[t] }}</span></div>{%- endif -%}
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "Pet trust row",
+  
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon_1",
+      "label": "Icon 1",
+      "default": "truck",
+      "options": [
+        {
+          "value": "paw",
+          "label": "Paw"
+        },
+        {
+          "value": "truck",
+          "label": "Truck"
+        },
+        {
+          "value": "box",
+          "label": "Box"
+        },
+        {
+          "value": "mail",
+          "label": "Mail"
+        },
+        {
+          "value": "heart",
+          "label": "Heart"
+        },
+        {
+          "value": "leaf",
+          "label": "Leaf"
+        },
+        {
+          "value": "lock",
+          "label": "Lock"
+        },
+        {
+          "value": "shield",
+          "label": "Shield"
+        },
+        {
+          "value": "bone",
+          "label": "Bone"
+        },
+        {
+          "value": "bowl",
+          "label": "Bowl"
+        },
+        {
+          "value": "bed",
+          "label": "Bed"
+        },
+        {
+          "value": "leash",
+          "label": "Leash"
+        },
+        {
+          "value": "brush",
+          "label": "Brush"
+        },
+        {
+          "value": "cat",
+          "label": "Cat"
+        },
+        {
+          "value": "dog",
+          "label": "Dog"
+        },
+        {
+          "value": "bird",
+          "label": "Bird"
+        },
+        {
+          "value": "shirt",
+          "label": "Shirt"
+        },
+        {
+          "value": "star",
+          "label": "Star"
+        },
+        {
+          "value": "clock",
+          "label": "Clock"
+        },
+        {
+          "value": "tag",
+          "label": "Tag"
+        },
+        {
+          "value": "chat",
+          "label": "Chat"
+        },
+        {
+          "value": "gift",
+          "label": "Gift"
+        },
+        {
+          "value": "sparkle",
+          "label": "Sparkle"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "Text 1",
+      "default": "Tracked shipping"
+    },
+    {
+      "type": "select",
+      "id": "icon_2",
+      "label": "Icon 2",
+      "default": "box",
+      "options": [
+        {
+          "value": "paw",
+          "label": "Paw"
+        },
+        {
+          "value": "truck",
+          "label": "Truck"
+        },
+        {
+          "value": "box",
+          "label": "Box"
+        },
+        {
+          "value": "mail",
+          "label": "Mail"
+        },
+        {
+          "value": "heart",
+          "label": "Heart"
+        },
+        {
+          "value": "leaf",
+          "label": "Leaf"
+        },
+        {
+          "value": "lock",
+          "label": "Lock"
+        },
+        {
+          "value": "shield",
+          "label": "Shield"
+        },
+        {
+          "value": "bone",
+          "label": "Bone"
+        },
+        {
+          "value": "bowl",
+          "label": "Bowl"
+        },
+        {
+          "value": "bed",
+          "label": "Bed"
+        },
+        {
+          "value": "leash",
+          "label": "Leash"
+        },
+        {
+          "value": "brush",
+          "label": "Brush"
+        },
+        {
+          "value": "cat",
+          "label": "Cat"
+        },
+        {
+          "value": "dog",
+          "label": "Dog"
+        },
+        {
+          "value": "bird",
+          "label": "Bird"
+        },
+        {
+          "value": "shirt",
+          "label": "Shirt"
+        },
+        {
+          "value": "star",
+          "label": "Star"
+        },
+        {
+          "value": "clock",
+          "label": "Clock"
+        },
+        {
+          "value": "tag",
+          "label": "Tag"
+        },
+        {
+          "value": "chat",
+          "label": "Chat"
+        },
+        {
+          "value": "gift",
+          "label": "Gift"
+        },
+        {
+          "value": "sparkle",
+          "label": "Sparkle"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "Text 2",
+      "default": "30-day returns"
+    },
+    {
+      "type": "select",
+      "id": "icon_3",
+      "label": "Icon 3",
+      "default": "lock",
+      "options": [
+        {
+          "value": "paw",
+          "label": "Paw"
+        },
+        {
+          "value": "truck",
+          "label": "Truck"
+        },
+        {
+          "value": "box",
+          "label": "Box"
+        },
+        {
+          "value": "mail",
+          "label": "Mail"
+        },
+        {
+          "value": "heart",
+          "label": "Heart"
+        },
+        {
+          "value": "leaf",
+          "label": "Leaf"
+        },
+        {
+          "value": "lock",
+          "label": "Lock"
+        },
+        {
+          "value": "shield",
+          "label": "Shield"
+        },
+        {
+          "value": "bone",
+          "label": "Bone"
+        },
+        {
+          "value": "bowl",
+          "label": "Bowl"
+        },
+        {
+          "value": "bed",
+          "label": "Bed"
+        },
+        {
+          "value": "leash",
+          "label": "Leash"
+        },
+        {
+          "value": "brush",
+          "label": "Brush"
+        },
+        {
+          "value": "cat",
+          "label": "Cat"
+        },
+        {
+          "value": "dog",
+          "label": "Dog"
+        },
+        {
+          "value": "bird",
+          "label": "Bird"
+        },
+        {
+          "value": "shirt",
+          "label": "Shirt"
+        },
+        {
+          "value": "star",
+          "label": "Star"
+        },
+        {
+          "value": "clock",
+          "label": "Clock"
+        },
+        {
+          "value": "tag",
+          "label": "Tag"
+        },
+        {
+          "value": "chat",
+          "label": "Chat"
+        },
+        {
+          "value": "gift",
+          "label": "Gift"
+        },
+        {
+          "value": "sparkle",
+          "label": "Sparkle"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "text_3",
+      "label": "Text 3",
+      "default": "Secure checkout"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet trust row"
+    }
+  ]
+}
+{% endschema %}

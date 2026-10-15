@@ -1,0 +1,68 @@
+{%- assign p = closest.product -%}
+<div class="pl-info" {{ block.shopify_attributes }}>
+  {%- if block.settings.show_desc and p.description != blank -%}
+    <details{% if block.settings.open_first %} open{% endif %}><summary>{{ block.settings.desc_title }}{% render 'pl-icon', name: 'chevron', size: 20 %}</summary><div class="pl-info__body rte">{{ p.description }}</div></details>
+  {%- endif -%}
+  {%- if block.settings.care_text != blank -%}
+    <details><summary>{{ block.settings.care_title }}{% render 'pl-icon', name: 'chevron', size: 20 %}</summary><div class="pl-info__body rte">{{ block.settings.care_text }}</div></details>
+  {%- endif -%}
+  {%- if block.settings.ship_text != blank -%}
+    <details><summary>{{ block.settings.ship_title }}{% render 'pl-icon', name: 'chevron', size: 20 %}</summary><div class="pl-info__body rte">{{ block.settings.ship_text }}</div></details>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Pet product info tabs",
+  
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_desc",
+      "label": "Show product description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first",
+      "label": "Open description by default",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "desc_title",
+      "label": "Description title",
+      "default": "Product details"
+    },
+    {
+      "type": "text",
+      "id": "care_title",
+      "label": "Second tab title",
+      "default": "Care & use"
+    },
+    {
+      "type": "richtext",
+      "id": "care_text",
+      "label": "Second tab text",
+      "default": "<p>Check the product details for materials. Wipe or wash as described, inspect toys and gear regularly and replace anything showing wear. Always supervise play.</p>"
+    },
+    {
+      "type": "text",
+      "id": "ship_title",
+      "label": "Third tab title",
+      "default": "Shipping & returns"
+    },
+    {
+      "type": "richtext",
+      "id": "ship_text",
+      "label": "Third tab text",
+      "default": "<p>Orders are processed within 1\u20133 business days with tracking by email. Not the right fit? Contact us within 30 days of delivery.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet product info tabs"
+    }
+  ]
+}
+{% endschema %}

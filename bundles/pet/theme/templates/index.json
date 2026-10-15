@@ -1,0 +1,525 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "pl-hero",
+      "settings": {
+        "image": "shopify://shop_images/Golden_retriever_and_tabby_in_ivory_bed.png",
+        "image_mobile": "shopify://shop_images/Golden_retriever_and_tabby_in_ivory_bed_1.png",
+        "focal": "object-position:center",
+        "fade": true,
+        "badge": "Everyday pet essentials",
+        "heading": "Made for the best part of their day.",
+        "text": "Toys, beds, walking gear and grooming tools for dogs, cats and small pets — chosen for comfort and built for daily use.",
+        "btn_label": "Shop all essentials",
+        "btn_link": "shopify://collections/all",
+        "link_label": "See best sellers",
+        "link_url": "shopify://collections/best-sellers",
+        "note": "Picked for comfy naps and busy paws",
+        "bg": "#dcebdc"
+      }
+    },
+    "trust": {
+      "type": "pl-trust-strip",
+      "blocks": {
+        "item_1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Tracked shipping",
+            "text": "Updates by email at every step",
+            "link": "shopify://pages/shipping-returns"
+          }
+        },
+        "item_2": {
+          "type": "item",
+          "settings": {
+            "icon": "box",
+            "title": "30-day returns",
+            "text": "Easy if it isn't the right fit",
+            "link": "shopify://pages/shipping-returns"
+          }
+        },
+        "item_3": {
+          "type": "item",
+          "settings": {
+            "icon": "mail",
+            "title": "Help by email",
+            "text": "Real answers from pet people",
+            "link": "shopify://pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "item_1",
+        "item_2",
+        "item_3"
+      ],
+      "settings": {
+        "heading": "",
+        "style": "compact",
+        "bg": "#ffffff",
+        "pt": 0,
+        "pb": 0
+      }
+    },
+    "tiles": {
+      "type": "pl-category-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "toys-play",
+            "icon": "bone",
+            "label": "Toys & play"
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "feeding-water",
+            "icon": "bowl",
+            "label": "Feeding"
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "beds-furniture",
+            "icon": "bed",
+            "label": "Beds & comfort"
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "walk-travel",
+            "icon": "leash",
+            "label": "Walk & travel"
+          }
+        },
+        "tile_5": {
+          "type": "tile",
+          "settings": {
+            "collection": "grooming-hygiene",
+            "icon": "brush",
+            "label": "Grooming"
+          }
+        },
+        "tile_6": {
+          "type": "tile",
+          "settings": {
+            "collection": "pet-apparel",
+            "icon": "shirt",
+            "label": "Apparel"
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4",
+        "tile_5",
+        "tile_6"
+      ],
+      "settings": {
+        "heading": "Shop by what they need",
+        "text": "",
+        "link_label": "All products",
+        "link": "shopify://collections/all",
+        "pt": 56,
+        "pb": 24
+      }
+    },
+    "best": {
+      "type": "pl-picked-products",
+      "blocks": {
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 6,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_PEPpfq": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_WNMpHe": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 8,
+                "padding-block-end": 0,
+                "padding-inline-start": 14,
+                "padding-inline-end": 14
+              },
+              "blocks": {}
+            },
+            "price_yXfkPX": {
+              "type": "price",
+              "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h5",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 0,
+                "padding-block-end": 14,
+                "padding-inline-start": 14,
+                "padding-inline-end": 14
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_PEPpfq",
+            "product_title_WNMpHe",
+            "price_yXfkPX"
+          ]
+        }
+      },
+      "settings": {
+        "heading": "Pet favourites",
+        "text": "Our pick of the comfiest beds, smartest toys and easiest walking gear.",
+        "products": [
+          "pet-calming-bed-60735",
+          "dog-puzzle-feeder",
+          "funny-interactive-elasticity-ball-82978",
+          "mewoofun-sturdy-cat-window-perch-wooden-assembly-hanging-bed-cotton-canvas-easy-washable-multi-ply-plywood-hot-selling-hammock-35212",
+          "adjustable-dog-harness",
+          "pet-outdoor-travel-backpack-breathable-portable-for-dogs-cats-49841",
+          "rechargeable-pet-nail-grinder-dog-nail-clippers-painless-usb-electric-33174",
+          "donut-cat-tunnel"
+        ],
+        "link_label": "Shop best sellers",
+        "link": "shopify://collections/best-sellers",
+        "pt": 48,
+        "pb": 40
+      }
+    },
+    "story": {
+      "type": "pl-image-banner",
+      "settings": {
+        "image": "shopify://shop_images/Cozy_pet_essentials_with_furry_friends-9.png",
+        "image_mobile": "shopify://shop_images/Cozy_pet_essentials_with_furry_friends-9.png",
+        "heading": "Rest well, play hard.",
+        "text": "<p>Soft beds for long naps, sturdy toys for the zoomies and gear that makes walks easier — everything here is picked for real everyday use.</p>",
+        "btn_label": "Shop beds & comfort",
+        "btn_link": "shopify://collections/beds-furniture",
+        "style": "mint",
+        "media_side": "left",
+        "full": false,
+        "pt": 24,
+        "pb": 24
+      }
+    },
+    "duo": {
+      "type": "pl-promo-cards",
+      "blocks": {
+        "card_1": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Sunlit_Garden_Walk_with_a_Golden_Retriever-19.png",
+            "icon": "dog",
+            "heading": "For the tail-waggers",
+            "text": "Chew toys, harnesses, beds and coats for every size of dog.",
+            "btn_label": "Shop dogs",
+            "link": "shopify://collections/dogs",
+            "bg": "#f7dcc6"
+          }
+        },
+        "card_2": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Curious_tabby_cat_playing_with_feather-20.png",
+            "icon": "cat",
+            "heading": "For the curious ones",
+            "text": "Teasers, scratchers and cosy hideaways that cats actually use.",
+            "btn_label": "Shop cats",
+            "link": "shopify://collections/cats",
+            "bg": "#dcebdc"
+          }
+        }
+      },
+      "block_order": [
+        "card_1",
+        "card_2"
+      ],
+      "settings": {
+        "pt": 24,
+        "pb": 24
+      }
+    },
+    "new": {
+      "type": "pl-picked-products",
+      "blocks": {
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 6,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_PEPpfq": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_WNMpHe": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 8,
+                "padding-block-end": 0,
+                "padding-inline-start": 14,
+                "padding-inline-end": 14
+              },
+              "blocks": {}
+            },
+            "price_yXfkPX": {
+              "type": "price",
+              "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h5",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 0,
+                "padding-block-end": 14,
+                "padding-inline-start": 14,
+                "padding-inline-end": 14
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_PEPpfq",
+            "product_title_WNMpHe",
+            "price_yXfkPX"
+          ]
+        }
+      },
+      "settings": {
+        "heading": "Fresh for this season",
+        "text": "Cosy layers, new toys and everyday upgrades for dogs and cats.",
+        "products": [
+          "retractable-cat-feather-toy-set",
+          "windproof-reflective-dog-jacket-74058",
+          "cat-hanging-bed-shelf",
+          "pet-water-dispenser",
+          "reflective-nylon-dog-leashes",
+          "fruit-pet-coat-hoodies-16088",
+          "paw-shape-washable-sleeping-dog-bed",
+          "cat-grooming-brush"
+        ],
+        "link_label": "See new arrivals",
+        "link": "shopify://collections/new-arrivals",
+        "pt": 48,
+        "pb": 40
+      }
+    },
+    "reviews": {
+      "type": "pl-reviews",
+      "blocks": {
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "Ordering was quick and everything arrived well packed. My dog took to his new bed the same evening.",
+            "name": "Jessica H.",
+            "detail": "Dog parent"
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "Good quality for the price and the sizing guide was spot on. Our cat hasn't stopped playing since it arrived.",
+            "name": "Marcus T.",
+            "detail": "Cat parent"
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "rating": 4,
+            "quote": "Tracking updates every step of the way and a friendly reply when I emailed with a question. Will order again.",
+            "name": "Emily L.",
+            "detail": "Dog & cat parent"
+          }
+        }
+      },
+      "block_order": [
+        "review_1",
+        "review_2",
+        "review_3"
+      ],
+      "settings": {
+        "heading": "Loved by pet parents",
+        "label": "Sample reviews",
+        "pt": 48,
+        "pb": 48
+      }
+    },
+    "faq": {
+      "type": "pl-faq",
+      "blocks": {
+        "q_1": {
+          "type": "q",
+          "settings": {
+            "question": "Which pets are these products for?",
+            "answer": "<p>Mostly dogs and cats, plus a growing range for small pets, birds and aquariums. Each product page says which pets it suits.</p>"
+          }
+        },
+        "q_2": {
+          "type": "q",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "<p>Orders are processed within 1–3 business days. Delivery time depends on your location and is shown at checkout, and you get tracking by email.</p>"
+          }
+        },
+        "q_3": {
+          "type": "q",
+          "settings": {
+            "question": "How do returns work?",
+            "answer": "<p>Contact us within 30 days of delivery and we'll guide you through it. Details are on our <a href=\"/pages/shipping-returns\">Shipping &amp; Returns</a> page.</p>"
+          }
+        },
+        "q_4": {
+          "type": "q",
+          "settings": {
+            "question": "How do I pick the right size?",
+            "answer": "<p>Measure your pet and compare with the size chart on the product page. Between sizes? Choose the larger one.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q_1",
+        "q_2",
+        "q_3",
+        "q_4"
+      ],
+      "settings": {
+        "heading": "Good to know",
+        "text": "<p>Quick answers before you order. Still curious? We reply to every message.</p>",
+        "link_label": "Read all FAQs",
+        "link": "shopify://pages/faq",
+        "open_first": false,
+        "pt": 48,
+        "pb": 64
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "trust",
+    "tiles",
+    "best",
+    "story",
+    "duo",
+    "new",
+    "reviews",
+    "faq"
+  ]
+}

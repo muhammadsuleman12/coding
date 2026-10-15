@@ -1,0 +1,216 @@
+{%- if section.settings.show_news -%}
+<div class="pl-news">
+  <div class="pl-news__paws" aria-hidden="true">
+    <span style="right:40px;top:30px;transform:rotate(18deg)">{% render 'pl-icon', name: 'paw' %}</span>
+    <span style="right:110px;top:70px;transform:rotate(-8deg)">{% render 'pl-icon', name: 'paw' %}</span>
+  </div>
+  <div class="pl-wrap pl-news__inner">
+    <div>
+      <h2 class="pl-h2">{{ section.settings.news_heading }}</h2>
+      {%- if section.settings.news_text != blank -%}<p class="pl-text" style="margin-top:8px">{{ section.settings.news_text }}</p>{%- endif -%}
+    </div>
+    {%- form 'customer', id: 'PlNewsletter', class: 'pl-news__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <label class="visually-hidden" for="PlNewsEmail">Email address</label>
+      <input id="PlNewsEmail" type="email" name="contact[email]" autocomplete="email" required placeholder="Email address">
+      <button type="submit" class="pl-btn pl-btn--primary">{{ section.settings.news_button }}</button>
+      {%- if form.posted_successfully? -%}<p class="pl-news__msg" role="status">Thanks for signing up. Watch your inbox for our next email.</p>{%- elsif form.errors -%}<p class="pl-news__msg" role="alert">{{ form.errors.translated_fields.email | default: 'Email' }} {{ form.errors.messages.email | default: 'is invalid' }}</p>{%- endif -%}
+    {%- endform -%}
+  </div>
+</div>
+{%- endif -%}
+<footer class="pl-foot">
+  <div class="pl-wrap">
+    <div class="pl-foot__top" style="--menus: {{ section.blocks.size | at_least: 1 }}">
+      <div class="pl-foot__brand">
+        <a class="pl-foot__logo" href="{{ routes.root_url }}">
+          {%- assign logo = section.settings.logo | default: settings.logo_inverse -%}
+          {%- if logo != blank -%}
+            {{ logo | image_url: width: 400 | image_tag: loading: 'lazy', alt: shop.name, widths: '200, 400', sizes: '200px' }}
+          {%- else -%}
+            {% render 'pl-icon', name: 'paw' %}<span>{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+        {%- if section.settings.tagline != blank -%}<p style="margin:0;line-height:1.5;max-width:32ch">{{ section.settings.tagline }}</p>{%- endif -%}
+        {%- liquid
+          assign socials = 'instagram,facebook,pinterest,tiktok,youtube' | split: ','
+          assign has_social = false
+          for s in socials
+            assign k = 'social_' | append: s
+            if section.settings[k] != blank
+              assign has_social = true
+            endif
+          endfor
+        -%}
+        {%- if has_social -%}
+          <ul class="pl-foot__social" style="flex-direction:row">
+            {%- for s in socials -%}{%- assign k = 'social_' | append: s -%}{%- if section.settings[k] != blank -%}<li><a href="{{ section.settings[k] }}" target="_blank" rel="noopener">{{ s | capitalize }}</a></li>{%- endif -%}{%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+      {%- for block in section.blocks -%}
+        {%- assign menu = linklists[block.settings.menu] -%}
+        <div class="pl-foot__col" {{ block.shopify_attributes }}>
+          <details open>
+            <summary><h2>{{ block.settings.title | default: menu.title }}</h2>{% render 'pl-icon', name: 'chevron', size: 18 %}</summary>
+            <ul>{%- for l in menu.links -%}<li><a href="{{ l.url }}">{{ l.title }}</a></li>{%- endfor -%}</ul>
+          </details>
+        </div>
+      {%- endfor -%}
+      {%- if section.settings.contact_text != blank -%}
+        <div class="pl-foot__col">
+          <details open>
+            <summary><h2>{{ section.settings.contact_heading }}</h2>{% render 'pl-icon', name: 'chevron', size: 18 %}</summary>
+            <div style="padding-bottom:16px;line-height:1.55;font-size:.92rem">{{ section.settings.contact_text }}</div>
+          </details>
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="pl-foot__bottom">
+      <div>
+        <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}</span>
+      </div>
+      {%- if section.settings.show_payment and shop.enabled_payment_types.size > 0 -%}
+        <ul class="pl-foot__pay" aria-label="Payment methods">{%- for t in shop.enabled_payment_types -%}<li>{{ t | payment_type_svg_tag }}</li>{%- endfor -%}</ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+<script>
+  (function(){var m=window.matchMedia('(max-width: 899px)');function s(){document.querySelectorAll('.pl-foot__col details').forEach(function(d){d.open=!m.matches;});}s();m.addEventListener('change',s);})();
+</script>
+
+{% schema %}
+{
+  "name": "Pet footer",
+  "tag": "div",
+  "class": "pl-footer-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_news",
+      "label": "Show newsletter band",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "news_heading",
+      "label": "Heading",
+      "default": "Treats for your inbox"
+    },
+    {
+      "type": "text",
+      "id": "news_text",
+      "label": "Text",
+      "default": "New arrivals, care tips and offers for pet people. No spam, unsubscribe anytime."
+    },
+    {
+      "type": "text",
+      "id": "news_button",
+      "label": "Button",
+      "default": "Sign up"
+    },
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer logo (light version for dark background)"
+    },
+    {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Everyday essentials for dogs, cats and small pets \u2014 and the people who love them."
+    },
+    {
+      "type": "text",
+      "id": "contact_heading",
+      "label": "Extra column heading",
+      "default": "We're here to help"
+    },
+    {
+      "type": "richtext",
+      "id": "contact_text",
+      "label": "Extra column text",
+      "default": "<p>Questions about sizing, orders or returns? Send us a message and a real person will reply.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Social links (leave blank to hide)"
+    },
+    {
+      "type": "url",
+      "id": "social_instagram",
+      "label": "Instagram"
+    },
+    {
+      "type": "url",
+      "id": "social_facebook",
+      "label": "Facebook"
+    },
+    {
+      "type": "url",
+      "id": "social_pinterest",
+      "label": "Pinterest"
+    },
+    {
+      "type": "url",
+      "id": "social_tiktok",
+      "label": "TikTok"
+    },
+    {
+      "type": "url",
+      "id": "social_youtube",
+      "label": "YouTube"
+    }
+  ],
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet footer",
+      "blocks": [
+        {
+          "type": "menu"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": [
+      "footer"
+    ]
+  }
+}
+{% endschema %}

@@ -1,0 +1,167 @@
+{%- liquid
+  assign p = closest.product
+  assign v = p.selected_or_first_available_variant
+-%}
+<div class="pl-pricebox" data-pl-live="price-{{ block.id }}" {{ block.shopify_attributes }}>
+  <div class="pl-pricebox__row">
+    <span class="pl-pricebox__price">{{ v.price | money }}</span>
+    {%- if v.compare_at_price > v.price -%}
+      {%- assign save = v.compare_at_price | minus: v.price -%}
+      {%- assign pct = save | times: 100 | divided_by: v.compare_at_price -%}
+      <s class="pl-pricebox__was">{{ v.compare_at_price | money }}</s>
+      <span class="pl-pricebox__save">Save {{ pct }}%</span>
+    {%- endif -%}
+  </div>
+  <ul class="pl-pricebox__facts">
+    {%- if v.available -%}
+      {%- if v.inventory_management == 'shopify' and v.inventory_quantity > 0 and v.inventory_quantity <= block.settings.low_stock -%}
+        <li class="is-low"><span class="pl-dot"></span>Only {{ v.inventory_quantity }} left in stock</li>
+      {%- else -%}
+        <li class="is-ok"><span class="pl-dot"></span>In stock and ready to ship</li>
+      {%- endif -%}
+      {%- if block.settings.ship_days > 0 -%}
+        <li>{% render 'pl-icon', name: 'truck', size: 20 %}<span>Order today, ships by <b data-pl-shipby="{{ block.settings.ship_days }}">{{ block.settings.ship_days }} business days</b></span></li>
+      {%- endif -%}
+    {%- else -%}
+      <li class="is-out"><span class="pl-dot"></span>Sold out in this option — try another</li>
+    {%- endif -%}
+    {%- if block.settings.extra != blank -%}<li>{% render 'pl-icon', name: block.settings.extra_icon, size: 20 %}<span>{{ block.settings.extra }}</span></li>{%- endif -%}
+  </ul>
+</div>
+
+{% schema %}
+{
+  "name": "Pet price box",
+  "settings": [
+    {
+      "type": "range",
+      "id": "ship_days",
+      "label": "Ships within (business days, 0 hides)",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "low_stock",
+      "label": "Low-stock message at or below",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "select",
+      "id": "extra_icon",
+      "label": "Extra line icon",
+      "default": "heart",
+      "options": [
+        {
+          "value": "paw",
+          "label": "Paw"
+        },
+        {
+          "value": "truck",
+          "label": "Truck"
+        },
+        {
+          "value": "box",
+          "label": "Box"
+        },
+        {
+          "value": "mail",
+          "label": "Mail"
+        },
+        {
+          "value": "heart",
+          "label": "Heart"
+        },
+        {
+          "value": "leaf",
+          "label": "Leaf"
+        },
+        {
+          "value": "lock",
+          "label": "Lock"
+        },
+        {
+          "value": "shield",
+          "label": "Shield"
+        },
+        {
+          "value": "bone",
+          "label": "Bone"
+        },
+        {
+          "value": "bowl",
+          "label": "Bowl"
+        },
+        {
+          "value": "bed",
+          "label": "Bed"
+        },
+        {
+          "value": "leash",
+          "label": "Leash"
+        },
+        {
+          "value": "brush",
+          "label": "Brush"
+        },
+        {
+          "value": "cat",
+          "label": "Cat"
+        },
+        {
+          "value": "dog",
+          "label": "Dog"
+        },
+        {
+          "value": "bird",
+          "label": "Bird"
+        },
+        {
+          "value": "shirt",
+          "label": "Shirt"
+        },
+        {
+          "value": "star",
+          "label": "Star"
+        },
+        {
+          "value": "clock",
+          "label": "Clock"
+        },
+        {
+          "value": "tag",
+          "label": "Tag"
+        },
+        {
+          "value": "chat",
+          "label": "Chat"
+        },
+        {
+          "value": "gift",
+          "label": "Gift"
+        },
+        {
+          "value": "sparkle",
+          "label": "Sparkle"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "extra",
+      "label": "Extra line",
+      "default": "Not the right fit? 30-day returns"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet price box"
+    }
+  ]
+}
+{% endschema %}

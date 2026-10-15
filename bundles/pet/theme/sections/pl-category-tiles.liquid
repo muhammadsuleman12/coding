@@ -1,0 +1,223 @@
+<section class="pl-section" style="--pl-pt:{{ section.settings.pt }}px;--pl-pb:{{ section.settings.pb }}px;">
+  <div class="pl-wrap">
+    <div class="pl-head">
+      <div>
+        <h2 class="pl-h2">{{ section.settings.heading }}</h2>
+        {%- if section.settings.text != blank -%}<p class="pl-text">{{ section.settings.text }}</p>{%- endif -%}
+      </div>
+      {%- if section.settings.link_label != blank and section.settings.link != blank -%}
+        <a class="pl-link" href="{{ section.settings.link }}">{{ section.settings.link_label }}{% render 'pl-icon', name: 'arrow' %}</a>
+      {%- endif -%}
+    </div>
+    <div class="pl-tiles" style="--cols: {{ section.blocks.size | at_least: 1 | at_most: 6 }}">
+      {%- for block in section.blocks -%}
+        {%- assign c = block.settings.collection -%}
+        {%- assign pic = block.settings.image | default: c.featured_image -%}
+        <a class="pl-tile" href="{{ c.url | default: '/collections/all' }}" {{ block.shopify_attributes }}>
+          <div class="pl-tile__img">
+            {%- if pic != blank -%}
+              {{ pic | image_url: width: 600 | image_tag: class: 'pl-media', loading: 'lazy', widths: '300, 450, 600', sizes: '(min-width: 990px) 200px, (min-width: 750px) 30vw, 42vw', alt: '' }}
+            {%- else -%}<div class="pl-placeholder">{% render 'pl-icon', name: block.settings.icon %}</div>{%- endif -%}
+          </div>
+          <span class="pl-tile__label">{% render 'pl-icon', name: block.settings.icon %}{{ block.settings.label | default: c.title | default: 'All products' }}</span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Pet category tiles",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by what they need"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link label",
+      "default": "All products"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "paw",
+          "options": [
+            {
+              "value": "paw",
+              "label": "Paw"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "box",
+              "label": "Box"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "bone",
+              "label": "Bone"
+            },
+            {
+              "value": "bowl",
+              "label": "Bowl"
+            },
+            {
+              "value": "bed",
+              "label": "Bed"
+            },
+            {
+              "value": "leash",
+              "label": "Leash"
+            },
+            {
+              "value": "brush",
+              "label": "Brush"
+            },
+            {
+              "value": "cat",
+              "label": "Cat"
+            },
+            {
+              "value": "dog",
+              "label": "Dog"
+            },
+            {
+              "value": "bird",
+              "label": "Bird"
+            },
+            {
+              "value": "shirt",
+              "label": "Shirt"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label (optional)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (optional, 1:1). Uses collection image if empty"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet category tiles",
+      "blocks": [
+        {
+          "type": "tile"
+        },
+        {
+          "type": "tile"
+        },
+        {
+          "type": "tile"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

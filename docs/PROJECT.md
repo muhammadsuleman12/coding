@@ -44,8 +44,17 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
       policies, menus, redirects; ImportJob table + in-process worker; progress UI.
       Sample bundle (bundles/sample, images in public/bundles/sample) imports
       cleanly on asb-test-1 with product images; importer waits for media READY.
-- [ ] Waiting on boss: staff access to the General/Pet demo stores, the "files on
-      our server", and whether the theme is a paid Theme Store theme.
+- [x] Staff access to General/Pet demo stores granted. Themes are free (General's
+      live theme "eph-improved-general" is a customized Horizon). No pre-made files:
+      we export ourselves.
+- [x] Export script (scripts/export/export.mjs via `shopify store execute`);
+      bundles/general and bundles/pet exported (75 products each).
+- [x] Full General import into fresh dev store asb-test-2-xrwwlbjm: all steps done,
+      products/images/collections/menus show on the storefront (default Horizon look).
+      Importer retries CDN 503s and repairs failed media on job retry.
+- [ ] Theme: pull live themes, push to test store, then themeCreate after exemption.
+- [ ] Files: bundle files (135/80) look like duplicate product images; keep only
+      files referenced by the theme or page/article HTML.
 - Note: Dev Dashboard distribution card still says "Select distribution method".
 - Do NOT request other protected scopes (customer data, orders, subscriptions…).
 
@@ -96,7 +105,7 @@ INP<200ms); no Asset API; Polaris; GDPR webhooks; clean uninstall; Billing API i
 1. Install tools ✓
 2. `shopify app init` (React Router) → `shopify app config link`
 3. Scopes in toml → `shopify app deploy` → `shopify app dev` on a demo store ✓ (dev done; deploy pending)
-4. Export General + Pet bundles ← current (blocked on demo store access)
+4. Export General + Pet bundles ✓
 5. Importer (worker + queue)
 6. UI screens
 7. Deploy to Fly.io (+ Postgres, Redis, R2)

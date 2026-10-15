@@ -13,8 +13,9 @@ const FILE_TIMEOUT_MS = 120_000;
 
 // Uploads the standalone files the theme references by filename. Shopify
 // downloads each file from its source URL in the background; a download that
-// fails (source CDN hiccups happen) is deleted and retried. A file left
-// FAILED by an earlier run is replaced rather than skipped.
+// fails (source CDN hiccups happen) is retried. Uploads replace any file with
+// the same name, so a file left FAILED by an earlier run is overwritten and
+// the filename the theme references stays the same.
 export async function importFiles(ctx: StepContext) {
   await forEachLimit(ctx.bundle.files ?? [], CONCURRENCY, async (file) => {
     const existing = await findFile(ctx, file.filename);
@@ -22,14 +23,12 @@ export async function importFiles(ctx: StepContext) {
       ctx.log(`File ${file.filename} already exists`);
       return;
     }
-    if (existing) await deleteFile(ctx, existing.id);
 
     for (let attempt = 1; ; attempt++) {
       const id = await createFile(ctx, file);
       const error = await waitForFile(ctx, file.filename, id);
       if (!error) break;
 
-      await deleteFile(ctx, id);
       if (attempt >= MAX_ATTEMPTS) {
         throw new Error(`File ${file.filename} failed: ${error}`);
       }
@@ -79,7 +78,7 @@ async function createFile(ctx: StepContext, file: BundleFile) {
           filename: file.filename,
           alt: file.alt,
           contentType: file.contentType,
-          duplicateResolutionMode: "RAISE_ERROR",
+          duplicateResolutionMode: "REPLACE",
         },
       ],
     },
@@ -88,23 +87,6 @@ async function createFile(ctx: StepContext, file: BundleFile) {
   const id = data?.fileCreate?.files?.[0]?.id;
   if (!id) throw new Error(`File ${file.filename} was not created`);
   return id;
-}
-
-async function deleteFile(ctx: StepContext, id: string) {
-  const data = await gql(
-    ctx.admin,
-    `#graphql
-      mutation importerDeleteFile($fileIds: [ID!]!) {
-        fileDelete(fileIds: $fileIds) {
-          userErrors {
-            field
-            message
-          }
-        }
-      }`,
-    { fileIds: [id] },
-  );
-  assertNoUserErrors(`Deleting file ${id}`, data?.fileDelete?.userErrors);
 }
 
 // Waits until Shopify has processed the file. Returns the failure reason, or

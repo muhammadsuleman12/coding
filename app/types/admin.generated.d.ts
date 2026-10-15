@@ -80,13 +80,6 @@ export type ImporterCreateFileMutationVariables = AdminTypes.Exact<{
 
 export type ImporterCreateFileMutation = { fileCreate?: AdminTypes.Maybe<{ files?: AdminTypes.Maybe<Array<Pick<AdminTypes.ExternalVideo, 'id'> | Pick<AdminTypes.GenericFile, 'id'> | Pick<AdminTypes.MediaImage, 'id'> | Pick<AdminTypes.Model3d, 'id'> | Pick<AdminTypes.Video, 'id'>>>, userErrors: Array<Pick<AdminTypes.FilesUserError, 'field' | 'message'>> }> };
 
-export type ImporterDeleteFileMutationVariables = AdminTypes.Exact<{
-  fileIds: Array<AdminTypes.Scalars['ID']['input']> | AdminTypes.Scalars['ID']['input'];
-}>;
-
-
-export type ImporterDeleteFileMutation = { fileDelete?: AdminTypes.Maybe<{ userErrors: Array<Pick<AdminTypes.FilesUserError, 'field' | 'message'>> }> };
-
 export type ImporterFileStatusQueryVariables = AdminTypes.Exact<{
   ids: Array<AdminTypes.Scalars['ID']['input']> | AdminTypes.Scalars['ID']['input'];
 }>;
@@ -244,7 +237,6 @@ interface GeneratedMutationTypes {
   "#graphql\n          mutation importerCreateArticle($article: ArticleCreateInput!) {\n            articleCreate(article: $article) {\n              article {\n                id\n              }\n              userErrors {\n                field\n                message\n              }\n            }\n          }": {return: ImporterCreateArticleMutation, variables: ImporterCreateArticleMutationVariables},
   "#graphql\n        mutation importerCreateCollection($collection: CollectionCreateInput!) {\n          collectionCreate(collection: $collection) {\n            collection {\n              id\n            }\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreateCollectionMutation, variables: ImporterCreateCollectionMutationVariables},
   "#graphql\n      mutation importerCreateFile($files: [FileCreateInput!]!) {\n        fileCreate(files: $files) {\n          files {\n            id\n          }\n          userErrors {\n            field\n            message\n          }\n        }\n      }": {return: ImporterCreateFileMutation, variables: ImporterCreateFileMutationVariables},
-  "#graphql\n      mutation importerDeleteFile($fileIds: [ID!]!) {\n        fileDelete(fileIds: $fileIds) {\n          userErrors {\n            field\n            message\n          }\n        }\n      }": {return: ImporterDeleteFileMutation, variables: ImporterDeleteFileMutationVariables},
   "#graphql\n          mutation importerUpdateMenu($id: ID!, $title: String!, $items: [MenuItemUpdateInput!]!) {\n            menuUpdate(id: $id, title: $title, items: $items) {\n              userErrors {\n                field\n                message\n              }\n            }\n          }": {return: ImporterUpdateMenuMutation, variables: ImporterUpdateMenuMutationVariables},
   "#graphql\n          mutation importerCreateMenu($title: String!, $handle: String!, $items: [MenuItemCreateInput!]!) {\n            menuCreate(title: $title, handle: $handle, items: $items) {\n              userErrors {\n                field\n                message\n              }\n            }\n          }": {return: ImporterCreateMenuMutation, variables: ImporterCreateMenuMutationVariables},
   "#graphql\n        mutation importerCreatePage($page: PageCreateInput!) {\n          pageCreate(page: $page) {\n            page {\n              id\n            }\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreatePageMutation, variables: ImporterCreatePageMutationVariables},

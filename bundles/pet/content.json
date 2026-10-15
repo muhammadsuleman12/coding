@@ -12663,7 +12663,13 @@
       },
       "rules": {
         "disjunctive": false,
-        "conditions": []
+        "conditions": [
+          {
+            "column": "VARIANT_PRICE",
+            "relation": "LESS_THAN",
+            "condition": "25"
+          }
+        ]
       }
     },
     {

@@ -2,6 +2,12 @@ import type { Bundle } from "./bundle";
 import type { Admin } from "./graphql.server";
 import { gql } from "./graphql.server";
 
+// What a step reports back besides success; most steps return nothing.
+export interface StepResult {
+  skipped?: boolean;
+  themeId?: string;
+}
+
 export interface StepContext {
   admin: Admin;
   bundle: Bundle;

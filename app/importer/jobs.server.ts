@@ -30,3 +30,10 @@ export async function retryImportJob(shop: string, id: string) {
     data: { status: "QUEUED", error: null },
   });
 }
+
+export async function markThemePublished(id: string) {
+  await db.importJob.update({
+    where: { id },
+    data: { themePublishedAt: new Date() },
+  });
+}

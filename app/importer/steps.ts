@@ -8,9 +8,10 @@ export type StepKey =
   | "blogs"
   | "policies"
   | "menus"
-  | "redirects";
+  | "redirects"
+  | "theme";
 
-export type StepStatus = "PENDING" | "RUNNING" | "DONE" | "FAILED";
+export type StepStatus = "PENDING" | "RUNNING" | "DONE" | "FAILED" | "SKIPPED";
 
 export interface StepState {
   key: StepKey;
@@ -31,6 +32,8 @@ export const STEP_ORDER: StepKey[] = [
   "policies",
   "menus",
   "redirects",
+  // Last: the theme's sections point at the content imported above.
+  "theme",
 ];
 
 export const STEP_LABELS: Record<StepKey, string> = {
@@ -42,4 +45,5 @@ export const STEP_LABELS: Record<StepKey, string> = {
   policies: "Store policies",
   menus: "Navigation menus",
   redirects: "URL redirects",
+  theme: "Store design",
 };

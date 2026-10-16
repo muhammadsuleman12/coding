@@ -213,6 +213,33 @@ export type ImporterCreateRedirectMutationVariables = AdminTypes.Exact<{
 
 export type ImporterCreateRedirectMutation = { urlRedirectCreate?: AdminTypes.Maybe<{ userErrors: Array<Pick<AdminTypes.UrlRedirectUserError, 'field' | 'message'>> }> };
 
+export type ImporterThemesQueryVariables = AdminTypes.Exact<{ [key: string]: never; }>;
+
+
+export type ImporterThemesQuery = { themes?: AdminTypes.Maybe<{ nodes: Array<Pick<AdminTypes.OnlineStoreTheme, 'id' | 'name'>> }> };
+
+export type ImporterCreateThemeMutationVariables = AdminTypes.Exact<{
+  source: AdminTypes.Scalars['URL']['input'];
+  name: AdminTypes.Scalars['String']['input'];
+}>;
+
+
+export type ImporterCreateThemeMutation = { themeCreate?: AdminTypes.Maybe<{ theme?: AdminTypes.Maybe<Pick<AdminTypes.OnlineStoreTheme, 'id'>>, userErrors: Array<Pick<AdminTypes.ThemeCreateUserError, 'field' | 'message'>> }> };
+
+export type ImporterThemeStatusQueryVariables = AdminTypes.Exact<{
+  id: AdminTypes.Scalars['ID']['input'];
+}>;
+
+
+export type ImporterThemeStatusQuery = { theme?: AdminTypes.Maybe<Pick<AdminTypes.OnlineStoreTheme, 'processing' | 'processingFailed'>> };
+
+export type ImporterPublishThemeMutationVariables = AdminTypes.Exact<{
+  id: AdminTypes.Scalars['ID']['input'];
+}>;
+
+
+export type ImporterPublishThemeMutation = { themePublish?: AdminTypes.Maybe<{ userErrors: Array<Pick<AdminTypes.ThemePublishUserError, 'field' | 'message'>> }> };
+
 interface GeneratedQueryTypes {
   "#graphql\n      query importerPublications {\n        publications(first: 50) {\n          nodes {\n            id\n            name\n          }\n        }\n      }": {return: ImporterPublicationsQuery, variables: ImporterPublicationsQueryVariables},
   "#graphql\n      query importerFindBlog($query: String!) {\n        blogs(first: 1, query: $query) {\n          nodes {\n            id\n            handle\n            articles(first: 250) {\n              nodes {\n                id\n                handle\n              }\n            }\n          }\n        }\n      }": {return: ImporterFindBlogQuery, variables: ImporterFindBlogQueryVariables},
@@ -229,6 +256,8 @@ interface GeneratedQueryTypes {
   "#graphql\n        query importerFindProduct($handle: String!) {\n          productByIdentifier(identifier: { handle: $handle }) {\n            id\n          }\n        }": {return: ImporterFindProductQuery, variables: ImporterFindProductQueryVariables},
   "#graphql\n      query importerProductMedia($id: ID!) {\n        product(id: $id) {\n          media(first: 250) {\n            nodes {\n              alt\n              status\n              mediaErrors {\n                message\n                details\n              }\n            }\n          }\n        }\n      }": {return: ImporterProductMediaQuery, variables: ImporterProductMediaQueryVariables},
   "#graphql\n        query importerFindRedirect($query: String!) {\n          urlRedirects(first: 1, query: $query) {\n            nodes {\n              path\n            }\n          }\n        }": {return: ImporterFindRedirectQuery, variables: ImporterFindRedirectQueryVariables},
+  "#graphql\n      query importerThemes {\n        themes(first: 50, roles: [UNPUBLISHED, MAIN]) {\n          nodes {\n            id\n            name\n          }\n        }\n      }": {return: ImporterThemesQuery, variables: ImporterThemesQueryVariables},
+  "#graphql\n        query importerThemeStatus($id: ID!) {\n          theme(id: $id) {\n            processing\n            processingFailed\n          }\n        }": {return: ImporterThemeStatusQuery, variables: ImporterThemeStatusQueryVariables},
 }
 
 interface GeneratedMutationTypes {
@@ -243,6 +272,8 @@ interface GeneratedMutationTypes {
   "#graphql\n        mutation importerUpdatePolicy($shopPolicy: ShopPolicyInput!) {\n          shopPolicyUpdate(shopPolicy: $shopPolicy) {\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterUpdatePolicyMutation, variables: ImporterUpdatePolicyMutationVariables},
   "#graphql\n      mutation importerSetProduct($handle: String!, $input: ProductSetInput!) {\n        productSet(\n          identifier: { handle: $handle }\n          input: $input\n          synchronous: true\n        ) {\n          product {\n            id\n          }\n          userErrors {\n            field\n            message\n          }\n        }\n      }": {return: ImporterSetProductMutation, variables: ImporterSetProductMutationVariables},
   "#graphql\n        mutation importerCreateRedirect($urlRedirect: UrlRedirectInput!) {\n          urlRedirectCreate(urlRedirect: $urlRedirect) {\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreateRedirectMutation, variables: ImporterCreateRedirectMutationVariables},
+  "#graphql\n        mutation importerCreateTheme($source: URL!, $name: String!) {\n          themeCreate(source: $source, name: $name, role: UNPUBLISHED) {\n            theme {\n              id\n            }\n            userErrors {\n              field\n              message\n            }\n          }\n        }": {return: ImporterCreateThemeMutation, variables: ImporterCreateThemeMutationVariables},
+  "#graphql\n      mutation importerPublishTheme($id: ID!) {\n        themePublish(id: $id) {\n          userErrors {\n            field\n            message\n          }\n        }\n      }": {return: ImporterPublishThemeMutation, variables: ImporterPublishThemeMutationVariables},
 }
 declare module '@shopify/admin-api-client' {
   type InputMaybe<T> = AdminTypes.InputMaybe<T>;

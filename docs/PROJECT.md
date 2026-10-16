@@ -53,7 +53,14 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
       products/images/collections/menus show on the storefront (default Horizon look).
       Importer retries CDN 503s and repairs failed media on job retry.
 - [x] Themes pulled (bundles/*/theme); General tested on asb-test-2, Pet on asb-test-3 via `shopify theme push --unpublished` — both match the templates.
-- [ ] App theme step (themeCreate from zip → publish on merchant confirm) once exemption approved.
+- [x] App theme step built behind THEME_API_ENABLED (themeCreate from public/bundles/<t>/theme.zip,
+      built by scripts/build-theme-zips.mjs; merchant previews, then clicks Publish → themePublish).
+      Off until Shopify approves the exemption; the step then shows "Coming soon".
+- [x] Screens polished: template cards with preview images, ?template=<id> preselect, Sample
+      template hidden unless SHOW_SAMPLE_TEMPLATE=true, progress count, publish/preview/customize.
+- [x] shop/redact also deletes import jobs.
+- [ ] Hosting on Render (boss creating account): web service + PostgreSQL; switch Prisma to postgresql.
+- [ ] App review prep: app icon (AI-made), privacy policy URL, support email. App is free (no billing).
 - [ ] Files: bundle files (135/80) look like duplicate product images; keep only
       files referenced by the theme or page/article HTML.
 - Note: Dev Dashboard distribution card still says "Select distribution method".

@@ -1,7 +1,7 @@
 import db from "../db.server";
 import { unauthenticated } from "../shopify.server";
 import { createContext } from "./context.server";
-import type { StepContext } from "./context.server";
+import type { StepContext, StepResult } from "./context.server";
 import type { StepKey, StepState } from "./steps";
 import { parseSteps } from "./jobs.server";
 import { importBlogs } from "./steps/blogs.server";
@@ -12,18 +12,21 @@ import { importPages } from "./steps/pages.server";
 import { importPolicies } from "./steps/policies.server";
 import { importProducts } from "./steps/products.server";
 import { importRedirects } from "./steps/redirects.server";
+import { importTheme } from "./steps/theme.server";
 import { loadBundle } from "./templates.server";
 
-const STEPS: Record<StepKey, (ctx: StepContext) => Promise<void>> = {
-  files: importFiles,
-  products: importProducts,
-  collections: importCollections,
-  pages: importPages,
-  blogs: importBlogs,
-  policies: importPolicies,
-  menus: importMenus,
-  redirects: importRedirects,
-};
+const STEPS: Record<StepKey, (ctx: StepContext) => Promise<void | StepResult>> =
+  {
+    files: importFiles,
+    products: importProducts,
+    collections: importCollections,
+    pages: importPages,
+    blogs: importBlogs,
+    policies: importPolicies,
+    menus: importMenus,
+    redirects: importRedirects,
+    theme: importTheme,
+  };
 
 // Runs every unfinished step of a claimed job, saving progress after each
 // one. Each step skips content that already exists, so re-running a step
@@ -46,15 +49,21 @@ export async function runImportJob(jobId: string) {
     const ctx = createContext(admin, bundle, log);
 
     for (const step of steps) {
-      if (step.status === "DONE") continue;
+      if (step.status === "DONE" || step.status === "SKIPPED") continue;
       current = step;
       step.status = "RUNNING";
       step.message = undefined;
       await save();
 
-      await STEPS[step.key](ctx);
+      const result = await STEPS[step.key](ctx);
 
-      step.status = "DONE";
+      step.status = result?.skipped ? "SKIPPED" : "DONE";
+      if (result?.themeId) {
+        await db.importJob.update({
+          where: { id: jobId },
+          data: { themeId: result.themeId },
+        });
+      }
       await save();
     }
 

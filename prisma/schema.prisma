@@ -45,6 +45,9 @@ model ImportJob {
   steps       String
   error       String?
   attempts    Int      @default(0)
+  // Theme created by the theme step (unpublished until the merchant publishes)
+  themeId          String?
+  themePublishedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   startedAt   DateTime?

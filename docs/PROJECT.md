@@ -33,7 +33,7 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
 - [x] Joined client's Partner org (Optiapps)
 - [x] App "AI Store Builder" created in Dev Dashboard (versions -1, -2, unconfigured)
 - [x] Distribution: Public (unlisted, install via link)
-- [ ] Theme exemption request (submitting) (Asset API + Theme API; app renamed "Auto Store Builder")
+- [x] Theme exemption request submitted Oct 16, 2026 (Asset API + Theme API: themeCreate, themePublish, themeFilesUpsert). Shopify replies within 14 days. App renamed "Auto Store Builder".
       themePublish, themeFilesUpsert. Waiting on who submits.
 - [x] Step 1: tools installed on dev machine (Windows): Node 24, Git, VS Code, Shopify CLI 4.9
 - [x] Step 2: project scaffolded from React Router template, linked to AI Store Builder
@@ -52,7 +52,8 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
 - [x] Full General import into fresh dev store asb-test-2-xrwwlbjm: all steps done,
       products/images/collections/menus show on the storefront (default Horizon look).
       Importer retries CDN 503s and repairs failed media on job retry.
-- [ ] Theme: pull live themes, push to test store, then themeCreate after exemption.
+- [x] Themes pulled (bundles/*/theme); General tested on asb-test-2, Pet on asb-test-3 via `shopify theme push --unpublished` — both match the templates.
+- [ ] App theme step (themeCreate from zip → publish on merchant confirm) once exemption approved.
 - [ ] Files: bundle files (135/80) look like duplicate product images; keep only
       files referenced by the theme or page/article HTML.
 - Note: Dev Dashboard distribution card still says "Select distribution method".

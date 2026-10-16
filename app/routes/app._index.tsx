@@ -87,7 +87,7 @@ export default function Index() {
     const templateName =
       templates.find((t) => t.id === job.template)?.name ?? job.template;
     return (
-      <s-page heading="App Store Builder">
+      <s-page heading="Auto Store Builder">
         <ImportProgress
           templateName={templateName}
           status={job.status}
@@ -137,7 +137,7 @@ export default function Index() {
   }
 
   return (
-    <s-page heading="App Store Builder">
+    <s-page heading="Auto Store Builder">
       <s-section heading="Choose a store template">
         <s-paragraph>
           We copy the template&apos;s products, collections, pages, blog posts,

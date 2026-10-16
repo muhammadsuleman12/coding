@@ -1,4 +1,4 @@
-# AI Store Builder — Shopify App (project brief)
+# App Store Builder (formerly "AI Store Builder") — Shopify App (project brief)
 
 ## Dev workflow
 Code is written in the cloud session and pushed to branch
@@ -33,7 +33,7 @@ Competitor reference: https://freestorebuild.com — aim for faster, cleaner UI.
 - [x] Joined client's Partner org (Optiapps)
 - [x] App "AI Store Builder" created in Dev Dashboard (versions -1, -2, unconfigured)
 - [x] Distribution: Public (unlisted, install via link)
-- [ ] Theme exemption request (Online Store Protected Scope Exemption): themeCreate,
+- [x] Theme exemption request submitted (Asset API + Theme API; app renamed "App Store Builder")
       themePublish, themeFilesUpsert. Waiting on who submits.
 - [x] Step 1: tools installed on dev machine (Windows): Node 24, Git, VS Code, Shopify CLI 4.9
 - [x] Step 2: project scaffolded from React Router template, linked to AI Store Builder

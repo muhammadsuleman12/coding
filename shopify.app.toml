@@ -3,7 +3,7 @@
 client_id = "58a0e997ee1bd53381b27d22937c6f28"
 application_url = "https://example.com"
 embedded = true
-name = "AI Store Builder"
+name = "App Store Builder"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
